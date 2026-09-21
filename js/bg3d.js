@@ -30,14 +30,16 @@
   halter.add(cilindro(0.85, 0.28, 1.7));    // peso maior dir.
   halter.add(cilindro(0.6, 0.24, 2.15));    // peso menor dir.
   halter.rotation.z = -0.35;                // inclinação de vitrine
-  halter.scale.setScalar(1.15);
+  halter.scale.setScalar(1.35);
   scene.add(halter);
 
-  // 2b) Posição responsiva: o cartão de login ocupa o centro, então o
-  // halter vai para a lateral em telas largas (visível ao lado do cartão)
+  // 2b) Posição responsiva: no desktop o halter fica atrás do vidro do
+  // cartão (visível através do glass + saindo pela lateral); no mobile,
+  // onde o cartão ocupa quase tudo, ele ancora no topo com as partículas
   function layout() {
-    if (innerWidth / innerHeight > 1.1) { halter.position.x = -5.4; halter.position.y = 0; }
-    else { halter.position.x = 0; halter.position.y = 0; } // mobile: partículas assumem
+    if (innerWidth / innerHeight > 1.1) { halter.position.x = -3.1; halter.userData.baseY = 0; }
+    else { halter.position.x = 0; halter.userData.baseY = 3.1; }
+    halter.position.y = halter.userData.baseY;
   }
   layout();
 
@@ -73,7 +75,7 @@
     requestAnimationFrame(animar);
     t += 0.008;
     halter.rotation.y += 0.005;
-    halter.position.y = Math.sin(t) * 0.35;
+    halter.position.y = halter.userData.baseY + Math.sin(t) * 0.3;
     var p = geoPart.attributes.position.array;
     for (var i = 0; i < N; i++) {
       p[i * 3 + 1] += 0.012;
