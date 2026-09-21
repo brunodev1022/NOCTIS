@@ -47,7 +47,7 @@ strong{font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
 
 /* login em split */
 .login-screen{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative;z-index:1}
-.login-grid{display:grid;grid-template-columns:1.1fr .9fr;max-width:1020px;width:100%;border:1px solid rgba(139,92,246,.28);border-radius:28px;overflow:hidden;background:rgba(15,15,24,.55);backdrop-filter:blur(16px);box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 60px rgba(139,92,246,.12)}
+.login-grid{display:grid;grid-template-columns:1.1fr .9fr;max-width:1020px;width:100%;border:1px solid rgba(139,92,246,.28);border-radius:28px;overflow:hidden;background:rgba(15,15,24,.55);backdrop-filter:blur(7px);box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 60px rgba(139,92,246,.12)}
 .login-brand{padding:56px 48px;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(76,29,149,.22),transparent 60%)}
 .login-brand h1{font-size:clamp(34px,4.5vw,54px);line-height:1.02;letter-spacing:-.04em;margin:26px 0 14px;text-wrap:balance}
 .login-brand p{color:var(--muted);line-height:1.65;max-width:44ch}

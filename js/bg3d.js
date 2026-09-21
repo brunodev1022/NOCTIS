@@ -14,7 +14,7 @@
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 
-  var violeta = new THREE.MeshBasicMaterial({ color: 0x8b5cf6, wireframe: true, transparent: true, opacity: 0.85 });
+  var violeta = new THREE.MeshBasicMaterial({ color: 0xa78bfa, wireframe: true, transparent: true, opacity: 1 });
 
   // 2) Halter montado com formas básicas: 1 barra + 4 pesos + 2 presilhas
   var halter = new THREE.Group();
@@ -33,11 +33,19 @@
   halter.scale.setScalar(1.35);
   scene.add(halter);
 
-  // 2b) Posição responsiva: no desktop o halter fica atrás do vidro do
-  // cartão (visível através do glass + saindo pela lateral); no mobile,
-  // onde o cartão ocupa quase tudo, ele ancora no topo com as partículas
+  // 2b) Posição responsiva: o halter ancora no meio da faixa livre à
+  // esquerda do cartão (calculado pela largura real da tela), então sempre
+  // aparece de verdade — parte fora do cartão, parte através do vidro.
+  // No mobile o cartão ocupa quase tudo: ancora no topo.
   function layout() {
-    if (innerWidth / innerHeight > 1.1) { halter.position.x = -3.1; halter.userData.baseY = 0; }
+    var aspect = innerWidth / innerHeight;
+    if (aspect > 1.1) {
+      var halfW = Math.tan(camera.fov * Math.PI / 360) * camera.position.z * aspect;
+      var cardPx = Math.min(1020, innerWidth - 64);
+      var cardHalf = (cardPx / 2) / ((innerWidth / 2) / halfW);
+      halter.position.x = -(cardHalf + halfW) / 2;
+      halter.userData.baseY = 0;
+    }
     else { halter.position.x = 0; halter.userData.baseY = 3.1; }
     halter.position.y = halter.userData.baseY;
   }
