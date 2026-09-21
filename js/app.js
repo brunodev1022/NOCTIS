@@ -249,6 +249,15 @@ function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins()
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();
+// Intro cinematográfica: 1x por sessão (clique pula direto)
+try {
+  if (sessionStorage.getItem('noctis_intro') === '1') $('intro').classList.add('done');
+  else {
+    const pularIntro = () => { $('intro').classList.add('done'); try { sessionStorage.setItem('noctis_intro', '1'); } catch (e) {} };
+    $('intro').addEventListener('click', pularIntro);
+    setTimeout(pularIntro, 2800);
+  }
+} catch (e) { const el = $('intro'); if (el) setTimeout(() => el.classList.add('done'), 2800); }
 // Verificação anti-robôs vale por sessão — pula ela no reload da demo
 try { if (sessionStorage.getItem('noctis_human') === '1') $('verify-screen').classList.add('hidden'); } catch (e) {}
 // Mantém login na mesma aba (sessionStorage) — prático na demo

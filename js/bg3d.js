@@ -1,5 +1,5 @@
 // bg3d.js — fundo 3D das telas de entrada (verificação + login)
-// Three.js via CDN: halter em wireframe violeta + partículas.
+// Three.js via CDN: campo de partículas violeta com parallax de mouse.
 // Se o CDN falhar, o site continua normal (fundo em gradiente do CSS).
 
 (function () {
@@ -14,45 +14,8 @@
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 
-  var violeta = new THREE.MeshBasicMaterial({ color: 0xa78bfa, wireframe: true, transparent: true, opacity: 1 });
-
-  // 2) Halter montado com formas básicas: 1 barra + 4 pesos + 2 presilhas
-  var halter = new THREE.Group();
-  function cilindro(raio, altura, x) {
-    var malha = new THREE.Mesh(new THREE.CylinderGeometry(raio, raio, altura, 20), violeta);
-    malha.rotation.z = Math.PI / 2; // deita o cilindro (vira a barra/peso)
-    malha.position.x = x;
-    return malha;
-  }
-  halter.add(cilindro(0.1, 4.6, 0));        // barra
-  halter.add(cilindro(0.85, 0.28, -1.7));   // peso maior esq.
-  halter.add(cilindro(0.6, 0.24, -2.15));   // peso menor esq.
-  halter.add(cilindro(0.85, 0.28, 1.7));    // peso maior dir.
-  halter.add(cilindro(0.6, 0.24, 2.15));    // peso menor dir.
-  halter.rotation.z = -0.35;                // inclinação de vitrine
-  halter.scale.setScalar(1.35);
-  scene.add(halter);
-
-  // 2b) Posição responsiva: o halter ancora no meio da faixa livre à
-  // esquerda do cartão (calculado pela largura real da tela), então sempre
-  // aparece de verdade — parte fora do cartão, parte através do vidro.
-  // No mobile o cartão ocupa quase tudo: ancora no topo.
-  function layout() {
-    var aspect = innerWidth / innerHeight;
-    if (aspect > 1.1) {
-      var halfW = Math.tan(camera.fov * Math.PI / 360) * camera.position.z * aspect;
-      var cardPx = Math.min(1020, innerWidth - 64);
-      var cardHalf = (cardPx / 2) / ((innerWidth / 2) / halfW);
-      halter.position.x = -(cardHalf + halfW) / 2;
-      halter.userData.baseY = 0;
-    }
-    else { halter.position.x = 0; halter.userData.baseY = 3.1; }
-    halter.position.y = halter.userData.baseY;
-  }
-  layout();
-
-  // 3) Partículas subindo em loop
-  var N = 250, pos = new Float32Array(N * 3);
+  // 2) Partículas subindo em loop
+  var N = 280, pos = new Float32Array(N * 3);
   for (var i = 0; i < N; i++) {
     pos[i * 3] = (Math.random() - 0.5) * 22;
     pos[i * 3 + 1] = (Math.random() - 0.5) * 14;
@@ -73,17 +36,13 @@
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
-    layout();
   });
 
-  // 5) Loop de animação: halter gira e flutua, partículas sobem
-  var rodando = true, t = 0;
+  // 4) Loop de animação: partículas sobem, câmera segue o mouse
+  var rodando = true;
   (function animar() {
     if (!rodando) return;
     requestAnimationFrame(animar);
-    t += 0.008;
-    halter.rotation.y += 0.005;
-    halter.position.y = halter.userData.baseY + Math.sin(t) * 0.3;
     var p = geoPart.attributes.position.array;
     for (var i = 0; i < N; i++) {
       p[i * 3 + 1] += 0.012;
