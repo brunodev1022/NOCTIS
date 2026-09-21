@@ -2,7 +2,7 @@
 
 > MVP conforme o Workspace da equipe no Loop · publicado no GitHub Pages · apresentação pelo Loop + este README.
 
-**Site no ar:** `https://SEU-USUARIO.github.io/SEU-REPOSITORIO/` *(trocar após publicar — enviar no Moodle)*
+**Site no ar:** `https://brunodev1022.github.io/NOCTIS/` *(enviar no Moodle)*
 **MVP:** 23/09 · **Ajustes:** até 30/09
 
 Identidade: roxo + preto. Tipografia Sora + JetBrains Mono. Sem dependência de build.
