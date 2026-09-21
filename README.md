@@ -94,8 +94,8 @@ GitHub → Settings → Pages → Deploy from branch → main → /(root) → Sa
 
 ## 10. Equipe
 
-| Nome | Papel no MVP | Responsável por |
-|---|---|---|
-| Bruno Campos | Desenvolvimento e deploy | Código das 7 telas, verificação anti-robôs, deploy no GitHub Pages, README |
-| Rafael Santos | Requisitos e qualidade | Escopo no Loop, backlog, testes das 3 fases (login, matrícula, check-in) e validação com usuários |
-| Tiago Ribeiro | Produto e apresentação | Fases do projeto, riscos e decisões, roteiro da demo e apresentação em sala |
+| Nome | Responsável por |
+|---|---|
+| Bruno Campos | Login (3 perfis), verificação anti-robôs, Dashboard geral e deploy no GitHub Pages |
+| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes do MVP |
+| Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano alimentar), Dashboard do Aluno e apresentação |
