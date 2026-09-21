@@ -30,7 +30,16 @@
   halter.add(cilindro(0.85, 0.28, 1.7));    // peso maior dir.
   halter.add(cilindro(0.6, 0.24, 2.15));    // peso menor dir.
   halter.rotation.z = -0.35;                // inclinação de vitrine
+  halter.scale.setScalar(1.15);
   scene.add(halter);
+
+  // 2b) Posição responsiva: o cartão de login ocupa o centro, então o
+  // halter vai para a lateral em telas largas (visível ao lado do cartão)
+  function layout() {
+    if (innerWidth / innerHeight > 1.1) { halter.position.x = -5.4; halter.position.y = 0; }
+    else { halter.position.x = 0; halter.position.y = 0; } // mobile: partículas assumem
+  }
+  layout();
 
   // 3) Partículas subindo em loop
   var N = 250, pos = new Float32Array(N * 3);
@@ -54,6 +63,7 @@
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
+    layout();
   });
 
   // 5) Loop de animação: halter gira e flutua, partículas sobem
