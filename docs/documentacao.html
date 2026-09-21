@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>NOCTIS — Documentação do Projeto (MVP)</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
 <style>
   :root{ --violet:#5b21b6; --ink:#1a1a22; --muted:#5c5c6e; --line:#dddde5; }
   *{ box-sizing:border-box; }
@@ -22,6 +24,8 @@
   ul{ margin:8px 0; }
   li{ margin-bottom:4px; }
   .nota{ background:#faf8ff; border-left:4px solid var(--violet); padding:12px 16px; margin:16px 0; font-size:14px; }
+  .mermaid{ background:#fafaff; border:1px solid var(--line); border-radius:8px; padding:16px; margin:16px 0; text-align:center; }
+  .fig{ font-size:13px; color:var(--muted); text-align:center; margin:-8px 0 20px; }
   .toolbar{ position:sticky; top:0; background:#0d0d14; color:#fff; padding:12px 20px; display:flex; gap:12px; align-items:center; font-size:14px; }
   .toolbar button{ background:#8b5cf6; border:none; color:#fff; font-weight:700; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px; }
   @media print{
@@ -85,6 +89,24 @@
   <li><strong>RNF04:</strong> identidade roxo + preto, tipografia Sora + JetBrains Mono.</li>
 </ul>
 
+<h3>2.3 Diagrama de casos de uso</h3>
+<pre class="mermaid">flowchart LR
+  ADM(["Administrador"])
+  FUN(["Funcionário"])
+  ALU(["Aluno"])
+  UC1["Fazer login"]
+  UC2["Gerenciar matrículas"]
+  UC3["Registrar check-in"]
+  UC4["Gerenciar mensalidades"]
+  UC5["Preencher anamnese"]
+  UC6["Gerar cardápio"]
+  UC7["Ver dashboard do aluno"]
+  ADM --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7
+  FUN --> UC1 & UC2 & UC3 & UC4
+  ALU --> UC1 & UC7
+</pre>
+<p class="fig">Figura 2 — Atores e casos de uso por perfil.</p>
+
 <h2 class="sec">3. Arquitetura e tecnologias</h2>
 <p>HTML + CSS + JS puro, Chart.js via CDN, <code>localStorage</code>, GitHub Pages. Arquitetura em 3 camadas:</p>
 <table>
@@ -94,6 +116,14 @@
   <tr><td>Apresentação</td><td><code>index.html</code> + <code>css/style.css</code></td><td>7 telas em SPA por abas, tema NOCTIS</td></tr>
 </table>
 <div class="nota">Não há build nem servidor: qualquer push na branch <code>main</code> entra no ar pelo Pages em 1–2 minutos.</div>
+<h3>3.1 Diagrama de arquitetura</h3>
+<pre class="mermaid">flowchart LR
+  B["Navegador: index.html + style.css"] --> A["app.js: regras de negócio"]
+  A --> S["store.js: camada de dados"]
+  S --> L[("localStorage: noctis_mvp_v1")]
+  A --> C["Chart.js: gráficos do dashboard"]
+</pre>
+<p class="fig">Figura 1 — Arquitetura em 3 camadas do MVP.</p>
 
 <h2 class="sec">4. Modelo de dados (localStorage, chave <code>noctis_mvp_v1</code>)</h2>
 <table>
@@ -105,6 +135,54 @@
   <tr><td>planosAlimentares</td><td>mapa alunoId → {objetivo, data}</td></tr>
 </table>
 <p>Usuários demo (fixos em <code>store.js</code>): <code>admin@noctis / admin123</code>, <code>recepcao@noctis / recepcao123</code>, <code>aluno@noctis / aluno123</code> (vinculado ao registro da Ana Souza).</p>
+<h3>4.1 Diagrama entidade-relacionamento (modelo lógico)</h3>
+<pre class="mermaid">erDiagram
+  ALUNO ||--o{ TREINO : possui
+  ALUNO ||--o{ CHECKIN : registra
+  ALUNO ||--o| ANAMNESE : possui
+  ALUNO ||--o| PLANO-ALIMENTAR : recebe
+  USUARIO ||--o| ALUNO : "vincula (perfil Aluno)"
+  ALUNO {
+    string id PK
+    string nome
+    int idade
+    string fone
+    string plano
+    string status
+    string mensalidade
+    string desde
+  }
+  TREINO {
+    string id PK
+    string alunoId FK
+    string tipo
+    string dia
+    string exercicios
+  }
+  CHECKIN {
+    string data PK
+    string alunoId FK
+    string hora
+  }
+  ANAMNESE {
+    string alunoId PK_FK
+    string objetivo
+    int refeicoes
+    string restricoes
+    string obs
+  }
+  PLANO-ALIMENTAR {
+    string alunoId PK_FK
+    string objetivo
+    string data
+  }
+  USUARIO {
+    string email PK
+    string perfil
+    string alunoId FK
+  }
+</pre>
+<p class="fig">Figura 3 — DER lógico do banco (localStorage) do MVP.</p>
 
 <h2 class="sec">5. Regras de negócio</h2>
 <ul>
@@ -113,6 +191,15 @@
   <li><strong>RN03 — Perfis:</strong> Administrador vê tudo; Funcionário vê matrícula, check-in e financeiro; Aluno vê apenas o próprio Dashboard do Aluno.</li>
   <li><strong>RN04 — Cardápio:</strong> modelo ilustrativo por objetivo (Hipertrofia, Emagrecimento, Manutenção); prescrição real exige nutricionista.</li>
 </ul>
+<h3>5.1 Fluxograma do check-in (RN01)</h3>
+<pre class="mermaid">flowchart TD
+  A["Recepcionista escolhe o aluno"] --> B{"status = Ativo?"}
+  B -- Não --> X["Acesso NEGADO: aluno inativo"]
+  B -- Sim --> C{"mensalidade = Paga?"}
+  C -- Não --> Y["Acesso NEGADO: mensalidade pendente"]
+  C -- Sim --> D["Registra acesso com hora atual"]
+</pre>
+<p class="fig">Figura 4 — Fluxo da regra principal do MVP.</p>
 
 <h2 class="sec">6. Riscos e decisões</h2>
 <table>

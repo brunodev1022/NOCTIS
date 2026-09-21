@@ -45,6 +45,7 @@ function fazerLogin() {
 function entrar() {
   $('login-screen').style.display = 'none';
   $('app').classList.remove('hidden');
+  if (window.NOCTIS_BG) window.NOCTIS_BG.parar(); // desliga o 3D dentro do painel
   $('user-nome').textContent = usuarioLogado.nome;
   $('user-perfil').textContent = usuarioLogado.perfil;
   // Controle de acesso por perfil (regra simples de explicar)
