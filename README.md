@@ -99,3 +99,13 @@ GitHub → Settings → Pages → Deploy from branch → main → /(root) → Sa
 | Bruno Campos | Login (3 perfis), verificação anti-robôs, Dashboard geral e deploy no GitHub Pages |
 | Rafael Santos | Matrícula, Check-in com validação de pagamento e testes do MVP |
 | Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano alimentar), Dashboard do Aluno e apresentação |
+
+## 11. Divisão da apresentação
+
+| Quem | Tempo | O que mostra |
+|---|---|---|
+| Bruno Campos | 1 min | Problema e solução, verificação anti-robôs, login como admin, Dashboard geral |
+| Rafael Santos | 1 min | Nova matrícula, check-in liberado e bloqueado (Beatriz, pendente), regra Ativo + mensalidade Paga |
+| Tiago Ribeiro | 1 min | Financeiro (alternar Paga/Pendente), Anamnese, geração de cardápio, Dashboard do Aluno |
+
+Perguntas: LGPD e pagamento com Tiago, código e dados com Bruno, regra de negócio com Rafael.
