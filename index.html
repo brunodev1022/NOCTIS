@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOCTIS — Sistema de gestão para academias</title>
+<meta name="description" content="NOCTIS · MVP de gestão para academias: matrícula, check-in validado, financeiro e módulo nutricional.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%238b5cf6'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%2308080c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- VERIFICAÇÃO ANTI-ROBÔS (estilo Cloudflare, 100% front-end para o MVP) -->
+<div id="verify-screen" class="verify-screen">
+  <div class="verify-box">
+    <div class="brandmark sm"><span class="mark"></span>NOCTIS</div>
+    <p class="sub">Verificação de segurança antes de entrar.</p>
+    <div id="verify-widget" class="verify-widget" onclick="verificarHumano()">
+      <span id="verify-check" class="verify-check"></span>
+      <span id="verify-label">Sou humano</span>
+      <span id="verify-spinner" class="verify-spinner hidden"></span>
+    </div>
+    <p id="verify-msg" class="verify-msg">Clique na caixa para verificar.</p>
+    <div class="verify-foot">Protegido por verificação anti-robôs · NOCTIS Security</div>
+  </div>
+</div>
+
+<!-- TELA 1 · LOGIN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-grid">
+    <div class="login-brand">
+      <div class="brandmark"><span class="mark"></span>NOCTIS</div>
+      <h1>Gestão da academia,<br>sem caderno.</h1>
+      <p>Matrícula, check-in validado e financeiro em um painel só. MVP pronto para operar e apresentar.</p>
+      <ul class="brand-points">
+        <li><span>01</span>Matrícula completa do aluno</li>
+        <li><span>02</span>Check-in com validação de pagamento</li>
+        <li><span>03</span>Financeiro e dashboard em tempo real</li>
+      </ul>
+      <div class="brand-foot">MVP · v0.2 · HTML + CSS + JS · GitHub Pages</div>
+    </div>
+    <div class="login-form">
+      <h2>Acesso ao painel</h2>
+      <p class="sub">Autenticação de 3 perfis — escolha um usuário demo.</p>
+      <label>E-mail<input id="login-email" value="admin@noctis" autocomplete="username"></label>
+      <label>Senha<input id="login-senha" type="password" value="admin123" autocomplete="current-password"></label>
+      <button class="btn" onclick="fazerLogin()">Entrar no painel</button>
+      <p id="login-erro" class="erro"></p>
+      <div class="demo">
+        <strong>Acessos demo</strong>
+        <div><code>admin@noctis / admin123</code><span>Administrador — acesso total</span></div>
+        <div><code>recepcao@noctis / recepcao123</code><span>Funcionário — matrícula, check-in, financeiro</span></div>
+        <div><code>aluno@noctis / aluno123</code><span>Aluno — dashboard do aluno</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+<aside class="sidebar">
+  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>MVP</small></div>
+  <div class="userbox"><div><strong id="user-nome"></strong><small id="user-perfil"></small></div><span class="status-dot" title="Sessão ativa"></span></div>
+  <nav id="nav" aria-label="Navegação principal">
+    <button class="nav-btn active" data-route="dashboard" data-perfis="Administrador,Funcionário"><span class="num">00</span>Dashboard</button>
+    <button class="nav-btn" data-route="matricula" data-perfis="Administrador,Funcionário"><span class="num">01</span>Matrícula</button>
+    <button class="nav-btn" data-route="checkin" data-perfis="Administrador,Funcionário"><span class="num">02</span>Check-in</button>
+    <button class="nav-btn" data-route="financeiro" data-perfis="Administrador,Funcionário"><span class="num">03</span>Financeiro</button>
+    <button class="nav-btn" data-route="anamnese" data-perfis="Administrador,Funcionário"><span class="num">04</span>Anamnese<em class="tag">Fase 4</em></button>
+    <button class="nav-btn" data-route="plano" data-perfis="Administrador,Funcionário"><span class="num">05</span>Plano alimentar<em class="tag">Fase 4</em></button>
+    <button class="nav-btn" data-route="dashaluno" data-perfis="Administrador,Funcionário,Aluno"><span class="num">06</span>Dashboard do aluno</button>
+  </nav>
+  <div class="sidebar-foot"><button class="logout-btn" onclick="sair()">Sair da conta</button></div>
+</aside>
+
+<main class="content">
+
+  <section id="view-dashboard" class="view active">
+    <div class="page-head">
+      <div><h1>Dashboard</h1><p class="sub">Operação de hoje — <span id="hoje"></span></p></div>
+      <div class="head-meta">NOCTIS / Painel geral</div>
+    </div>
+    <div class="cards kpis">
+      <div class="card"><span class="label">Alunos</span><strong id="kpi-alunos">0</strong><small id="kpi-ativos"></small></div>
+      <div class="card"><span class="label">Check-ins hoje</span><strong id="kpi-checkins">0</strong><small>validados (pagamento + acesso)</small></div>
+      <div class="card"><span class="label">Recebido (mês)</span><strong id="kpi-receita">R$ 0</strong><small>mensalidades pagas</small></div>
+      <div class="card"><span class="label">A receber</span><strong id="kpi-pendente">R$ 0</strong><small>mensalidades pendentes</small></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel"><h2>Alunos por plano</h2><canvas id="chart-planos" height="220"></canvas></div>
+      <div class="panel"><h2>Check-ins · 7 dias</h2><canvas id="chart-checkins" height="220"></canvas></div>
+    </div>
+  </section>
+
+  <section id="view-matricula" class="view">
+    <div class="page-head">
+      <div><h1>Matrícula</h1><p class="sub">Tela 01 — Cadastro completo do aluno</p></div>
+    </div>
+    <div class="toolbar">
+      <input id="busca-aluno" type="search" placeholder="Buscar por nome...">
+      <select id="filtro-plano"><option value="">Todos os planos</option><option>Mensal</option><option>Trimestral</option><option>Anual</option></select>
+      <select id="filtro-status"><option value="">Todos os status</option><option>Ativo</option><option>Inativo</option></select>
+      <button class="btn" onclick="abrirModalAluno()">Nova matrícula</button>
+      <button class="btn ghost" onclick="exportarAlunosCSV()">Exportar CSV</button>
+    </div>
+    <div class="panel nopad"><table>
+      <thead><tr><th>Aluno</th><th>Plano</th><th>Status</th><th>Mensalidade</th><th>Ações</th></tr></thead>
+      <tbody id="tb-alunos"></tbody>
+    </table></div>
+  </section>
+
+  <section id="view-checkin" class="view">
+    <div class="page-head">
+      <div><h1>Check-in</h1><p class="sub">Tela 02 — Validação de pagamento + acesso</p></div>
+    </div>
+    <div class="toolbar">
+      <select id="checkin-aluno"></select>
+      <button class="btn" onclick="fazerCheckin()">Registrar acesso</button>
+    </div>
+    <p id="checkin-msg" class="aviso"></p>
+    <div class="panel"><h2>Hoje (<span id="checkin-hoje-total">0</span>)</h2>
+      <table><thead><tr><th>Aluno</th><th>Hora</th><th>Ação</th></tr></thead><tbody id="tb-checkins"></tbody></table>
+    </div>
+  </section>
+
+  <section id="view-financeiro" class="view">
+    <div class="page-head">
+      <div><h1>Financeiro</h1><p class="sub">Tela 03 — Gestão de mensalidades</p></div>
+    </div>
+    <div class="cards">
+      <div class="card"><span class="label">Recebido</span><strong id="fin-recebido">R$ 0</strong></div>
+      <div class="card"><span class="label">A receber</span><strong id="fin-areceber">R$ 0</strong></div>
+      <div class="card"><span class="label">Inadimplentes</span><strong id="fin-inad">0</strong></div>
+    </div>
+    <div class="panel nopad"><table>
+      <thead><tr><th>Aluno</th><th>Plano</th><th>Valor</th><th>Situação</th><th>Ação</th></tr></thead>
+      <tbody id="tb-financeiro"></tbody>
+    </table></div>
+  </section>
+
+  <section id="view-anamnese" class="view">
+    <div class="page-head">
+      <div><h1>Anamnese <em class="tag">Fase 4</em></h1><p class="sub">Tela 04 — Coleta de dados alimentares</p></div>
+    </div>
+    <div class="toolbar"><select id="anam-aluno"></select></div>
+    <div class="panel">
+      <div class="row">
+        <label>Objetivo<select id="anam-objetivo"><option>Hipertrofia</option><option>Emagrecimento</option><option>Manutenção</option></select></label>
+        <label>Refeições por dia<input id="anam-refeicoes" type="number" value="4" min="2" max="8"></label>
+      </div>
+      <label>Restrições e alergias<input id="anam-restricoes" placeholder="Ex: lactose, glúten..."></label>
+      <label>Observações<textarea id="anam-obs" rows="3" placeholder="Rotina, horários, preferências..."></textarea></label>
+      <button class="btn" onclick="salvarAnamnese()">Salvar anamnese</button>
+    </div>
+  </section>
+
+  <section id="view-plano" class="view">
+    <div class="page-head">
+      <div><h1>Plano alimentar <em class="tag">Fase 4</em></h1><p class="sub">Tela 05 — Geração de cardápio a partir da anamnese</p></div>
+    </div>
+    <div class="toolbar"><select id="plano-aluno"></select><button class="btn" onclick="gerarPlano()">Gerar cardápio</button></div>
+    <div id="plano-result" class="panel"><p class="muted">Escolha o aluno e gere o cardápio.</p></div>
+  </section>
+
+  <section id="view-dashaluno" class="view">
+    <div class="page-head">
+      <div><h1>Dashboard do aluno</h1><p class="sub">Tela 06 — Tela inicial do aluno</p></div>
+    </div>
+    <div class="toolbar"><select id="dash-aluno"></select></div>
+    <div id="dash-aluno-box"></div>
+  </section>
+
+</main>
+</div>
+
+<div id="modal-aluno" class="modal"><div class="box">
+  <h2 id="modal-aluno-titulo">Nova matrícula</h2>
+  <input type="hidden" id="f-aluno-id">
+  <label>Nome completo<input id="f-aluno-nome" placeholder="Ex: Ana Souza"></label>
+  <div class="row">
+    <label>Idade<input id="f-aluno-idade" type="number" placeholder="22"></label>
+    <label>Telefone<input id="f-aluno-fone" placeholder="(11) 99999-9999"></label>
+  </div>
+  <div class="row">
+    <label>Plano<select id="f-aluno-plano"><option>Mensal</option><option>Trimestral</option><option>Anual</option></select></label>
+    <label>Status<select id="f-aluno-status"><option>Ativo</option><option>Inativo</option></select></label>
+  </div>
+  <label>Mensalidade<select id="f-aluno-mens"><option>Paga</option><option>Pendente</option></select></label>
+  <div class="actions"><button class="btn ghost" onclick="fecharModalAluno()">Cancelar</button><button class="btn" onclick="salvarAluno()">Salvar</button></div>
+</div></div>
+
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
