@@ -39,22 +39,26 @@ body::after{
 #bg3d{position:fixed;inset:0;z-index:0;pointer-events:none}
 
 /* intro cinematográfica */
-.intro{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;animation:introOut .8s cubic-bezier(.32,.72,0,1) 2s forwards}
+.intro{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:radial-gradient(700px 380px at 50% 42%,rgba(76,29,149,.35),transparent 70%),var(--bg);cursor:pointer;animation:introOut .9s cubic-bezier(.16,1,.3,1) 2.3s forwards}
 .intro.done{display:none;animation:none}
 .intro-inner{text-align:center}
-.intro-bell{width:min(230px,55vw);height:auto;margin:0 auto 6px;display:block;filter:drop-shadow(0 0 18px rgba(139,92,246,.55))}
-.intro-bell line,.intro-bell rect{stroke-dasharray:100;stroke-dashoffset:100;animation:desenhar 1.1s cubic-bezier(.32,.72,0,1) forwards}
-.intro-bell rect:nth-of-type(1){animation-delay:.15s}.intro-bell rect:nth-of-type(2){animation-delay:.3s}.intro-bell rect:nth-of-type(3){animation-delay:.3s}.intro-bell rect:nth-of-type(4){animation-delay:.15s}
+.intro-bell{width:min(230px,55vw);height:auto;margin:0 auto 10px;display:block;filter:drop-shadow(0 0 18px rgba(139,92,246,.55));animation:flutuar 3.2s ease-in-out .9s infinite}
+.intro-bell line,.intro-bell rect{stroke-dasharray:100;stroke-dashoffset:100;animation:desenhar 1s cubic-bezier(.16,1,.3,1) forwards}
+.intro-bell rect:nth-of-type(1){animation-delay:.12s}.intro-bell rect:nth-of-type(2){animation-delay:.26s}.intro-bell rect:nth-of-type(3){animation-delay:.26s}.intro-bell rect:nth-of-type(4){animation-delay:.12s}
 @keyframes desenhar{to{stroke-dashoffset:0}}
+@keyframes flutuar{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 .intro-logo{display:flex;align-items:center;justify-content:center;gap:16px;font-size:clamp(44px,9vw,92px);font-weight:800;letter-spacing:.16em}
-.intro-logo .mark{width:.42em;height:.42em;border-radius:.12em;background:linear-gradient(135deg,var(--violet),var(--violet-deep));box-shadow:0 0 40px rgba(139,92,246,.7);animation:markIn .7s cubic-bezier(.32,.72,0,1) both}
+.intro-logo .mark{width:.42em;height:.42em;border-radius:.12em;background:linear-gradient(135deg,var(--violet),var(--violet-deep));animation:markIn .8s cubic-bezier(.16,1,.3,1) .35s both,pulso 2.2s ease-in-out 1.2s infinite}
+@keyframes pulso{0%,100%{box-shadow:0 0 22px rgba(139,92,246,.5)}50%{box-shadow:0 0 46px rgba(139,92,246,.85)}}
 .intro-logo .word{display:flex}
-.intro-logo .word i{font-style:normal;opacity:0;filter:blur(10px);transform:translateY(30px);animation:letraIn .7s cubic-bezier(.32,.72,0,1) forwards}
-.intro-logo .word i:nth-child(1){animation-delay:.15s}.intro-logo .word i:nth-child(2){animation-delay:.23s}.intro-logo .word i:nth-child(3){animation-delay:.31s}.intro-logo .word i:nth-child(4){animation-delay:.39s}.intro-logo .word i:nth-child(5){animation-delay:.47s}.intro-logo .word i:nth-child(6){animation-delay:.55s}
-.intro-tag{margin:18px 0 0;color:var(--muted);font-size:clamp(14px,2.5vw,18px);letter-spacing:.04em;opacity:0;transform:translateY(14px);animation:letraIn .7s cubic-bezier(.32,.72,0,1) 1s forwards}
+.intro-logo .word i{font-style:normal;opacity:0;filter:blur(12px);transform:translateY(34px);animation:letraIn .9s cubic-bezier(.16,1,.3,1) forwards}
+.intro-logo .word i:nth-child(1){animation-delay:.5s}.intro-logo .word i:nth-child(2){animation-delay:.57s}.intro-logo .word i:nth-child(3){animation-delay:.64s}.intro-logo .word i:nth-child(4){animation-delay:.71s}.intro-logo .word i:nth-child(5){animation-delay:.78s}.intro-logo .word i:nth-child(6){animation-delay:.85s}
+.intro-tag{margin:20px 0 0;color:var(--muted);font-size:clamp(14px,2.5vw,18px);letter-spacing:.04em;opacity:0;transform:translateY(14px);animation:letraIn .8s cubic-bezier(.16,1,.3,1) 1.25s forwards}
+.intro-line{display:block;height:2px;width:0;margin:22px auto 0;border-radius:2px;background:linear-gradient(90deg,transparent,var(--violet),transparent);animation:linha 1s cubic-bezier(.16,1,.3,1) 1.4s forwards}
+@keyframes linha{to{width:min(280px,60vw)}}
 @keyframes letraIn{to{opacity:1;filter:blur(0);transform:none}}
-@keyframes markIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
-@keyframes introOut{to{opacity:0;visibility:hidden;transform:scale(1.04)}}
+@keyframes markIn{from{opacity:0;transform:scale(.4) rotate(-12deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes introOut{to{opacity:0;visibility:hidden;transform:scale(1.05)}}
 strong{font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
 
 /* marca */

@@ -255,7 +255,7 @@ try {
   else {
     const pularIntro = () => { $('intro').classList.add('done'); try { sessionStorage.setItem('noctis_intro', '1'); } catch (e) {} };
     $('intro').addEventListener('click', pularIntro);
-    setTimeout(pularIntro, 2800);
+    setTimeout(pularIntro, 3300);
   }
 } catch (e) { const el = $('intro'); if (el) setTimeout(() => el.classList.add('done'), 2800); }
 // Verificação anti-robôs vale por sessão — pula ela no reload da demo
