@@ -140,7 +140,7 @@
   ALUNO ||--o{ TREINO : possui
   ALUNO ||--o{ CHECKIN : registra
   ALUNO ||--o| ANAMNESE : possui
-  ALUNO ||--o| PLANO-ALIMENTAR : recebe
+  ALUNO ||--o| PLANO_ALIMENTAR : recebe
   USUARIO ||--o| ALUNO : "vincula (perfil Aluno)"
   ALUNO {
     string id PK
@@ -165,14 +165,14 @@
     string hora
   }
   ANAMNESE {
-    string alunoId PK_FK
+    string alunoId PK, FK
     string objetivo
     int refeicoes
     string restricoes
     string obs
   }
-  PLANO-ALIMENTAR {
-    string alunoId PK_FK
+  PLANO_ALIMENTAR {
+    string alunoId PK, FK
     string objetivo
     string data
   }
