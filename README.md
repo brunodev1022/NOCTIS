@@ -5,7 +5,7 @@
 **Site no ar:** `https://brunodev1022.github.io/NOCTIS/` *(enviar no Moodle)*
 **MVP:** 23/09 · **Revisão do MVP:** 30/09 (só o MVP, não o projeto final)
 
-Identidade: roxo + preto. Tipografia Sora + JetBrains Mono. Sem dependência de build.
+Identidade: roxo + preto. Tipografia Sora + Anton (títulos) + JetBrains Mono (números). Sem dependência de build.
 
 ---
 
@@ -17,7 +17,7 @@ Sistema para academia pequena sair do caderno: matrícula, check-in com validaç
 
 | Nº | Tela | Descrição | Status no MVP |
 |---|---|---|---|
-| 00 | Login | Autenticação de 3 perfis | Feito (Admin, Funcionário, Aluno) |
+| 00 | Login | Intro, verificação anti-robôs no botão Entrar e autenticação de 3 perfis | Feito (Admin, Funcionário, Aluno) |
 | 01 | Matrícula | Cadastro completo do aluno | Feito |
 | 02 | Check-in | Validação de pagamento + acesso | Feito (bloqueia inadimplente/inativo) |
 | 03 | Financeiro | Gestão de mensalidades | Feito |
@@ -55,11 +55,13 @@ Sistema para academia pequena sair do caderno: matrícula, check-in com validaç
 | Falha de integração de pagamento | Alto | Médio | MVP sem gateway: mensalidade Paga/Pendente manual; testar gateway antes da versão real |
 | Dados de saúde e nutrição (LGPD) | Alto | Alto | Cardápio ilustrativo; consultoria jurídica antes do lançamento; sem dados sensíveis reais na demo |
 | Atraso no módulo nutricional | Médio | Médio | MVP lança sem nutrição completa (telas 04–05 marcadas Fase 4) |
+| Perda de dados no navegador | Médio | Alto | Seed de demonstração + exportação CSV; backend real no pós-MVP |
+| Falha no deploy do Pages | Baixo | Alto | Deploy via Actions com build verificável |
 
 ## 6. Tecnologias
 
-HTML + CSS + JS puro · Chart.js via CDN · localStorage · GitHub Pages.
-Arquitetura em 3 partes: `store.js` (dados) → `app.js` (regras) → `index.html + css` (telas). Sem build, sem backend.
+HTML + CSS + JS puro · Chart.js e Three.js via CDN · localStorage · GitHub Pages (deploy via Actions).
+Arquitetura em 3 partes: `store.js` (dados) → `app.js` (regras) → `index.html + css` (telas). Sem build, sem backend. Diagramas da documentação em Mermaid.
 
 ## 7. Estrutura
 
@@ -68,6 +70,10 @@ Arquitetura em 3 partes: `store.js` (dados) → `app.js` (regras) → `index.htm
 ├── css/style.css   # identidade NOCTIS (roxo + preto)
 ├── js/store.js     # dados, 3 perfis, seed inicial
 ├── js/app.js       # login, CRUD, check-in validado, financeiro, nutrição
+├── js/bg3d.js      # partículas 3D das telas de entrada
+├── docs/documentacao.html  # documentação imprimível em PDF
+├── roteiros/       # roteiro de apresentação por integrante
+├── .github/workflows/pages.yml  # deploy no Pages via Actions
 └── README.md       # apresentação
 ```
 
@@ -75,16 +81,7 @@ Arquitetura em 3 partes: `store.js` (dados) → `app.js` (regras) → `index.htm
 
 Local: duplo clique em `index.html` ou `npx serve .`
 
-Pages:
-
-```bash
-git init; git add .; git commit -m "MVP NOCTIS - 7 telas"
-git branch -M main
-git remote add origin https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git
-git push -u origin main
-```
-
-GitHub → Settings → Pages → Deploy from branch → main → /(root) → Save. O link vai no Moodle.
+Pages: push na `main` dispara o workflow de deploy (Actions) sozinho. Config em Settings → Pages → Source: GitHub Actions. O link vai no Moodle.
 
 ## 9. Roteiro de apresentação (3 min)
 
@@ -96,7 +93,7 @@ GitHub → Settings → Pages → Deploy from branch → main → /(root) → Sa
 
 | Nome | Responsável por |
 |---|---|
-| Bruno Campos | Login (3 perfis), verificação anti-robôs, Dashboard geral e deploy no GitHub Pages |
+| Bruno Campos | Login (3 perfis), intro, verificação anti-robôs, Dashboard geral e deploy no GitHub Pages |
 | Rafael Santos | Matrícula, Check-in com validação de pagamento e testes do MVP |
 | Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano alimentar), Dashboard do Aluno e apresentação |
 
