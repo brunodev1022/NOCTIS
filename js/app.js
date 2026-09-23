@@ -22,8 +22,7 @@ function marcarVerificado() {
   $('verify-spinner').classList.add('hidden');
   $('verify-label').textContent = 'Verificado';
 }
-function rodarVerificacao(depois) {
-  if (verificando) return;
+function rodarVerificacao(depois) {  if (verificando) return;
   verificando = true;
   const widget = $('login-verify');
   widget.classList.add('busy');
@@ -35,6 +34,12 @@ function rodarVerificacao(depois) {
     try { sessionStorage.setItem('noctis_human', '1'); } catch (e) {}
     depois();
   }, 1400);
+}
+
+// Clique direto na caixinha também verifica (sem logar ainda)
+function tocarVerify() {
+  if (humanoOK || verificando) return;
+  rodarVerificacao(() => {});
 }
 
 // ---------- TELA 1: LOGIN ----------

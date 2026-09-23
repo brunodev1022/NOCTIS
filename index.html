@@ -52,12 +52,12 @@
       <p class="sub">Autenticação de 3 perfis — escolha um usuário demo.</p>
       <label>E-mail<input id="login-email" value="admin@noctis" autocomplete="username"></label>
       <label>Senha<input id="login-senha" type="password" value="admin123" autocomplete="current-password"></label>
-      <div id="login-verify" class="verify-widget sm">
+      <div id="login-verify" class="verify-widget sm" onclick="tocarVerify()" title="Confirmar que sou humano">
         <span id="verify-check" class="verify-check"></span>
         <span id="verify-label">Sou humano</span>
         <span id="verify-spinner" class="verify-spinner hidden"></span>
       </div>
-      <button class="btn" onclick="fazerLogin()">Entrar no painel</button>
+      <button class="btn btn-block" onclick="fazerLogin()">Entrar no painel</button>
       <p id="login-erro" class="erro"></p>
       <div class="demo">
         <strong>Acessos demo</strong>
