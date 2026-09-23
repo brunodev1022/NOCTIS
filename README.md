@@ -3,7 +3,7 @@
 > MVP conforme o Workspace da equipe no Loop · publicado no GitHub Pages · apresentação pelo Loop + este README.
 
 **Site no ar:** `https://brunodev1022.github.io/NOCTIS/` *(enviar no Moodle)*
-**MVP:** 23/09 · **Ajustes:** até 30/09
+**MVP:** 23/09 · **Revisão do MVP:** 30/09 (só o MVP, não o projeto final)
 
 Identidade: roxo + preto. Tipografia Sora + JetBrains Mono. Sem dependência de build.
 
