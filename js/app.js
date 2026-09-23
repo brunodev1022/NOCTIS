@@ -8,32 +8,39 @@ const $ = (id) => document.getElementById(id);
 const hojeISO = () => new Date().toISOString().slice(0, 10);
 const BRL = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-// ---------- VERIFICAÇÃO ANTI-ROBÔS (gate antes do login, estilo Cloudflare) ----------
-// MVP 100% front-end: checkbox + tempo de verificação simulando análise.
-// Vale 1 sessão (sessionStorage) para não pedir de novo a cada reload da demo.
+// ---------- VERIFICAÇÃO ANTI-ROBÔS (dispara no clique em Entrar) ----------
+// MVP 100% front-end: ao tentar logar, roda a checagem e só então valida.
+// Vale 1 sessão (sessionStorage) para não repetir a cada login da demo.
 let verificando = false;
-function verificarHumano() {
-  const widget = $('verify-widget');
-  if (verificando || widget.classList.contains('ok')) return;
+let humanoOK = false;
+try { humanoOK = sessionStorage.getItem('noctis_human') === '1'; } catch (e) {}
+function marcarVerificado() {
+  humanoOK = true;
+  const widget = $('login-verify');
+  widget.classList.remove('busy');
+  widget.classList.add('ok');
+  $('verify-spinner').classList.add('hidden');
+  $('verify-label').textContent = 'Verificado';
+}
+function rodarVerificacao(depois) {
+  if (verificando) return;
   verificando = true;
+  const widget = $('login-verify');
   widget.classList.add('busy');
   $('verify-spinner').classList.remove('hidden');
   $('verify-label').textContent = 'Verificando...';
-  $('verify-msg').textContent = 'Analisando o navegador. Aguarde.';
   setTimeout(() => {
-    widget.classList.remove('busy');
-    widget.classList.add('ok');
-    $('verify-spinner').classList.add('hidden');
-    $('verify-label').textContent = 'Verificado';
-    $('verify-msg').textContent = 'Verificação concluída. Liberando o acesso.';
-    $('verify-msg').classList.add('ok');
+    verificando = false;
+    marcarVerificado();
     try { sessionStorage.setItem('noctis_human', '1'); } catch (e) {}
-    setTimeout(() => $('verify-screen').classList.add('hidden'), 600);
+    depois();
   }, 1400);
 }
 
 // ---------- TELA 1: LOGIN ----------
 function fazerLogin() {
+  if (verificando) return;
+  if (!humanoOK) { rodarVerificacao(fazerLogin); return; } // verifica antes de validar
   const email = $('login-email').value.trim().toLowerCase();
   const senha = $('login-senha').value;
   const u = USUARIOS.find(x => x.email === email && x.senha === senha);
@@ -258,7 +265,7 @@ try {
     setTimeout(pularIntro, 3300);
   }
 } catch (e) { const el = $('intro'); if (el) setTimeout(() => el.classList.add('done'), 2800); }
-// Verificação anti-robôs vale por sessão — pula ela no reload da demo
-try { if (sessionStorage.getItem('noctis_human') === '1') $('verify-screen').classList.add('hidden'); } catch (e) {}
+// Verificação já feita nesta sessão: mostra o check direto no login
+if (humanoOK) marcarVerificado();
 // Mantém login na mesma aba (sessionStorage) — prático na demo
 try { const s = sessionStorage.getItem('fit_user'); if (s) { usuarioLogado = JSON.parse(s); entrar(); } } catch (e) {}

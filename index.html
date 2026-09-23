@@ -34,21 +34,6 @@
   </div>
 </div>
 
-<!-- VERIFICAÇÃO ANTI-ROBÔS (estilo Cloudflare, 100% front-end para o MVP) -->
-<div id="verify-screen" class="verify-screen">
-  <div class="verify-box">
-    <div class="brandmark sm"><span class="mark"></span>NOCTIS</div>
-    <p class="sub">Verificação de segurança antes de entrar.</p>
-    <div id="verify-widget" class="verify-widget" onclick="verificarHumano()">
-      <span id="verify-check" class="verify-check"></span>
-      <span id="verify-label">Sou humano</span>
-      <span id="verify-spinner" class="verify-spinner hidden"></span>
-    </div>
-    <p id="verify-msg" class="verify-msg">Clique na caixa para verificar.</p>
-    <div class="verify-foot">Protegido por verificação anti-robôs · NOCTIS Security</div>
-  </div>
-</div>
-
 <!-- TELA 1 · LOGIN -->
 <div id="login-screen" class="login-screen">
   <div class="login-grid">
@@ -67,6 +52,11 @@
       <p class="sub">Autenticação de 3 perfis — escolha um usuário demo.</p>
       <label>E-mail<input id="login-email" value="admin@noctis" autocomplete="username"></label>
       <label>Senha<input id="login-senha" type="password" value="admin123" autocomplete="current-password"></label>
+      <div id="login-verify" class="verify-widget sm">
+        <span id="verify-check" class="verify-check"></span>
+        <span id="verify-label">Sou humano</span>
+        <span id="verify-spinner" class="verify-spinner hidden"></span>
+      </div>
       <button class="btn" onclick="fazerLogin()">Entrar no painel</button>
       <p id="login-erro" class="erro"></p>
       <div class="demo">
