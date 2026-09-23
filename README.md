@@ -1,70 +1,38 @@
-# NOCTIS — Sistema de gestão para academias
+# NOCTIS — Sistema de Gestão para Academias
 
-> MVP conforme o Workspace da equipe no Loop · publicado no GitHub Pages · apresentação pelo Loop + este README.
+**No ar:** https://brunodev1022.github.io/NOCTIS/
+**MVP:** 23/09 · **Revisão:** 30/09
 
-**Site no ar:** `https://brunodev1022.github.io/NOCTIS/` *(enviar no Moodle)*
-**MVP:** 23/09 · **Revisão do MVP:** 30/09 (só o MVP, não o projeto final)
+## O problema que resolvemos
 
-Identidade: roxo + preto. Tipografia Sora + Anton (títulos) + JetBrains Mono (números). Sem dependência de build.
+A ideia do NOCTIS nasceu de um problema simples: academias pequenas ainda gerenciam tudo no caderno,
+ matrícula, pagamento, controle de acesso. A gente decidiu resolver isso com um sistema que roda direto no navegador, sem precisar de servidor, então dá pra publicar de graça no GitHub Pages.
 
----
+Identidade visual em roxo e preto, com Sora e Anton nos títulos e JetBrains Mono nos números, pra dar aquela cara mais tech, de academia moderna.
 
-## 1. Visão geral
+## O que já está pronto
 
-Sistema para academia pequena sair do caderno: matrícula, check-in com validação de pagamento e financeiro no MVP; nutrição entra na Fase 4. Roda 100% no navegador (sem backend) para funcionar no GitHub Pages.
+Nessa entrega (MVP) a gente fechou três frentes: login com três perfis diferentes (admin, funcionário e aluno), matrícula completa do aluno, e o check-in com validação automática de pagamento — só libera o acesso se o aluno estiver ativo e com a mensalidade em dia. O financeiro também já funciona, controlando quem pagou e quem está pendente.
 
-## 2. Escopo com requisitos (do Loop)
+A parte de nutrição (anamnese e plano alimentar) já tem a estrutura pronta na tela, mas o conteúdo é só ilustrativo por enquanto — isso fica pra fase 4.
 
-| Nº | Tela | Descrição | Status no MVP |
-|---|---|---|---|
-| 00 | Login | Intro, verificação anti-robôs no botão Entrar e autenticação de 3 perfis | Feito (Admin, Funcionário, Aluno) |
-| 01 | Matrícula | Cadastro completo do aluno | Feito |
-| 02 | Check-in | Validação de pagamento + acesso | Feito (bloqueia inadimplente/inativo) |
-| 03 | Financeiro | Gestão de mensalidades | Feito |
-| 04 | Anamnese | Coleta de dados alimentares | Estrutura pronta (Fase 4) |
-| 05 | Plano alimentar | Geração de cardápio | Modelo ilustrativo (Fase 4) |
-| 06 | Dashboard do aluno | Tela inicial do aluno | Feito (versão MVP) |
+Pra demonstrar a regra de bloqueio no check-in, é só tentar o check-in da Beatriz: ela entra como pendente no seed, então o sistema barra o acesso dela.
 
-**Regra principal do MVP (check-in):** acesso só libera se `status = Ativo` E `mensalidade = Paga`. Para demonstrar o bloqueio, tente o check-in da Beatriz (vem como Pendente no seed).
+Acessos pra testar: `admin@noctis / admin123`, `recepcao@noctis / recepcao123`, `aluno@noctis / aluno123`.
 
-**Acessos demo:** `admin@noctis / admin123` · `recepcao@noctis / recepcao123` · `aluno@noctis / aluno123`
+## Como o projeto foi dividido
 
-## 3. Fases do projeto (do Loop)
+O trabalho passou por seis fases: descoberta dos requisitos e wireframes (feito no Loop), design das telas, desenvolvimento do MVP — que é essa entrega, com matrícula e check-in —, depois o desenvolvimento da parte de nutrição, testes com usuários reais, e por fim o lançamento, com deploy no Pages e treinamento da equipe.
 
-| Fase | Entrega |
-|---|---|
-| 1 Descoberta | Requisitos, wireframes (Loop) |
-| 2 Design | UI das telas (este site) |
-| 3 Desenvolvimento (MVP) | Matrícula + Check-in — esta entrega |
-| 4 Desenvolvimento (Nutrição) | Anamnese + Plano alimentar (estrutura pronta) |
-| 5 Testes | QA + testes com usuários reais |
-| 6 Lançamento | Deploy (Pages) + treinamento da equipe |
+## Riscos que já pensamos em resolver
 
-## 4. Backlog (do Loop)
+O maior risco era a integração com um gateway de pagamento de verdade — pra não travar o MVP, deixamos o controle de mensalidade manual (Paga ou Pendente) e vamos testar o gateway antes da versão final. Outro ponto sensível é dado de saúde e nutrição, que cai na LGPD — por isso o cardápio no MVP é só ilustrativo, sem dado real de aluno, e antes do lançamento vamos buscar orientação jurídica. Também nos preocupamos com perda de dados no navegador, já que tudo roda em localStorage — por isso tem seed de demonstração e exportação em CSV, e no pós-MVP a ideia é migrar pra um backend de verdade. E pra não correr risco no deploy, o Pages sobe via GitHub Actions, com build verificável.
 
-- Descoberta: requisitos com o dono da academia · plano de dados
-- Design: wireframes das telas · protótipo navegável (o site é o protótipo funcional)
-- MVP: login · matrícula · check-in · financeiro
-- Nutrição: anamnese · plano alimentar · dashboard do aluno
-- Lançamento: testes internos · testes com alunos reais · deploy
-- Testes automatizados: `node tests/mvp.test.cjs` (29 asserts, zero dependências)
+## Tecnologias
 
-## 5. Riscos e decisões (do Loop)
+HTML, CSS e JavaScript puro — sem framework, sem build. Chart.js e Three.js entram via CDN. Os dados ficam em localStorage e o deploy é automático no GitHub Pages via Actions. A arquitetura é simples: `store.js` cuida dos dados, `app.js` cuida das regras, e `index.html` com o CSS cuida da interface.
 
-| Risco | Prob. | Impacto | Mitigação no MVP |
-|---|---|---|---|
-| Falha de integração de pagamento | Alto | Médio | MVP sem gateway: mensalidade Paga/Pendente manual; testar gateway antes da versão real |
-| Dados de saúde e nutrição (LGPD) | Alto | Alto | Cardápio ilustrativo; consultoria jurídica antes do lançamento; sem dados sensíveis reais na demo |
-| Atraso no módulo nutricional | Médio | Médio | MVP lança sem nutrição completa (telas 04–05 marcadas Fase 4) |
-| Perda de dados no navegador | Médio | Alto | Seed de demonstração + exportação CSV; backend real no pós-MVP |
-| Falha no deploy do Pages | Baixo | Alto | Deploy via Actions com build verificável |
-
-## 6. Tecnologias
-
-HTML + CSS + JS puro · Chart.js e Three.js via CDN · localStorage · GitHub Pages (deploy via Actions).
-Arquitetura em 3 partes: `store.js` (dados) → `app.js` (regras) → `index.html + css` (telas). Sem build, sem backend. Diagramas da documentação em Mermaid.
-
-## 7. Estrutura
+## Estrutura de arquivos
 
 ```
 ├── index.html      # login + telas (SPA por abas)
@@ -75,35 +43,25 @@ Arquitetura em 3 partes: `store.js` (dados) → `app.js` (regras) → `index.htm
 ├── docs/documentacao.html  # documentação imprimível em PDF
 ├── roteiros/       # roteiro de apresentação por integrante
 ├── .github/workflows/pages.yml  # deploy no Pages via Actions
-└── README.md       # apresentação
+└── README.md
 ```
 
-## 8. Como rodar e publicar
+## Rodando o projeto
 
-Local: duplo clique em `index.html` ou `npx serve .`
+Localmente, é só abrir o `index.html` direto ou rodar `npx serve .`. Pra publicar, basta dar push na main — o workflow do Actions cuida do deploy sozinho (configurado em Settings → Pages → Source: GitHub Actions). O link final vai no Moodle.
 
-Pages: push na `main` dispara o workflow de deploy (Actions) sozinho. Config em Settings → Pages → Source: GitHub Actions. O link vai no Moodle.
+## Roteiro de apresentação (3 minutos)
 
-## 9. Roteiro de apresentação (3 min)
+Primeiro minuto: contextualizar o problema, mostrar o escopo das telas que vieram do Loop, as fases do projeto e os riscos que mapeamos.
 
-1. Loop (1 min): escopo das telas, fases (MVP = Matrícula + Check-in), riscos.
-2. Demo (1:30): login admin → nova matrícula → check-in liberado x bloqueado (Beatriz pendente) → financeiro alternando Paga/Pendente → dashboard do aluno.
-3. Código (30s): `store.js` → regra do check-in em `app.js` → README como documentação.
+Minuto e meio de demo: login como admin, criar uma matrícula nova, mostrar o check-in liberando o acesso e depois bloqueando (com a Beatriz, que está pendente), alternar o status da mensalidade no financeiro, e fechar mostrando o dashboard do aluno.
 
-## 10. Equipe
+Últimos 30 segundos: passar rapidamente pelo código, mostrando o `store.js`, a regra do check-in no `app.js`, e o README como documentação do projeto.
 
-| Nome | Responsável por |
-|---|---|
-| Bruno Campos | Login (3 perfis), intro, verificação anti-robôs, Dashboard geral e deploy no GitHub Pages |
-| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes do MVP |
-| Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano alimentar), Dashboard do Aluno e apresentação |
+## Quem fez o quê
 
-## 11. Divisão da apresentação
+Bruno Campos cuidou do login com os três perfis, da intro, da verificação anti-robôs, do dashboard geral e do deploy no GitHub Pages. Rafael Santos ficou com a matrícula, o check-in com validação de pagamento e os testes do MVP. Tiago Ribeiro desenvolveu o painel financeiro, o módulo de nutrição (anamnese e plano alimentar), o dashboard do aluno e ajudou na apresentação.
 
-| Quem | Tempo | O que mostra |
-|---|---|---|
-| Bruno Campos | 1 min | Problema e solução, verificação anti-robôs, login como admin, Dashboard geral |
-| Rafael Santos | 1 min | Nova matrícula, check-in liberado e bloqueado (Beatriz, pendente), regra Ativo + mensalidade Paga |
-| Tiago Ribeiro | 1 min | Financeiro (alternar Paga/Pendente), Anamnese, geração de cardápio, Dashboard do Aluno |
+Na hora de apresentar: Bruno abre com 1 minuto mostrando o problema, a verificação anti-robôs e o login como admin. Rafael segue com 1 minuto de matrícula e check-in, mostrando a regra de ativo + mensalidade paga. Tiago fecha com 1 minuto de financeiro, anamnese, geração de cardápio e dashboard do aluno.
 
-Perguntas: LGPD e pagamento com Tiago, código e dados com Bruno, regra de negócio com Rafael.
+Se vier pergunta sobre LGPD ou pagamento, é com o Tiago. Sobre código e dados, é com o Bruno. Sobre regra de negócio, é com o Rafael.
