@@ -57,7 +57,7 @@ function fazerLogin() {
 function entrar() {
   $('login-screen').style.display = 'none';
   $('app').classList.remove('hidden');
-  if (window.NOCTIS_BG) window.NOCTIS_BG.parar(); // desliga o 3D dentro do painel
+  if (typeof window !== 'undefined' && window.NOCTIS_BG) window.NOCTIS_BG.parar(); // desliga o 3D dentro do painel
   $('user-nome').textContent = usuarioLogado.nome;
   $('user-perfil').textContent = usuarioLogado.perfil;
   // Controle de acesso por perfil (regra simples de explicar)
@@ -230,6 +230,7 @@ function verDashAluno() {
   const totalCheckins = Object.values(Store.db.checkins).flat().filter(c => c.alunoId === id).length;
   const anam = Store.db.anamneses[id];
   $('dash-aluno-box').innerHTML = `
+    <div class="panel"><h2>Olá, ${a.nome}</h2><small style="color:#8f8fa5">Plano ${a.plano} · desde ${a.desde.split('-').reverse().join('/')}</small></div>
     <div class="cards">
       <div class="card"><span class="label">Plano</span><strong style="font-size:22px">${a.plano}</strong><small>${BRL(PLANOS[a.plano])}</small></div>
       <div class="card ${a.mensalidade === 'Paga' ? 'green' : 'orange'}"><span class="label">Mensalidade</span><strong style="font-size:22px">${a.mensalidade}</strong></div>

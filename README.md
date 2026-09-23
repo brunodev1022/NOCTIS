@@ -47,6 +47,7 @@ Sistema para academia pequena sair do caderno: matrícula, check-in com validaç
 - MVP: login · matrícula · check-in · financeiro
 - Nutrição: anamnese · plano alimentar · dashboard do aluno
 - Lançamento: testes internos · testes com alunos reais · deploy
+- Testes automatizados: `node tests/mvp.test.cjs` (29 asserts, zero dependências)
 
 ## 5. Riscos e decisões (do Loop)
 
