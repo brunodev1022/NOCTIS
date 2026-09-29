@@ -86,6 +86,7 @@ HTML, CSS e JavaScript puro — sem framework, sem build. Chart.js e Three.js en
 ├── js/app.js       # login, CRUD, check-in validado, financeiro, nutrição, treinos, exames, desafios, fórum
 ├── js/bg3d.js      # partículas 3D das telas de entrada
 ├── docs/documentacao.html  # documentação imprimível em PDF
+├── roteiros/       # fala + código de cada um na apresentação (5 integrantes)
 ├── .github/workflows/pages.yml  # deploy no Pages via Actions
 └── README.md       # apresentação
 ```
@@ -94,32 +95,30 @@ HTML, CSS e JavaScript puro — sem framework, sem build. Chart.js e Three.js en
 
 Localmente, é só abrir o `index.html` direto ou rodar `npx serve .`. Pra publicar, basta dar push na `main` — o workflow do Actions cuida do deploy sozinho (configurado em Settings → Pages → Source: GitHub Actions). O link final vai no Moodle.
 
-## 9. Roteiro de apresentação
+## 9. Roteiro de apresentação (5 integrantes, ~1 min cada)
 
-Primeiro minuto: contextualizar o problema, mostrar o escopo das telas que vieram do Loop, as fases do projeto e os riscos que mapeamos.
-
-Minuto e meio de demo: login como admin, dashboard bento (receita/meta, ocupação, cobrança, ao vivo), criar uma matrícula nova, mostrar o check-in liberando o acesso e depois bloqueando (com a Beatriz, que está pendente), exames com parecer da nutri, treino do personal, desafios e fórum, e fechar no dashboard do aluno (nível, streak, semana).
-
-Últimos 30 segundos: passar rapidamente pelo código, mostrando o `store.js`, a regra do check-in no `app.js`, e o README como documentação do projeto.
+Bruno abre com problema, solução e login; Rafael mostra matrícula + check-in; Tiago mostra financeiro + nutrição; Lucas mostra treinos, dashboard do aluno e o visual; Enzo fecha com desafios, fórum, testes e documentação. Fala detalhada + código de cada um em `roteiros/`.
 
 ## 10. Equipe
 
 | Nome | Responsável por |
 |---|---|
-| Bruno Campos | Login (5 perfis), intro, verificação anti-robôs, Dashboard geral bento e deploy no GitHub Pages |
-| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes (67 asserts) |
-| Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano com nutricionista + Exames), Dashboard do Aluno, Desafios, Fórum e apresentação |
-| Lucas Mynssem | Design das telas — identidade roxo + preto, tipografias (Sora, Anton, JetBrains Mono), `style.css`, partículas 3D da entrada |
-| Enzo Guimaraes | Documentação (`docs/documentacao.html` e README) e apoio nos testes do MVP |
+| Bruno Campos | Login (5 perfis + acesso rápido), intro, verificação anti-robôs, Dashboards bento com sigilo financeiro e deploy no GitHub Pages |
+| Rafael Santos | Matrícula (só atendimento/admin), Check-in com validação de pagamento (RN01) e suite de testes (67 asserts) |
+| Tiago Ribeiro | Financeiro, nutrição (Anamnese + Plano manual + Exames com parecer) e apresentação |
+| Lucas Mynssem | Identidade visual e front-end (bento, cards, ranking, Treino de Hoje, responsivo), `style.css`, Dashboard do Aluno e Treinos |
+| Enzo Guimaraes | Documentação (`docs/documentacao.html`, README), roteiros dos 5, Desafios, Fórum e apoio nos testes |
 
 ## 11. Divisão da apresentação
 
 | Quem | Tempo | O que mostra |
 |---|---|---|
-| Bruno Campos | 1 min | Problema e solução, verificação anti-robôs, login como admin, Dashboard geral bento |
-| Rafael Santos | 1 min | Nova matrícula, check-in liberado e bloqueado (Beatriz, pendente), regra Ativo + mensalidade Paga |
-| Tiago Ribeiro | 1 min | Financeiro (alternar Paga/Pendente), Anamnese, plano manual + Exames com parecer, Treinos do personal, Desafios e Fórum |
+| Bruno Campos | ~1 min | Problema e solução, login 5 perfis, Dashboard geral bento, deploy |
+| Rafael Santos | ~1 min | Nova matrícula, check-in liberado e bloqueado (Beatriz, pendente), RN01 + testes |
+| Tiago Ribeiro | ~1 min | Financeiro, Anamnese, plano manual da nutri + Exames com parecer |
+| Lucas Mynssem | ~1 min | Visual (roxo + preto), Treinos em cards, Treino de Hoje, Dashboard do aluno |
+| Enzo Guimaraes | ~1 min | Desafios, Fórum, documentação e como rodar os 67 testes |
 
-Na hora de apresentar: Bruno abre, Rafael segue com matrícula e check-in, Tiago fecha com financeiro, nutrição e engajamento.
+Na hora de apresentar: Bruno → Rafael → Tiago → Lucas → Enzo fecha. Roteiro completo de cada um (fala + código) em `roteiros/`.
 
 Se vier pergunta sobre LGPD ou pagamento, é com o Tiago. Sobre código e dados, é com o Bruno. Sobre regra de negócio, é com o Rafael. Sobre design e identidade visual, é com o Lucas. Sobre documentação, é com o Enzo.
