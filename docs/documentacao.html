@@ -154,7 +154,6 @@ f<!DOCTYPE html>
   <tr><td>forum</td><td>lista de {id, titulo, autorNome, autorPerfil, data, mensagens[{autorNome, autorPerfil, texto, data}]}</td></tr>
 </table>
 <p>Usuários demo (fixos em <code>store.js</code>): <code>admin@noctis / admin123</code>, <code>recepcao@noctis / recepcao123</code>, <code>aluno@noctis / aluno123</code> (vinculado à Ana Souza), <code>nutri@noctis / nutri123</code>, <code>personal@noctis / personal123</code>.</p>
-<div class="nota">Sem backend, cada navegador guarda seu próprio banco. Para levar dados entre aparelhos (ex.: do PC do nutricionista para o do admin), o Dashboard exporta e importa backup em JSON.</div>
 <h3>4.1 Diagrama entidade-relacionamento (modelo lógico)</h3>
 <pre class="mermaid">erDiagram
   ALUNO ||--o{ TREINO : possui
@@ -264,7 +263,7 @@ f<!DOCTYPE html>
   <tr><td>Design</td><td>UI das 11 telas</td><td>Concluída</td></tr>
   <tr><td>Desenvolvimento (MVP)</td><td>Matrícula + Check-in (+ login e financeiro)</td><td>Concluída (23/09)</td></tr>
   <tr><td>Nutrição + Maristela</td><td>Anamnese + Plano com nutricionista + Exames + Treinos + Desafios + Fórum</td><td>Entregue (revisão 30/09)</td></tr>
-  <tr><td>Testes</td><td>Suite <code>node tests/mvp.test.cjs</code> (64 asserts) + QA com usuários reais</td><td>Suite verde; QA em andamento</td></tr>
+  <tr><td>Testes</td><td>Suite <code>node tests/mvp.test.cjs</code> (58 asserts) + QA com usuários reais</td><td>Suite verde; QA em andamento</td></tr>
   <tr><td>Lançamento</td><td>Deploy + treinamento</td><td>Deploy feito; treinamento pendente</td></tr>
 </table>
 

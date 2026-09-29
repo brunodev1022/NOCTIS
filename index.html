@@ -74,7 +74,7 @@
 <div id="app" class="app hidden">
 <aside class="sidebar">
   <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>MVP</small></div>
-  <div class="userbox"><div><strong id="user-nome"></strong><small id="user-perfil"></small></div><span class="status-dot" title="Sessão ativa"></span></div>
+  <div class="userbox"><span class="avatar sm" id="user-avatar">N</span><div style="flex:1;min-width:0"><strong id="user-nome"></strong><small id="user-perfil"></small></div><button class="mini-logout" onclick="sair()" title="Encerrar sessão">Sair</button></div>
   <nav id="nav" aria-label="Navegação principal">
     <div class="nav-sec">Operação</div>
     <button class="nav-btn active" data-route="dashboard" data-perfis="Administrador,Funcionário,Nutricionista,Personal"><span class="num">00</span>Dashboard</button>
@@ -150,14 +150,6 @@
       <div class="panel dash-rank">
         <div class="dash-flex-between"><span class="tele">RANKING · MAIS FREQUENTES</span><small class="mono muted">presenças totais</small></div>
         <div id="dash-ranking"></div>
-      </div>
-      <div class="panel dash-backup">
-        <div class="tele">BACKUP · LEVAR DADOS ENTRE APARELHOS (SEM SERVIDOR)</div>
-        <p class="muted">Cada navegador guarda seu próprio banco. O nutri exporta e manda o arquivo; o admin importa aqui.</p>
-        <div class="dash-actions">
-          <button class="btn small" onclick="exportarBackup()">Exportar backup</button>
-          <span id="backup-import-wrap"><input id="backup-arquivo" type="file" accept=".json" style="max-width:240px"><button class="btn small ghost" id="btn-importar" onclick="importarBackup()">Importar backup</button></span>
-        </div>
       </div>
     </div>
   </section>

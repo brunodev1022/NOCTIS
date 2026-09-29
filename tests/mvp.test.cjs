@@ -251,24 +251,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok($('desafios-lista').innerHTML.includes('chal-card'), 'desafios em cards com stack e líder (Strava)');
   vm.runInContext(`listarTreinos()`, sandbox);
   ok($('treinos-lista').innerHTML.includes('work-card'), 'treinos em cards (Nike Training)');
-
-  console.log('-- backup entre aparelhos (sem servidor) --');
-  vm.runInContext(`Store.db = seedInicial(); Store.db.planosAlimentares['a1'] = {data:'2026-09-29', autor:'Nutri (Nutricionista)', itens:[{refeicao:'Café', detalhe:'ovos'}], orientacoes:'ok'}; Store.salvar()`, sandbox);
-  sandbox.__snap = vm.runInContext(`backupJSON()`, sandbox);
-  ok(typeof sandbox.__snap === 'string' && sandbox.__snap.includes('Café'), 'exportar gera JSON com o plano');
-  vm.runInContext(`exportarBackup()`, sandbox);
-  ok(true, 'download do backup roda sem erro');
-  vm.runInContext(`Store.db = seedInicial(); Store.salvar()`, sandbox);
-  ok(vm.runInContext(`importarBackupDados(__snap)`, sandbox) === true, 'importar restaura o banco');
-  ok(vm.runInContext(`!!(Store.db.planosAlimentares['a1']||{}).itens`, sandbox), 'plano volta junto no backup');
-  ok(vm.runInContext(`importarBackupDados('{"x":1}')`, sandbox) === false, 'arquivo inválido é recusado');
-  vm.runInContext(`usuarioLogado = USUARIOS[0]`, sandbox);
+  vm.runInContext(`Store.db = seedInicial(); Store.db.planosAlimentares['a1'] = {data:'2026-09-29', autor:'Nutri (Nutricionista)', itens:[{refeicao:'Café', detalhe:'ovos'}], orientacoes:'ok'}; usuarioLogado = USUARIOS[0]`, sandbox);
   $('plano-aluno').value = 'a1';
   vm.runInContext(`renderPlanoResult('a1')`, sandbox);
   ok($('plano-result').innerHTML.includes('Café'), 'admin vê o plano prescrito (mesma máquina)');
-  const alb0 = vm.runInContext(`Store.db.alunos.length`, sandbox);
-  vm.runInContext(`usuarioLogado = USUARIOS.find(u=>u.perfil==='Nutricionista'); importarBackup()`, sandbox);
-  ok(vm.runInContext(`Store.db.alunos.length`, sandbox) === alb0, 'só admin/funcionário importam backup');
 
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);

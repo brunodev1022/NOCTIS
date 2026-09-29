@@ -61,6 +61,7 @@ function entrar() {
   if (typeof window !== 'undefined' && window.NOCTIS_BG) window.NOCTIS_BG.parar(); // desliga o 3D dentro do painel
   $('user-nome').textContent = usuarioLogado.nome;
   $('user-perfil').textContent = usuarioLogado.perfil;
+  const ua = $('user-avatar'); if (ua) ua.textContent = iniciais(usuarioLogado.nome);
   // Controle de acesso por perfil (regra simples de explicar)
   document.querySelectorAll('#nav .nav-btn').forEach(b => {
     const permitido = b.dataset.perfis.split(',').includes(usuarioLogado.perfil);
@@ -144,35 +145,7 @@ function atualizarDashboard() {
   const rk = $('dash-ranking');
   if (rk) { const pres = presencasTotais();
     rk.innerHTML = [...alunos].sort((a, b) => (pres[b.id] || 0) - (pres[a.id] || 0)).slice(0, 5).map((a, i) => `<div class="rank-row"><span class="rank-pos anton">${String(i + 1).padStart(2, '0')}</span><span class="avatar sm">${iniciais(a.nome)}</span><span class="feed-name">${a.nome}<br><small class="muted">${a.plano} · ${a.status}</small></span><strong class="mono">${pres[a.id] || 0} <small class="muted">presenças</small></strong></div>`).join('') || '<p class="muted">Sem presenças ainda.</p>'; }
-  // backup entre aparelhos: importar backup sobrescreve — só Admin/Funcionário
-  const bw = $('backup-import-wrap'); if (bw) bw.style.display = podeGerenciarFinanceiro() ? '' : 'none';
   desenharGraficos();
-}
-
-// ---------- BACKUP (sem servidor: arquivo JSON viaja entre aparelhos) ----------
-function backupJSON() { return JSON.stringify(Store.db); }
-function exportarBackup() {
-  const blob = new Blob([backupJSON()], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'noctis-backup-' + hojeISO() + '.json'; a.click();
-}
-function importarBackupDados(texto) {
-  const db = JSON.parse(texto);
-  if (!db || !Array.isArray(db.alunos)) return false;
-  Store.db = Object.assign(seedInicial(), db);
-  Store.salvar(); return true;
-}
-function importarBackup() {
-  if (!podeGerenciarFinanceiro()) return alert('Só Admin ou Funcionário importam backup.');
-  const file = $('backup-arquivo').files && $('backup-arquivo').files[0];
-  if (!file) return alert('Escolha o arquivo de backup (.json)');
-  const reader = new FileReader();
-  reader.onload = () => {
-    try { if (!importarBackupDados(reader.result)) return alert('Arquivo inválido: não é um backup NOCTIS.'); }
-    catch (e) { return alert('Não consegui ler esse arquivo.'); }
-    $('backup-arquivo').value = ''; recarregarTudo(); alert('Backup importado!');
-  };
-  reader.readAsText(file);
 }
 function desenharGraficos() {
   const { alunos, checkins } = Store.db;
