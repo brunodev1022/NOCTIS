@@ -26,7 +26,7 @@ A parte de nutrição (anamnese e plano alimentar) saiu do ilustrativo: tem auto
 | Nº | Tela | Descrição | Status |
 |---|---|---|---|
 | 00 | Login | Intro, verificação anti-robôs no botão Entrar e autenticação de 5 perfis | Feito (Admin, Funcionário, Aluno, Nutricionista, Personal) |
-| 01 | Matrícula | Cadastro completo do aluno | Feito |
+| 01 | Matrícula | Cadastro completo do aluno (só atendimento e admin) | Feito |
 | 02 | Check-in | Catraca com validação de pagamento + acesso | Feito (bloqueia inadimplente/inativo) |
 | 03 | Financeiro | Gestão de mensalidades | Feito |
 | 04 | Anamnese | Coleta de dados alimentares | Feito (nutricionista + equipe) |
@@ -59,7 +59,7 @@ O trabalho passou por seis fases: descoberta dos requisitos e wireframes (feito 
 - Treinos (Maristela): personal monta por aluno/perfil/objetivo
 - Engajamento (Maristela): desafios por perfil + desafios do aluno · fórum com tópicos e respostas
 - Lançamento: testes internos · testes com alunos reais · deploy
-- Testes automatizados: `node tests/mvp.test.cjs` (62 asserts, zero dependências)
+- Testes automatizados: `node tests/mvp.test.cjs` (64 asserts, zero dependências)
 
 ## 5. Riscos e decisões (do Loop)
 
@@ -107,7 +107,7 @@ Minuto e meio de demo: login como admin, dashboard bento (receita/meta, ocupaç�
 | Nome | Responsável por |
 |---|---|
 | Bruno Campos | Login (5 perfis), intro, verificação anti-robôs, Dashboard geral bento e deploy no GitHub Pages |
-| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes (62 asserts) |
+| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes (64 asserts) |
 | Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano com nutricionista + Exames), Dashboard do Aluno, Desafios, Fórum e apresentação |
 | Lucas Mynssem | Design das telas — identidade roxo + preto, tipografias (Sora, Anton, JetBrains Mono), `style.css`, partículas 3D da entrada |
 | Enzo Guimaraes | Documentação (`docs/documentacao.html` e README) e apoio nos testes do MVP |

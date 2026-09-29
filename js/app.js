@@ -88,6 +88,7 @@ function idAlvoPessoal(selectId) {
 const podeGerenciarTreinos = () => usuarioLogado && ['Administrador', 'Personal', 'Funcionário'].includes(usuarioLogado.perfil);
 const podeGerenciarNutri = () => usuarioLogado && ['Administrador', 'Nutricionista', 'Funcionário'].includes(usuarioLogado.perfil);
 const podeGerenciarFinanceiro = () => usuarioLogado && ['Administrador', 'Funcionário'].includes(usuarioLogado.perfil);
+const podeMatricular = () => usuarioLogado && ['Administrador', 'Funcionário'].includes(usuarioLogado.perfil);
 const ehAluno = () => usuarioLogado && usuarioLogado.perfil === 'Aluno';
 // Helpers de front (dia da semana PT, presenças, filtro rápido) — tudo no navegador
 const DIAS_PT = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -201,6 +202,7 @@ function editarAluno(id) { const a = Store.db.alunos.find(x => x.id === id);
   $('f-aluno-idade').value = a.idade; $('f-aluno-fone').value = a.fone; $('f-aluno-plano').value = a.plano;
   $('f-aluno-status').value = a.status; $('f-aluno-mens').value = a.mensalidade; $('modal-aluno').classList.add('open'); }
 function salvarAluno() {
+  if (!podeMatricular()) return alert('Só o atendimento (recepção) ou o admin fazem matrícula.');
   const nome = $('f-aluno-nome').value.trim();
   if (!nome) return alert('Digite o nome do aluno');
   const id = $('f-aluno-id').value || ('a' + Date.now());
@@ -212,7 +214,8 @@ function salvarAluno() {
   i >= 0 ? Store.db.alunos[i] = dados : Store.db.alunos.push(dados);
   Store.salvar(); fecharModalAluno(); recarregarTudo();
 }
-function excluirAluno(id) { if (!confirm('Excluir matrícula e treinos deste aluno?')) return;
+function excluirAluno(id) { if (!podeMatricular()) return alert('Só o atendimento (recepção) ou o admin excluem matrícula.');
+  if (!confirm('Excluir matrícula e treinos deste aluno?')) return;
   Store.db.alunos = Store.db.alunos.filter(a => a.id !== id);
   Store.db.treinos = Store.db.treinos.filter(t => t.alunoId !== id);
   Store.salvar(); recarregarTudo(); }

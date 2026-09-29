@@ -229,7 +229,7 @@ f<!DOCTYPE html>
 <ul>
   <li><strong>RN01 — Check-in:</strong> acesso liberado somente se <code>status = Ativo</code> E <code>mensalidade = Paga</code>. Caso contrário, acesso negado com o motivo em tela.</li>
   <li><strong>RN02 — Receita:</strong> soma dos valores dos planos (Mensal R$ 89,90 · Trimestral R$ 239,90 · Anual R$ 799,90) dos alunos ativos com mensalidade Paga; pendentes compõem o "a receber".</li>
-  <li><strong>RN03 — Perfis:</strong> Administrador vê tudo; Funcionário opera matrícula, check-in e financeiro; Nutricionista cuida de anamnese, plano e exames; Personal tem visão operacional (sem valores financeiros: receita e cobrança ficam ocultos); Aluno vê só os próprios dados (treinos, exames, plano, dashboard) e participa da comunidade.</li>
+  <li><strong>RN03 — Perfis:</strong> Administrador vê tudo; Funcionário (atendimento) opera matrícula, check-in e financeiro; Nutricionista cuida de anamnese, plano e exames; Personal monta treinos e tem visão operacional (sem matrícula e sem valores financeiros); Aluno vê só os próprios dados (treinos, exames, plano, dashboard) e participa da comunidade.</li>
   <li><strong>RN04 — Plano:</strong> prescrição manual do nutricionista (refeições + orientações, com autor e data); não há cardápio automático; só a equipe de nutrição prescreve e edita; aluno acompanha o próprio em leitura.</li>
   <li><strong>RN05 — Treinos:</strong> só Personal, Funcionário ou Admin criam/editam; treino carrega objetivo e é exibido no dia correspondente ("treino de hoje").</li>
   <li><strong>RN06 — Exames:</strong> aluno envia PDF/imagem (até 1,5 MB, sem backend: fica no navegador); parecer restrito à nutrição; remoção só pelo admin, remetente ou dono.</li>
@@ -263,7 +263,7 @@ f<!DOCTYPE html>
   <tr><td>Design</td><td>UI das 11 telas</td><td>Concluída</td></tr>
   <tr><td>Desenvolvimento (MVP)</td><td>Matrícula + Check-in (+ login e financeiro)</td><td>Concluída (23/09)</td></tr>
   <tr><td>Nutrição + Maristela</td><td>Anamnese + Plano com nutricionista + Exames + Treinos + Desafios + Fórum</td><td>Entregue (revisão 30/09)</td></tr>
-  <tr><td>Testes</td><td>Suite <code>node tests/mvp.test.cjs</code> (62 asserts) + QA com usuários reais</td><td>Suite verde; QA em andamento</td></tr>
+  <tr><td>Testes</td><td>Suite <code>node tests/mvp.test.cjs</code> (64 asserts) + QA com usuários reais</td><td>Suite verde; QA em andamento</td></tr>
   <tr><td>Lançamento</td><td>Deploy + treinamento</td><td>Deploy feito; treinamento pendente</td></tr>
 </table>
 

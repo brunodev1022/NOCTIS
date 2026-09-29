@@ -263,6 +263,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok($('dash-fin-note').style.display === '', 'personal vê aviso operacional');
   vm.runInContext(`usuarioLogado = USUARIOS[0]; atualizarDashboard()`, sandbox);
   ok($('dash-hero').style.display === '', 'admin continua vendo receita');
+  vm.runInContext(`usuarioLogado = USUARIOS.find(u=>u.perfil==='Personal')`, sandbox);
+  const mat0 = vm.runInContext(`Store.db.alunos.length`, sandbox);
+  $('f-aluno-id').value = ''; $('f-aluno-nome').value = 'Fulano';
+  vm.runInContext(`salvarAluno()`, sandbox);
+  ok(vm.runInContext(`Store.db.alunos.length`, sandbox) === mat0, 'personal não matricula (só atendimento/admin)');
+  vm.runInContext(`excluirAluno('a1')`, sandbox);
+  ok(vm.runInContext(`Store.db.alunos.length`, sandbox) === mat0, 'personal não exclui matrícula');
 
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
