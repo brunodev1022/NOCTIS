@@ -305,6 +305,18 @@ textarea:disabled{opacity:.6}
 .reply-pill{font-size:11px;color:var(--violet);border:1px solid rgba(139,92,246,.4);border-radius:20px;padding:5px 12px;white-space:nowrap}
 /* FRONT-2 · treino de hoje — Smart Fit */
 .al-today{border-color:rgba(139,92,246,.55);background:linear-gradient(180deg,rgba(139,92,246,.1),var(--panel));margin:0}
+/* FIX graphs + plano manual */
+.chart-box{position:relative;height:180px;margin-top:10px}
+.chart-box.sm{height:54px}
+.chart-box canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.chart-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;line-height:1.7;background:rgba(13,13,22,.55);border-radius:var(--r-md);z-index:2}
+.dash-planos .dash-flex{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.ref-row{display:grid;grid-template-columns:180px 1fr auto;gap:8px;margin-bottom:8px}
+.ref-row .btn{white-space:nowrap}
+#plano-itens{margin-bottom:6px}
+@media(max-width:900px){
+  .ref-row{grid-template-columns:1fr}
+}
 @media(max-width:900px){
   .work-grid{grid-template-columns:1fr}
   .check-row{flex-direction:column}

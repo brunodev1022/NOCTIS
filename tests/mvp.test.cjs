@@ -173,10 +173,19 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   $('f-treino-objetivo').value = 'Hipertrofia'; $('f-treino-exercicios').value = 'Supino 3x12'; $('f-treino-id').value = '';
   vm.runInContext(`usuarioLogado = USUARIOS[0]; salvarTreino()`, sandbox);
   ok(vm.runInContext(`Store.db.treinos.length`, sandbox) === 3, 'personal/admin cria treino (2 seed + 1 novo)');
-  // Plano com autor (nutricionista prescreve)
+  // Plano manual (nutricionista real prescreve, sem auto-cardápio)
   $('plano-aluno').value = 'a1';
-  vm.runInContext(`gerarPlano()`, sandbox);
+  vm.runInContext(`usuarioLogado = USUARIOS[0]; addRefeicao('Café da manhã', '3 ovos + 60g aveia')`, sandbox);
+  ok($('plano-itens').innerHTML.includes('ref-row'), 'nutri adiciona linhas de refeição');
+  sandbox.document.querySelectorAll = (sel) => sel === '#plano-itens .ref-row'
+    ? [{ querySelector: (s) => ({ value: s === '.ref-nome' ? 'Café da manhã' : '3 ovos + aveia' }) }]
+    : [];
+  $('plano-orientacoes').value = 'Ajustar proteína';
+  vm.runInContext(`salvarPlanoManual()`, sandbox);
+  ok(vm.runInContext(`Store.db.planosAlimentares['a1'].itens.length`, sandbox) === 1, 'plano manual salva refeições');
   ok(vm.runInContext(`!!Store.db.planosAlimentares['a1'].autor`, sandbox), 'plano registra autor (nutricionista)');
+  vm.runInContext(`renderPlanoResult('a1')`, sandbox);
+  ok($('plano-result').innerHTML.includes('3 ovos'), 'aluno vê o plano prescrito');
   // Desafios: criar + participar
   $('f-desafio-titulo').value = 'Desafio teste'; $('f-desafio-desc').value = 'desc'; $('f-desafio-perfil').value = 'Todos';
   const nd0 = vm.runInContext(`Store.db.desafios.length`, sandbox);
@@ -204,8 +213,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`usuarioLogado = USUARIOS.find(u=>u.perfil==='Aluno')`, sandbox);
   const plans0 = vm.runInContext(`Object.keys(Store.db.planosAlimentares).length`, sandbox);
   $('plano-aluno').value = 'a1';
-  vm.runInContext(`gerarPlano()`, sandbox);
-  ok(vm.runInContext(`Object.keys(Store.db.planosAlimentares).length`, sandbox) === plans0, 'aluno não gera cardápio (só nutrição)');
+  vm.runInContext(`salvarPlanoManual()`, sandbox);
+  ok(vm.runInContext(`Object.keys(Store.db.planosAlimentares).length`, sandbox) === plans0, 'aluno não prescreve plano (só nutrição)');
   vm.runInContext(`usuarioLogado = USUARIOS.find(u=>u.perfil==='Nutricionista')`, sandbox);
   vm.runInContext(`alternarMensalidade('a3')`, sandbox);
   ok(vm.runInContext(`Store.db.alunos.find(a=>a.id==='a3').mensalidade`, sandbox) === 'Pendente', 'nutri não dá baixa (só admin/funcionário)');

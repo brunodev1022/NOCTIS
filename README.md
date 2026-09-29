@@ -30,7 +30,7 @@ A parte de nutrição (anamnese e plano alimentar) saiu do ilustrativo: tem auto
 | 02 | Check-in | Catraca com validação de pagamento + acesso | Feito (bloqueia inadimplente/inativo) |
 | 03 | Financeiro | Gestão de mensalidades | Feito |
 | 04 | Anamnese | Coleta de dados alimentares | Feito (nutricionista + equipe) |
-| 05 | Plano alimentar | Cardápio por objetivo + orientações do nutricionista (com autor e data) | Feito (aluno vê o próprio) |
+| 05 | Plano alimentar | Prescrição manual do nutricionista (refeições + orientações, com autor e data) — sem cardápio automático | Feito (aluno vê o próprio em leitura) |
 | 06 | Dashboard do aluno | Hero do atleta (nível, streak, semana) + treino de hoje, próximo treino, plano, desafios | Feito (bento premium) |
 | 07 | Treinos | Personal monta planejamento por aluno: cards por dia com chips Seg–Sáb, destaque HOJE | Feito — `nutri` não edita, `aluno` só vê os próprios |
 | 08 | Exames | Aluno faz upload (PDF/imagem até 1,5 MB), nutricionista dá parecer | Feito — sem backend: fica no localStorage |
@@ -59,7 +59,7 @@ O trabalho passou por seis fases: descoberta dos requisitos e wireframes (feito 
 - Treinos (Maristela): personal monta por aluno/perfil/objetivo
 - Engajamento (Maristela): desafios por perfil + desafios do aluno · fórum com tópicos e respostas
 - Lançamento: testes internos · testes com alunos reais · deploy
-- Testes automatizados: `node tests/mvp.test.cjs` (54 asserts, zero dependências)
+- Testes automatizados: `node tests/mvp.test.cjs` (57 asserts, zero dependências)
 
 ## 5. Riscos e decisões (do Loop)
 
@@ -107,7 +107,7 @@ Minuto e meio de demo: login como admin, dashboard bento (receita/meta, ocupaç�
 | Nome | Responsável por |
 |---|---|
 | Bruno Campos | Login (5 perfis), intro, verificação anti-robôs, Dashboard geral bento e deploy no GitHub Pages |
-| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes (54 asserts) |
+| Rafael Santos | Matrícula, Check-in com validação de pagamento e testes (57 asserts) |
 | Tiago Ribeiro | Painel Financeiro, módulo nutricional (Anamnese + Plano com nutricionista + Exames), Dashboard do Aluno, Desafios, Fórum e apresentação |
 | Lucas Mynssem | Design das telas — identidade roxo + preto, tipografias (Sora, Anton, JetBrains Mono), `style.css`, partículas 3D da entrada |
 | Enzo Guimaraes | Documentação (`docs/documentacao.html` e README) e apoio nos testes do MVP |
@@ -118,7 +118,7 @@ Minuto e meio de demo: login como admin, dashboard bento (receita/meta, ocupaç�
 |---|---|---|
 | Bruno Campos | 1 min | Problema e solução, verificação anti-robôs, login como admin, Dashboard geral bento |
 | Rafael Santos | 1 min | Nova matrícula, check-in liberado e bloqueado (Beatriz, pendente), regra Ativo + mensalidade Paga |
-| Tiago Ribeiro | 1 min | Financeiro (alternar Paga/Pendente), Anamnese, cardápio com autor + Exames com parecer, Treinos do personal, Desafios e Fórum |
+| Tiago Ribeiro | 1 min | Financeiro (alternar Paga/Pendente), Anamnese, plano manual + Exames com parecer, Treinos do personal, Desafios e Fórum |
 
 Na hora de apresentar: Bruno abre, Rafael segue com matrícula e check-in, Tiago fecha com financeiro, nutrição e engajamento.
 

@@ -155,7 +155,7 @@ function desenharGraficos() {
   chartPlanos = new Chart($('chart-planos'), { type: 'doughnut',
     data: { labels: ['Mensal', 'Trimestral', 'Anual'],
       datasets: [{ data: dadosPlanos, backgroundColor: VIO, borderColor: '#12121b', borderWidth: 3, hoverOffset: 6 }] },
-    options: { cutout: '68%', plugins: { legend: { display: false } } } });
+    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } } });
   const lg = $('planos-legend');
   if (lg) lg.innerHTML = ['Mensal', 'Trimestral', 'Anual'].map((p, i) => { const tot = dadosPlanos.reduce((s, v) => s + v, 0) || 1; return `<div class="legend-row"><span class="legend-dot" style="background:${VIO[i]}"></span><span>${p}</span><strong class="mono">${dadosPlanos[i]} · ${Math.round(dadosPlanos[i] / tot * 100)}%</strong></div>`; }).join('');
   const dias = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d.toISOString().slice(0, 10); });
@@ -164,12 +164,14 @@ function desenharGraficos() {
   chartCheckins = new Chart($('chart-checkins'), { type: 'bar',
     data: { labels: dias.map(d => d.slice(8) + '/' + d.slice(5, 7)),
       datasets: [{ data: vals, backgroundColor: vals.map((_, i) => i === 6 ? '#a78bfa' : 'rgba(139,92,246,.35)'), borderRadius: 5, borderSkipped: false }] },
-    options: { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(36,36,49,.6)' } } } } });
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, suggestedMax: Math.max(4, ...vals), ticks: { stepSize: 1 }, grid: { color: 'rgba(36,36,49,.6)' } } } } });
+  const total7 = vals.reduce((s, v) => s + v, 0);
+  const fv = $('fluxo-vazio'); if (fv) fv.classList.toggle('hidden', total7 > 0);
   const t7 = $('checkins-7d'); if (t7) t7.textContent = vals.reduce((s, v) => s + v, 0);
   const md = $('checkins-media'); if (md) md.textContent = (vals.reduce((s, v) => s + v, 0) / 7).toFixed(1);
   // sparkline de receita (acumulado 7d proporcional aos check-ins pagantes como pulso operacional)
   const sc = $('chart-spark');
-  if (sc) { if (chartSpark) chartSpark.destroy(); chartSpark = new Chart(sc, { type: 'line', data: { labels: dias, datasets: [{ data: vals, borderColor: '#a78bfa', borderWidth: 2, pointRadius: 0, tension: .45, fill: true, backgroundColor: 'rgba(139,92,246,.14)' }] }, options: { plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, animation: { duration: 600 } } }); }
+  if (sc) { if (chartSpark) chartSpark.destroy(); chartSpark = new Chart(sc, { type: 'line', data: { labels: dias, datasets: [{ data: vals, borderColor: '#a78bfa', borderWidth: 2, pointRadius: 0, tension: .45, fill: true, backgroundColor: 'rgba(139,92,246,.14)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, animation: { duration: 600 } } }); }
 }
 
 // ---------- TELA 2: MATRÍCULA ----------
@@ -265,36 +267,44 @@ function salvarAnamnese() {
     restricoes: $('anam-restricoes').value, obs: $('anam-obs').value };
   Store.salvar(); alert('Anamnese salva!');
 }
-const CARDAPIOS = {
-  Hipertrofia: ['Café: ovos + aveia + banana', 'Almoço: arroz, frango 150g, feijão, salada', 'Pré-treino: batata-doce + whey', 'Jantar: carne + legumes + arroz'],
-  Emagrecimento: ['Café: iogurte natural + chia + fruta', 'Almoço: salada grande + frango grelhado', 'Lanche: whey + maçã', 'Jantar: omelete + legumes'],
-  Manutenção: ['Café: pão integral + ovos + café', 'Almoço: arroz, feijão, carne, salada', 'Lanche: fruta + castanhas', 'Jantar: frango + legumes']
-};
-function gerarPlano() {
-  if (!podeGerenciarNutri()) return alert('Só a equipe de nutrição gera o cardápio. O aluno acompanha aqui o próprio plano.');
-  const alunoId = idAlvoPessoal('plano-aluno');
-  const al = Store.db.alunos.find(a => a.id === alunoId);
-  if (!alunoId || !al) return alert('Escolha um aluno');
-  const anam = Store.db.anamneses[alunoId];
-  const objetivo = anam?.objetivo || 'Manutenção';
-  const itens = CARDAPIOS[objetivo].map(x => `<li>${x}</li>`).join('');
-  const autor = usuarioLogado ? `${usuarioLogado.nome} (${usuarioLogado.perfil})` : 'Equipe';
-  Store.db.planosAlimentares[alunoId] = { objetivo, data: hojeISO(), autor, orientacoes: Store.db.planosAlimentares[alunoId]?.orientacoes || '' }; Store.salvar();
-  renderPlanoResult(alunoId);
+// ---------- TELA 05: PLANO ALIMENTAR (100% manual — nutricionista real prescreve) ----------
+const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function addRefeicao(nome = '', detalhe = '') {
+  $('plano-itens').innerHTML += `<div class="ref-row"><input class="ref-nome" placeholder="Refeição (ex: Café da manhã)" value="${esc(nome)}"><input class="ref-detalhe" placeholder="Prescrição (ex: 3 ovos + 60g aveia)" value="${esc(detalhe)}"><button class="btn small danger" onclick="removerLinhaRefeicao(this)">×</button></div>`;
+}
+function removerLinhaRefeicao(btn) { btn.parentElement.remove(); }
+function preencherFormPlano(alunoId) {
+  const box = $('plano-itens'); if (!box) return;
+  const plan = Store.db.planosAlimentares[alunoId];
+  box.innerHTML = '';
+  (plan && plan.itens && plan.itens.length ? plan.itens : [{ refeicao: '', detalhe: '' }]).forEach(it => addRefeicao(it.refeicao, it.detalhe));
+  $('plano-orientacoes').value = (plan && plan.orientacoes) || '';
+}
+function salvarPlanoManual() {
+  if (!podeGerenciarNutri()) return alert('Só a equipe de nutrição prescreve o plano.');
+  const alunoId = $('plano-aluno').value;
+  if (!alunoId) return alert('Escolha um aluno');
+  const itens = [...document.querySelectorAll('#plano-itens .ref-row')].map(r => ({
+    refeicao: r.querySelector('.ref-nome').value.trim(),
+    detalhe: r.querySelector('.ref-detalhe').value.trim()
+  })).filter(x => x.refeicao || x.detalhe);
+  if (!itens.length) return alert('Adicione ao menos uma refeição ao plano.');
+  Store.db.planosAlimentares[alunoId] = { data: hojeISO(), autor: `${usuarioLogado.nome} (${usuarioLogado.perfil})`, itens, orientacoes: $('plano-orientacoes').value.trim() };
+  Store.salvar(); renderPlanoResult(alunoId); alert('Plano salvo!');
 }
 function renderPlanoResult(alunoId) {
   const al = Store.db.alunos.find(a => a.id === alunoId);
   const plan = Store.db.planosAlimentares[alunoId];
-  if (!plan) { $('plano-result').innerHTML = '<p class="muted">Escolha o aluno e gere o cardápio.</p>'; return; }
-  const itens = (CARDAPIOS[plan.objetivo] || CARDAPIOS.Manutenção).map(x => `<li>${x}</li>`).join('');
+  if (!plan || !plan.itens) { $('plano-result').innerHTML = '<p class="muted">Nenhum plano prescrito ainda. O nutricionista monta manualmente acima.</p>'; return; }
+  const itens = plan.itens.map(x => `<li><strong>${esc(x.refeicao)}</strong> — ${esc(x.detalhe)}</li>`).join('');
   const editavel = podeGerenciarNutri();
   const examesAl = (Store.db.exames || []).filter(e => e.alunoId === alunoId);
-  $('plano-result').innerHTML = `<h2>Cardápio — ${al ? al.nome : ''} (${plan.objetivo})</h2><ul>${itens}</ul>
-    <p class="muted">Prescrito por ${plan.autor || 'Equipe'} em ${(plan.data || '').split('-').reverse().join('/')}</p>
-    <label>Orientações do nutricionista ${editavel ? '' : '(somente leitura)'}<textarea id="plano-orient" rows="3" ${editavel ? '' : 'disabled'} placeholder="Ex: ajustar proteína pós-treino conforme exame...">${plan.orientacoes || ''}</textarea></label>
+  $('plano-result').innerHTML = `<h2>Plano — ${al ? al.nome : ''}</h2><ul>${itens}</ul>
+    <p class="muted">Prescrito por ${esc(plan.autor || 'Equipe')} em ${(plan.data || '').split('-').reverse().join('/')}</p>
+    <label>Orientações do nutricionista ${editavel ? '' : '(somente leitura)'}<textarea id="plano-orient" rows="3" ${editavel ? '' : 'disabled'} placeholder="Ex: ajustar proteína pós-treino conforme exame...">${esc(plan.orientacoes)}</textarea></label>
     ${editavel ? '<button class="btn small" onclick="salvarOrientacoes()">Salvar orientações</button>' : ''}
     <div class="panel" style="margin:14px 0 0"><div class="tele">EXAMES DO ALUNO · BASE DO PLANEJAMENTO (${examesAl.length})</div>${examesAl.map(e => `<p><strong>${e.nomeArquivo}</strong> <small class="muted">${(e.data || '').split('-').reverse().join('/')} · ${e.obs || 'sem obs'}</small><br><small>${e.parecer ? 'Parecer: ' + e.parecer : 'Aguardando análise na Tela 08'}</small></p>`).join('') || '<p class="muted">Nenhum exame enviado. Peça ao aluno na Tela 08.</p>'}<button class="btn small ghost" onclick="irPara('exames')">Abrir exames</button></div>
-    <br><small style="color:#9aa6b5">Modelo ilustrativo do MVP — prescrição real exige nutricionista (ver Riscos/LGPD no README).</small>`;
+    <br><small style="color:#9aa6b5">Prescrição do nutricionista responsável — sem cardápio automático (ver Riscos/LGPD no README).</small>`;
 }
 function salvarOrientacoes() {
   if (!podeGerenciarNutri()) return alert('Só a equipe de nutrição edita orientações.');
@@ -339,7 +349,7 @@ function verDashAluno() {
     <div class="dash-grid al-grid">
       <div class="panel al-today"><div class="tele">TREINO DE HOJE · ${diaHojePT().toUpperCase()}</div>${treinoHoje.length ? `<h2 class="anton">${treinoHoje[0].tipo}</h2><p class="muted">${(treinoHoje[0].exercicios || []).slice(0, 3).join(' · ')}${(treinoHoje[0].exercicios || []).length > 3 ? ' · ...' : ''}</p><button class="btn small" onclick="irPara('treinos')">Abrir treino</button>` : '<p class="muted">Descanso programado. Aproveita pra revisar o plano alimentar.</p>'}</div>
       <div class="panel"><div class="tele">PRÓXIMO TREINO</div>${prox ? `<h2>${prox.tipo} · ${prox.dia}</h2><p class="muted">${prox.objetivo || ''}</p><ul>${(prox.exercicios || []).slice(0, 4).map(e => `<li>${e}</li>`).join('')}</ul><button class="btn small ghost" onclick="irPara('treinos')">Ver todos</button>` : '<p class="muted">Nenhum treino montado. Fala com o personal.</p>'}</div>
-      <div class="panel"><div class="tele">PLANO · ${plan ? plan.objetivo.toUpperCase() : 'A GERAR'}</div>${plan ? `<h2>Cardápio por ${plan.autor || 'Equipe'}</h2><p class="muted">${plan.orientacoes ? plan.orientacoes.slice(0, 120) : 'Segue o cardápio da Tela 05.'}</p><button class="btn small ghost" onclick="irPara('plano')">Abrir cardápio</button>` : '<p class="muted">Anamnese + exames geram teu cardápio na Tela 05.</p>'}</div>
+      <div class="panel"><div class="tele">PLANO · ${plan && plan.itens ? 'PRESCRITO' : 'A PRESCREVER'}</div>${plan && plan.itens ? `<h2>${plan.itens.length} refeições</h2><p class="muted">por ${plan.autor || 'Equipe'}</p><button class="btn small ghost" onclick="irPara('plano')">Abrir plano</button>` : '<p class="muted">O nutricionista monta teu plano na Tela 05.</p>'}</div>
       <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${d.titulo}</span><span class="badge paga">${d.perfilAlvo}</span></div>`).join('') || '<p class="muted">Entra num desafio na Tela 09.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
     </div>
     <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${anam.objetivo} · ${anam.refeicoes} refeições/dia · ${anam.restricoes || 'sem restrições'}` : 'Anamnese ainda não preenchida (Fase 4).'}</p></div>`;
@@ -582,11 +592,12 @@ function preencherSelects() {
   if ($('treino-aluno')) $('treino-aluno').onchange = listarTreinos;
   if ($('treino-filtro-dia')) $('treino-filtro-dia').onchange = listarTreinos;
   if ($('exame-aluno')) $('exame-aluno').onchange = listarExames;
-  if ($('plano-aluno')) $('plano-aluno').onchange = () => renderPlanoResult(idAlvoPessoal('plano-aluno'));
+  if ($('plano-aluno')) $('plano-aluno').onchange = () => { preencherFormPlano(idAlvoPessoal('plano-aluno')); renderPlanoResult(idAlvoPessoal('plano-aluno')); };
   if ($('desafio-filtro')) $('desafio-filtro').onchange = listarDesafios;
-  // Aluno acompanha o próprio cardápio; só a nutrição gera (pedido Maristela)
-  const bg = $('btn-gerar-plano'); if (bg) bg.style.display = podeGerenciarNutri() ? '' : 'none';
+  // Aluno acompanha o próprio plano em leitura; só a nutrição prescreve (nutri real, sem auto-cardápio)
+  const pf = $('plano-form'); if (pf) pf.style.display = podeGerenciarNutri() ? '' : 'none';
   carregar();
+  preencherFormPlano(idAlvoPessoal('plano-aluno'));
   renderPlanoResult(idAlvoPessoal('plano-aluno'));
 }
 function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); }

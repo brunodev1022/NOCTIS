@@ -30,12 +30,21 @@ Header: `#hoje` + `#dash-turno` (MANHÃ/TARDE/NOITE) e selo `TEMPO REAL` com `.l
 
 Hero (`.al-hero`): avatar de iniciais (`.al-avatar`), `ATLETA · NÍVEL X · STREAK nD`, nome em Anton, pills de plano/mensalidade/desde, semana com 7 `.al-day` (`.on` = presente), score de presenças à direita.
 Níveis: `BASE <4, EMBALO <10, RITMO <20, ELITE 20+`.
-Abaixo: grid de 3 panels — próximo treino, plano (objetivo + autor), desafios ativos — e ficha de anamnese.
+Abaixo: grid — treino de hoje, próximo treino, plano (nº refeições + autor), desafios ativos — e ficha de anamnese.
+
+## Plano manual (nutri real, sem auto-cardápio)
+
+- Form `#plano-form` (só `podeGerenciarNutri()` vê): linhas em `#plano-itens` via `addRefeicao()` (`.ref-row`: `.ref-nome` + `.ref-detalhe` + remover), `#plano-orientacoes`, `salvarPlanoManual()` lê com `querySelectorAll`
+- NUNCA gerar cardápio automático (sem `CARDAPIOS`/templates). Modelo: `{data, autor, itens[{refeicao, detalhe}], orientacoes}`
+- `#plano-result` mostra itens + exames do aluno com parecer; aluno só lê (`#plano-orient` disabled)
+- `preencherFormPlano()` carrega o plano salvo no form ao trocar de aluno
 
 ## Charts (Chart.js)
 
 - `Chart.defaults.color='#8f8fa5'`, fonte JetBrains Mono 10px
+- SEMPRE `responsive:true, maintainAspectRatio:false` + canvas dentro de `.chart-box` (180px, `.sm` 54px) — canvas solto com `height=` quebra o layout
 - Nunca legenda padrão em doughnut; sempre legenda custom em HTML
+- Fluxo 7 dias: `suggestedMax` + overlay `#fluxo-vazio` quando total = 0 (nunca gráfico "morto")
 - Mobile: tudo colapsa para 1 coluna (`@media max-width:900px`)
 
 ## Front-2 (inspirado em Smart Fit, Strava, Nike Training, Glofox)

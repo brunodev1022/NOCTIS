@@ -79,7 +79,7 @@ f<!DOCTYPE html>
   <tr><td>RF03</td><td>Check-in</td><td>Registro de acesso com validação de pagamento + status</td><td>MVP entregue</td></tr>
   <tr><td>RF04</td><td>Financeiro</td><td>Gestão de mensalidades: recebido, a receber, inadimplentes</td><td>MVP entregue</td></tr>
   <tr><td>RF05</td><td>Anamnese</td><td>Coleta de dados alimentares por aluno (só equipe de nutrição registra)</td><td>Entregue (pedido Maristela)</td></tr>
-  <tr><td>RF06</td><td>Plano alimentar</td><td>Cardápio por objetivo com autor, data e orientações do nutricionista; aluno vê o próprio</td><td>Entregue (pedido Maristela)</td></tr>
+  <tr><td>RF06</td><td>Plano alimentar</td><td>Prescrição 100% manual do nutricionista (refeições + orientações, com autor e data); sem cardápio automático; aluno vê o próprio em leitura</td><td>Entregue (pedido Maristela)</td></tr>
   <tr><td>RF07</td><td>Dashboard do Aluno</td><td>Hero do atleta (nível, streak, semana) + treino de hoje, plano, desafios, exames</td><td>Entregue (bento premium)</td></tr>
   <tr><td>RF09</td><td>Treinos</td><td>Personal monta planejamento por aluno: tipo, dia, objetivo, exercícios</td><td>Entregue (pedido Maristela)</td></tr>
   <tr><td>RF10</td><td>Exames</td><td>Aluno faz upload (até 1,5 MB no localStorage); nutricionista registra parecer para orientar o plano</td><td>Entregue (pedido Maristela)</td></tr>
@@ -230,7 +230,7 @@ f<!DOCTYPE html>
   <li><strong>RN01 — Check-in:</strong> acesso liberado somente se <code>status = Ativo</code> E <code>mensalidade = Paga</code>. Caso contrário, acesso negado com o motivo em tela.</li>
   <li><strong>RN02 — Receita:</strong> soma dos valores dos planos (Mensal R$ 89,90 · Trimestral R$ 239,90 · Anual R$ 799,90) dos alunos ativos com mensalidade Paga; pendentes compõem o "a receber".</li>
   <li><strong>RN03 — Perfis:</strong> Administrador vê tudo; Funcionário opera matrícula, check-in e financeiro; Nutricionista cuida de anamnese, plano e exames; Personal monta treinos; Aluno vê só os próprios dados (treinos, exames, plano, dashboard) e participa da comunidade.</li>
-  <li><strong>RN04 — Cardápio:</strong> gerado a partir da anamnese com autor, data e orientações; só a equipe de nutrição gera e edita; aluno acompanha o próprio em leitura.</li>
+  <li><strong>RN04 — Plano:</strong> prescrição manual do nutricionista (refeições + orientações, com autor e data); não há cardápio automático; só a equipe de nutrição prescreve e edita; aluno acompanha o próprio em leitura.</li>
   <li><strong>RN05 — Treinos:</strong> só Personal, Funcionário ou Admin criam/editam; treino carrega objetivo e é exibido no dia correspondente ("treino de hoje").</li>
   <li><strong>RN06 — Exames:</strong> aluno envia PDF/imagem (até 1,5 MB, sem backend: fica no navegador); parecer restrito à nutrição; remoção só pelo admin, remetente ou dono.</li>
   <li><strong>RN07 — Desafios:</strong> qualquer perfil cria (academia sugere por perfil-alvo); só Aluno participa/sai; exclusão só do criador ou admin.</li>

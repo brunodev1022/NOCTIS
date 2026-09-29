@@ -112,7 +112,7 @@
           <div><span class="tele">TICKET MÉDIO</span><strong id="kpi-ticket" class="mono">R$ 0</strong></div>
           <div><span class="tele">INADIMPLENTES</span><strong id="kpi-inad" class="mono danger">0</strong></div>
         </div>
-        <canvas id="chart-spark" height="52"></canvas>
+        <div class="chart-box sm"><canvas id="chart-spark"></canvas></div>
       </div>
       <div class="panel dash-hoje">
         <div class="tele">HOJE · OCUPAÇÃO</div>
@@ -131,11 +131,12 @@
       </div>
       <div class="panel dash-planos">
         <div class="tele">BASE · POR PLANO</div>
-        <div class="dash-flex"><canvas id="chart-planos" height="170"></canvas><div id="planos-legend" class="legend"></div></div>
+        <div class="chart-box"><canvas id="chart-planos"></canvas></div>
+        <div id="planos-legend" class="legend"></div>
       </div>
       <div class="panel dash-fluxo">
         <div class="dash-flex-between"><span class="tele">FLUXO · 7 DIAS</span><small class="mono muted"><span id="checkins-7d">0</span> total · média <span id="checkins-media">0</span>/dia</small></div>
-        <canvas id="chart-checkins" height="170"></canvas>
+        <div class="chart-box"><canvas id="chart-checkins"></canvas><div id="fluxo-vazio" class="chart-empty hidden">Sem movimento nos últimos 7 dias.<br>Registre check-ins na Tela 02.</div></div>
       </div>
       <div class="panel dash-alerts">
         <div class="tele">ATENÇÃO · COBRANÇA</div>
@@ -222,10 +223,17 @@
 
   <section id="view-plano" class="view">
     <div class="page-head">
-      <div><h1>Plano alimentar <em class="tag">Fase 4</em></h1><p class="sub">Tela 05 — Geração de cardápio a partir da anamnese</p></div>
+      <div><h1>Plano alimentar</h1><p class="sub">Tela 05 — Prescrição manual do nutricionista</p></div>
     </div>
-    <div class="toolbar"><select id="plano-aluno"></select><button class="btn" id="btn-gerar-plano" onclick="gerarPlano()">Gerar cardápio</button></div>
-    <div id="plano-result" class="panel"><p class="muted">Escolha o aluno e gere o cardápio.</p></div>
+    <div class="toolbar"><select id="plano-aluno"></select></div>
+    <div class="panel" id="plano-form">
+      <h2>Prescrição do nutricionista</h2>
+      <div id="plano-itens"></div>
+      <button class="btn small ghost" onclick="addRefeicao()">+ Adicionar refeição</button>
+      <label style="margin-top:12px">Orientações<textarea id="plano-orientacoes" rows="3" placeholder="Ex: ajustar proteína pós-treino conforme exame..."></textarea></label>
+      <button class="btn" onclick="salvarPlanoManual()">Salvar plano</button>
+    </div>
+    <div id="plano-result" class="panel"><p class="muted">Escolha o aluno para ver o plano prescrito.</p></div>
   </section>
 
   <section id="view-dashaluno" class="view">
