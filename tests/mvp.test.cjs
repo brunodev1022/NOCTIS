@@ -256,6 +256,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`renderPlanoResult('a1')`, sandbox);
   ok($('plano-result').innerHTML.includes('Café'), 'admin vê o plano prescrito (mesma máquina)');
 
+  console.log('-- sigilo financeiro --');
+  vm.runInContext(`usuarioLogado = USUARIOS.find(u=>u.perfil==='Personal'); atualizarDashboard()`, sandbox);
+  ok($('dash-hero').style.display === 'none', 'personal não vê receita');
+  ok($('dash-alerts').style.display === 'none', 'personal não vê cobrança');
+  ok($('dash-fin-note').style.display === '', 'personal vê aviso operacional');
+  vm.runInContext(`usuarioLogado = USUARIOS[0]; atualizarDashboard()`, sandbox);
+  ok($('dash-hero').style.display === '', 'admin continua vendo receita');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);

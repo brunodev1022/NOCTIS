@@ -145,6 +145,11 @@ function atualizarDashboard() {
   const rk = $('dash-ranking');
   if (rk) { const pres = presencasTotais();
     rk.innerHTML = [...alunos].sort((a, b) => (pres[b.id] || 0) - (pres[a.id] || 0)).slice(0, 5).map((a, i) => `<div class="rank-row"><span class="rank-pos anton">${String(i + 1).padStart(2, '0')}</span><span class="avatar sm">${iniciais(a.nome)}</span><span class="feed-name">${a.nome}<br><small class="muted">${a.plano} · ${a.status}</small></span><strong class="mono">${pres[a.id] || 0} <small class="muted">presenças</small></strong></div>`).join('') || '<p class="muted">Sem presenças ainda.</p>'; }
+  // Personal vê operação, nunca dinheiro: receita e cobrança só p/ admin/funcionário (nutri mantém)
+  const semFin = usuarioLogado && usuarioLogado.perfil === 'Personal';
+  const dh = $('dash-hero'); if (dh) dh.style.display = semFin ? 'none' : '';
+  const dal = $('dash-alerts'); if (dal) dal.style.display = semFin ? 'none' : '';
+  const fn = $('dash-fin-note'); if (fn) fn.style.display = semFin ? '' : 'none';
   desenharGraficos();
 }
 function desenharGraficos() {

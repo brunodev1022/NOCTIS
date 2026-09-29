@@ -25,6 +25,7 @@ Grid de 12 colunas (`.dash-grid`):
 - `.dash-live` (span 5): `#dash-atividade` — últimos 6 acessos `dot + nome + data/hora mono`
 
 Header: `#hoje` + `#dash-turno` (MANHÃ/TARDE/NOITE) e selo `TEMPO REAL` com `.live-dot`.
+Sigilo: Personal NÃO vê dinheiro — `#dash-hero` e `#dash-alerts` ocultos p/ Personal, com `#dash-fin-note` no lugar.
 
 ## Dashboard do aluno (`verDashAluno`)
 

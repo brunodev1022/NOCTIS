@@ -103,7 +103,8 @@
       <div class="head-meta"><span class="live-dot"></span>NOCTIS / TEMPO REAL</div>
     </div>
     <div class="dash-grid">
-      <div class="panel dash-hero">
+      <p id="dash-fin-note" class="fin-note muted" style="display:none">Visão operacional — valores financeiros visíveis só para administração e recepção.</p>
+      <div class="panel dash-hero" id="dash-hero">
         <div class="tele">RECEITA · MÊS <span id="kpi-receita-delta" class="delta up"></span></div>
         <div class="dash-big anton"><span id="kpi-receita">R$ 0</span></div>
         <div class="meta-row"><div class="meta-track"><div id="meta-bar-fill" class="meta-fill"></div></div><small id="meta-txt" class="muted mono"></small></div>
@@ -138,7 +139,7 @@
         <div class="dash-flex-between"><span class="tele">FLUXO · 7 DIAS</span><small class="mono muted"><span id="checkins-7d">0</span> total · média <span id="checkins-media">0</span>/dia</small></div>
         <div class="chart-box"><canvas id="chart-checkins"></canvas><div id="fluxo-vazio" class="chart-empty hidden">Sem movimento nos últimos 7 dias.<br>Registre check-ins na Tela 02.</div></div>
       </div>
-      <div class="panel dash-alerts">
+      <div class="panel dash-alerts" id="dash-alerts">
         <div class="tele">ATENÇÃO · COBRANÇA</div>
         <div id="dash-inadimplentes" class="feed"></div>
         <button class="btn small ghost" onclick="irPara('financeiro')">Abrir financeiro</button>
