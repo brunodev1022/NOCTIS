@@ -5,11 +5,14 @@ const DB_KEY = 'noctis_mvp_v1';
 
 const PLANOS = { Mensal: 89.90, Trimestral: 239.90, Anual: 799.90 };
 
-// 3 perfis da tela 1 (Login/Cadastro) — demo sem backend, funciona no Pages
+// 5 perfis (pedido da profa. Maristela: nutri + personal entram no fluxo)
+// demo sem backend, funciona no Pages
 const USUARIOS = [
   { email: 'admin@noctis', senha: 'admin123', perfil: 'Administrador', nome: 'Admin' },
   { email: 'recepcao@noctis', senha: 'recepcao123', perfil: 'Funcionário', nome: 'Recepção' },
-  { email: 'aluno@noctis', senha: 'aluno123', perfil: 'Aluno', nome: 'Ana Souza', alunoId: 'a1' }
+  { email: 'aluno@noctis', senha: 'aluno123', perfil: 'Aluno', nome: 'Ana Souza', alunoId: 'a1' },
+  { email: 'nutri@noctis', senha: 'nutri123', perfil: 'Nutricionista', nome: 'Nutri Helena' },
+  { email: 'personal@noctis', senha: 'personal123', perfil: 'Personal', nome: 'Personal Caio' }
 ];
 
 function seedInicial() {
@@ -27,7 +30,20 @@ function seedInicial() {
     checkins: {},
     // Fase 4 — Módulo Nutricional (estrutura pronta, tela marca "Fase 4")
     anamneses: {},
-    planosAlimentares: {}
+    planosAlimentares: {},
+    // Pedidos da profa. Maristela (pós-MVP): exames, treinos planejados, desafios e fórum
+    exames: [],
+    desafios: [
+      { id: 'd1', titulo: '7 dias sem faltar', descricao: 'Treine 7 dias seguidos e registre o check-in. Vale para todos os perfis.', perfilAlvo: 'Todos', criadorNome: 'Academia NOCTIS', criadorPerfil: 'Administrador', data: '2026-09-20', participantes: ['a1', 'a2'] },
+      { id: 'd2', titulo: 'Foco Hipertrofia: +4 treinos na semana', descricao: 'Sugestão da academia para o perfil Hipertrofia: complete 4 treinos de musculação na semana.', perfilAlvo: 'Hipertrofia', criadorNome: 'Academia NOCTIS', criadorPerfil: 'Administrador', data: '2026-09-21', participantes: [] }
+    ],
+    forum: [
+      { id: 'f1', titulo: 'Boas-vindas: apresente-se e conte seu objetivo', autorNome: 'Admin', autorPerfil: 'Administrador', data: '2026-09-20',
+        mensagens: [
+          { autorNome: 'Admin', autorPerfil: 'Administrador', texto: 'Usem este espaço para trocar ideia sobre treino, dieta e desafios. Sejam bem-vindos!', data: '2026-09-20' },
+          { autorNome: 'Ana Souza', autorPerfil: 'Aluno', texto: 'Oi! Meu foco é hipertrofia, bora pro desafio dos 7 dias!', data: '2026-09-21' }
+        ] }
+    ]
   };
 }
 
@@ -40,6 +56,10 @@ const Store = {
     } catch (e) { this.db = seedInicial(); }
     if (!this.db.anamneses) this.db.anamneses = {};
     if (!this.db.planosAlimentares) this.db.planosAlimentares = {};
+    if (!this.db.exames) this.db.exames = [];
+    if (!this.db.desafios) this.db.desafios = [];
+    if (!this.db.forum) this.db.forum = [];
+    if (!Array.isArray(this.db.treinos)) this.db.treinos = [];
     return this.db;
   },
   salvar() { localStorage.setItem(DB_KEY, JSON.stringify(this.db)); }

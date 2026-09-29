@@ -59,26 +59,32 @@ f<!DOCTYPE html>
 <h3>1.1 Problema</h3>
 <p>Academias pequenas controlam alunos, treinos e pagamentos em caderno ou planilha: dados se perdem, inadimplentes passam na porta e o dono não sabe quanto entra por mês.</p>
 <h3>1.2 Solução</h3>
-<p>O NOCTIS centraliza matrícula, check-in com validação de pagamento, financeiro e (na Fase 4) o módulo nutricional em um painel web que roda no navegador, publicado gratuitamente no GitHub Pages.</p>
+<p>O NOCTIS centraliza matrícula, check-in com validação de pagamento, financeiro, treinos do personal, nutrição com nutricionista (anamnese, plano com autor e exames com parecer), desafios por perfil e fórum da comunidade em um painel web com 5 perfis, rodando no navegador e publicado gratuitamente no GitHub Pages.</p>
 <h3>1.3 Objetivos do MVP</h3>
 <ul>
   <li>Cadastrar alunos com plano, status e situação da mensalidade.</li>
   <li>Liberar o acesso apenas para alunos ativos e adimplentes.</li>
   <li>Gerenciar mensalidades e estimar a receita mensal.</li>
-  <li>Estruturar as telas do módulo nutricional para a Fase 4.</li>
+  <li>Nutricionista prescreve o plano por perfil/objetivo com base em anamnese e exames do aluno.</li>
+  <li>Personal monta treinos por aluno, perfil e objetivo.</li>
+  <li>Engajar com desafios da academia e dos alunos + fórum da comunidade.</li>
 </ul>
 
 <h2 class="sec">2. Escopo e requisitos</h2>
 <h3>2.1 Requisitos funcionais</h3>
 <table>
   <tr><th>ID</th><th>Tela</th><th>Descrição</th><th>Status</th></tr>
-  <tr><td>RF01</td><td>Login</td><td>Intro cinematográfica, verificação anti-robôs e autenticação de 3 perfis (Administrador, Funcionário, Aluno)</td><td>MVP entregue</td></tr>
+  <tr><td>RF01</td><td>Login</td><td>Intro cinematográfica, verificação anti-robôs e autenticação de 5 perfis (Administrador, Funcionário, Aluno, Nutricionista, Personal)</td><td>MVP entregue</td></tr>
   <tr><td>RF02</td><td>Matrícula</td><td>CRUD de alunos: nome, idade, telefone, plano, status, mensalidade; busca e filtros; exportação CSV</td><td>MVP entregue</td></tr>
   <tr><td>RF03</td><td>Check-in</td><td>Registro de acesso com validação de pagamento + status</td><td>MVP entregue</td></tr>
   <tr><td>RF04</td><td>Financeiro</td><td>Gestão de mensalidades: recebido, a receber, inadimplentes</td><td>MVP entregue</td></tr>
-  <tr><td>RF05</td><td>Anamnese</td><td>Coleta de dados alimentares por aluno</td><td>Estrutura pronta (Fase 4)</td></tr>
-  <tr><td>RF06</td><td>Plano alimentar</td><td>Geração de cardápio a partir da anamnese</td><td>Modelo ilustrativo (Fase 4)</td></tr>
-  <tr><td>RF07</td><td>Dashboard do Aluno</td><td>Visão do aluno: plano, mensalidade, treinos, presenças</td><td>MVP entregue (v. inicial)</td></tr>
+  <tr><td>RF05</td><td>Anamnese</td><td>Coleta de dados alimentares por aluno (só equipe de nutrição registra)</td><td>Entregue (pedido Maristela)</td></tr>
+  <tr><td>RF06</td><td>Plano alimentar</td><td>Cardápio por objetivo com autor, data e orientações do nutricionista; aluno vê o próprio</td><td>Entregue (pedido Maristela)</td></tr>
+  <tr><td>RF07</td><td>Dashboard do Aluno</td><td>Hero do atleta (nível, streak, semana) + treino de hoje, plano, desafios, exames</td><td>Entregue (bento premium)</td></tr>
+  <tr><td>RF09</td><td>Treinos</td><td>Personal monta planejamento por aluno: tipo, dia, objetivo, exercícios</td><td>Entregue (pedido Maristela)</td></tr>
+  <tr><td>RF10</td><td>Exames</td><td>Aluno faz upload (até 1,5 MB no localStorage); nutricionista registra parecer para orientar o plano</td><td>Entregue (pedido Maristela)</td></tr>
+  <tr><td>RF11</td><td>Desafios</td><td>Academia sugere por perfil; aluno cria os próprios e participa/sai</td><td>Entregue (pedido Maristela)</td></tr>
+  <tr><td>RF12</td><td>Fórum</td><td>Tópicos e respostas para clientes e equipe interagirem</td><td>Entregue (pedido Maristela)</td></tr>
   <tr><td>RF08</td><td>Segurança</td><td>Verificação anti-robôs no botão Entrar; aluno enxerga só os próprios dados; logout com sessão por aba</td><td>MVP entregue</td></tr>
 </table>
 <h3>2.2 Requisitos não funcionais</h3>
@@ -94,6 +100,8 @@ f<!DOCTYPE html>
   ADM(["Administrador"])
   FUN(["Funcionário"])
   ALU(["Aluno"])
+  NUT(["Nutricionista"])
+  PER(["Personal"])
   UC1["Fazer login"]
   UC2["Gerenciar matrículas"]
   UC3["Registrar check-in"]
@@ -101,9 +109,15 @@ f<!DOCTYPE html>
   UC5["Preencher anamnese"]
   UC6["Gerar cardápio"]
   UC7["Ver dashboard do aluno"]
-  ADM --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7
-  FUN --> UC1 & UC2 & UC3 & UC4
-  ALU --> UC1 & UC7
+  UC8["Montar treinos"]
+  UC9["Enviar/analisar exames"]
+  UC10["Criar e participar de desafios"]
+  UC11["Interagir no fórum"]
+  ADM --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC11
+  FUN --> UC1 & UC2 & UC3 & UC4 & UC8
+  NUT --> UC1 & UC5 & UC6 & UC7 & UC9 & UC10 & UC11
+  PER --> UC1 & UC2 & UC7 & UC8 & UC10 & UC11
+  ALU --> UC1 & UC6 & UC7 & UC9 & UC10 & UC11
 </pre>
 <p class="fig">Figura 2 — Atores e casos de uso por perfil.</p>
 
@@ -112,8 +126,8 @@ f<!DOCTYPE html>
 <table>
   <tr><th>Camada</th><th>Arquivo</th><th>Papel</th></tr>
   <tr><td>Dados</td><td><code>js/store.js</code></td><td>Usuários, seed inicial, leitura/escrita no <code>localStorage</code></td></tr>
-  <tr><td>Lógica</td><td><code>js/app.js</code></td><td>Login, CRUD, check-in validado, financeiro, nutrição, gráficos</td></tr>
-  <tr><td>Apresentação</td><td><code>index.html</code> + <code>css/style.css</code></td><td>7 telas em SPA por abas, tema NOCTIS</td></tr>
+  <tr><td>Lógica</td><td><code>js/app.js</code></td><td>Login 5 perfis, CRUD, check-in validado, financeiro, nutrição, treinos, exames, desafios, fórum, dashboards bento</td></tr>
+  <tr><td>Apresentação</td><td><code>index.html</code> + <code>css/style.css</code></td><td>11 telas em SPA por abas (00–10), tema NOCTIS, skill <code>noctis-dashboards</code></td></tr>
 </table>
 <div class="nota">Não há build nem servidor: qualquer push na branch <code>main</code> entra no ar pelo Pages em 1–2 minutos.</div>
 <h3>3.1 Diagrama de arquitetura</h3>
@@ -131,18 +145,24 @@ f<!DOCTYPE html>
 <table>
   <tr><th>Entidade</th><th>Campos</th></tr>
   <tr><td>alunos</td><td>id, nome, idade, fone, plano (Mensal/Trimestral/Anual), status (Ativo/Inativo), mensalidade (Paga/Pendente), desde</td></tr>
-  <tr><td>treinos</td><td>id, alunoId, tipo, dia, exercicios[]</td></tr>
+  <tr><td>treinos</td><td>id, alunoId, tipo, dia, objetivo, exercicios[], criadoPor</td></tr>
   <tr><td>checkins</td><td>mapa data → lista de {alunoId, hora}</td></tr>
   <tr><td>anamneses</td><td>mapa alunoId → {objetivo, refeicoes, restricoes, obs}</td></tr>
-  <tr><td>planosAlimentares</td><td>mapa alunoId → {objetivo, data}</td></tr>
+  <tr><td>planosAlimentares</td><td>mapa alunoId → {objetivo, data, autor, orientacoes}</td></tr>
+  <tr><td>exames</td><td>lista de {id, alunoId, nomeArquivo, tipo, tamanhoKb, data, obs, parecer, conteudo (dataURL), enviadoPor}</td></tr>
+  <tr><td>desafios</td><td>lista de {id, titulo, descricao, perfilAlvo, criadorNome, criadorPerfil, data, participantes[]}</td></tr>
+  <tr><td>forum</td><td>lista de {id, titulo, autorNome, autorPerfil, data, mensagens[{autorNome, autorPerfil, texto, data}]}</td></tr>
 </table>
-<p>Usuários demo (fixos em <code>store.js</code>): <code>admin@noctis / admin123</code>, <code>recepcao@noctis / recepcao123</code>, <code>aluno@noctis / aluno123</code> (vinculado ao registro da Ana Souza).</p>
+<p>Usuários demo (fixos em <code>store.js</code>): <code>admin@noctis / admin123</code>, <code>recepcao@noctis / recepcao123</code>, <code>aluno@noctis / aluno123</code> (vinculado à Ana Souza), <code>nutri@noctis / nutri123</code>, <code>personal@noctis / personal123</code>.</p>
 <h3>4.1 Diagrama entidade-relacionamento (modelo lógico)</h3>
 <pre class="mermaid">erDiagram
   ALUNO ||--o{ TREINO : possui
   ALUNO ||--o{ CHECKIN : registra
   ALUNO ||--o| ANAMNESE : possui
   ALUNO ||--o| PLANO_ALIMENTAR : recebe
+  ALUNO ||--o{ EXAME : envia
+  ALUNO ||--o{ DESAFIO : participa
+  USUARIO ||--o{ TOPICO : publica
   USUARIO ||--o| ALUNO : "vincula (perfil Aluno)"
   ALUNO {
     string id PK
@@ -159,7 +179,9 @@ f<!DOCTYPE html>
     string alunoId FK
     string tipo
     string dia
+    string objetivo
     string exercicios
+    string criadoPor
   }
   CHECKIN {
     string data PK
@@ -177,6 +199,23 @@ f<!DOCTYPE html>
     string alunoId PK, FK
     string objetivo
     string data
+    string autor
+    string orientacoes
+  }
+  EXAME {
+    string id PK
+    string alunoId FK
+    string nomeArquivo
+    string parecer
+  }
+  DESAFIO {
+    string id PK
+    string perfilAlvo
+    string participantes
+  }
+  TOPICO {
+    string id PK
+    string mensagens
   }
   USUARIO {
     string email PK
@@ -190,8 +229,12 @@ f<!DOCTYPE html>
 <ul>
   <li><strong>RN01 — Check-in:</strong> acesso liberado somente se <code>status = Ativo</code> E <code>mensalidade = Paga</code>. Caso contrário, acesso negado com o motivo em tela.</li>
   <li><strong>RN02 — Receita:</strong> soma dos valores dos planos (Mensal R$ 89,90 · Trimestral R$ 239,90 · Anual R$ 799,90) dos alunos ativos com mensalidade Paga; pendentes compõem o "a receber".</li>
-  <li><strong>RN03 — Perfis:</strong> Administrador vê tudo; Funcionário vê matrícula, check-in e financeiro; Aluno vê apenas o próprio Dashboard do Aluno.</li>
-  <li><strong>RN04 — Cardápio:</strong> modelo ilustrativo por objetivo (Hipertrofia, Emagrecimento, Manutenção); prescrição real exige nutricionista.</li>
+  <li><strong>RN03 — Perfis:</strong> Administrador vê tudo; Funcionário opera matrícula, check-in e financeiro; Nutricionista cuida de anamnese, plano e exames; Personal monta treinos; Aluno vê só os próprios dados (treinos, exames, plano, dashboard) e participa da comunidade.</li>
+  <li><strong>RN04 — Cardápio:</strong> gerado a partir da anamnese com autor, data e orientações; só a equipe de nutrição gera e edita; aluno acompanha o próprio em leitura.</li>
+  <li><strong>RN05 — Treinos:</strong> só Personal, Funcionário ou Admin criam/editam; treino carrega objetivo e é exibido no dia correspondente ("treino de hoje").</li>
+  <li><strong>RN06 — Exames:</strong> aluno envia PDF/imagem (até 1,5 MB, sem backend: fica no navegador); parecer restrito à nutrição; remoção só pelo admin, remetente ou dono.</li>
+  <li><strong>RN07 — Desafios:</strong> qualquer perfil cria (academia sugere por perfil-alvo); só Aluno participa/sai; exclusão só do criador ou admin.</li>
+  <li><strong>RN08 — Fórum:</strong> todos os perfis publicam tópicos e respondem.</li>
 </ul>
 <h3>5.1 Fluxograma do check-in (RN01)</h3>
 <pre class="mermaid">flowchart TD
@@ -207,8 +250,8 @@ f<!DOCTYPE html>
 <table>
   <tr><th>Risco</th><th>Prob.</th><th>Impacto</th><th>Decisão</th></tr>
   <tr><td>Falha de integração de pagamento</td><td>Alto</td><td>Médio</td><td>MVP sem gateway (mensalidade manual); testar gateway antes da versão real. Dono: Rafael Santos</td></tr>
-  <tr><td>Dados de saúde e LGPD</td><td>Alto</td><td>Alto</td><td>Cardápio ilustrativo, sem dados reais na demo; consultoria jurídica antes do lançamento. Dono: Tiago Ribeiro</td></tr>
-  <tr><td>Atraso no módulo nutricional</td><td>Médio</td><td>Médio</td><td>MVP sem nutrição completa; telas 04–05 marcadas como Fase 4; revisão do MVP em 30/09</td></tr>
+  <tr><td>Dados de saúde e LGPD</td><td>Alto</td><td>Alto</td><td>Exames com parecer restrito à nutrição e sem dados reais na demo; consultoria jurídica antes do lançamento. Dono: Tiago Ribeiro</td></tr>
+  <tr><td>Atraso no módulo nutricional</td><td>Médio</td><td>Médio</td><td>Entregue com nutricionista + exames + treinos nesta revisão</td></tr>
   <tr><td>Perda de dados no navegador</td><td>Médio</td><td>Alto</td><td>Seed de demonstração embutido; backup via exportação CSV; backend real no pós-MVP</td></tr>
   <tr><td>Falha no deploy do Pages</td><td>Baixo</td><td>Alto</td><td>Deploy via Actions com build verificável; repositório como reserva para apresentar o código</td></tr>
 </table>
@@ -217,10 +260,10 @@ f<!DOCTYPE html>
 <table>
   <tr><th>Fase</th><th>Entrega</th><th>Status</th></tr>
   <tr><td>Descoberta</td><td>Requisitos, wireframes</td><td>Concluída</td></tr>
-  <tr><td>Design</td><td>UI das 7 telas</td><td>Concluída</td></tr>
+  <tr><td>Design</td><td>UI das 11 telas</td><td>Concluída</td></tr>
   <tr><td>Desenvolvimento (MVP)</td><td>Matrícula + Check-in (+ login e financeiro)</td><td>Concluída (23/09)</td></tr>
-  <tr><td>Nutrição</td><td>Anamnese + Plano alimentar</td><td>Revisão do MVP em 30/09</td></tr>
-  <tr><td>Testes</td><td>QA + testes com alunos reais</td><td>Em andamento</td></tr>
+  <tr><td>Nutrição + Maristela</td><td>Anamnese + Plano com nutricionista + Exames + Treinos + Desafios + Fórum</td><td>Entregue (revisão 30/09)</td></tr>
+  <tr><td>Testes</td><td>Suite <code>node tests/mvp.test.cjs</code> (54 asserts) + QA com usuários reais</td><td>Suite verde; QA em andamento</td></tr>
   <tr><td>Lançamento</td><td>Deploy + treinamento</td><td>Deploy feito; treinamento pendente</td></tr>
 </table>
 
@@ -228,19 +271,19 @@ f<!DOCTYPE html>
   <h2 class="sec">8. Equipe</h2>
 <table>
   <tr><th>Nome</th><th>Responsável por</th></tr>
-  <tr><td>Bruno Campos</td><td>Login (3 perfis), intro cinematográfica, verificação anti-robôs, Dashboard geral e deploy</td></tr>
-  <tr><td>Rafael Santos</td><td>Matrícula, Check-in com validação e testes do MVP</td></tr>
-  <tr><td>Tiago Ribeiro</td><td>Financeiro, módulo nutricional, Dashboard do Aluno e apresentação</td></tr>
+  <tr><td>Bruno Campos</td><td>Login (5 perfis), intro cinematográfica, verificação anti-robôs, Dashboards bento e deploy</td></tr>
+  <tr><td>Rafael Santos</td><td>Matrícula, Check-in com validação e suite de testes (54 asserts)</td></tr>
+  <tr><td>Tiago Ribeiro</td><td>Financeiro, módulo nutricional (Anamnese + Plano + Exames), Dashboard do Aluno, Desafios, Fórum e apresentação</td></tr>
   <tr><td>Lucas Mynssem</td><td>Design das telas, identidade visual (roxo + preto, Sora/Anton/JetBrains Mono) e implementação do <code>style.css</code></td></tr>
   <tr><td>Enzo Guimaraes</td><td>Documentação do projeto (<code>docs/documentacao.html</code>, README), roteiros de apresentação e apoio nos testes</td></tr>
 </table>
 
 <h2 class="sec">9. Após o MVP (fora deste escopo)</h2>
 <ul>
-  <li>Backend real com banco de dados e login com senha criptografada.</li>
+  <li>Backend real com banco de dados e login com senha criptografada (hoje tudo é <code>localStorage</code>, 100% front-end).</li>
   <li>Gateway de pagamento e baixa automática de mensalidades.</li>
   <li>Trava contra check-in duplicado no mesmo dia.</li>
-  <li>Módulo nutricional completo com acompanhamento profissional.</li>
+  <li>Upload de exames para servidor com controle LGPD (hoje até 1,5 MB no navegador).</li>
 </ul>
 
 </div>

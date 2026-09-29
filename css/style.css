@@ -189,6 +189,127 @@ label{display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:var(--mu
 .modal .box{background:var(--panel2);border:1px solid rgba(139,92,246,.3);border-radius:22px;padding:28px;width:100%;max-width:500px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
 .modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
 .aviso{min-height:22px;color:var(--violet);font-weight:600;font-size:14px}
+/* DASHBOARDS NOCTIS — bento operacional, sem cara de IA */
+.anton{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em}
+.mono{font-family:'JetBrains Mono',monospace}
+.tele{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.delta{font-size:10px;padding:3px 8px;border-radius:20px;border:1px solid rgba(139,92,246,.4);color:var(--violet);margin-left:8px;vertical-align:middle}
+.dash-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-bottom:22px}
+.dash-hero{grid-column:span 8;margin:0;position:relative;overflow:hidden}
+.dash-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px 160px at 85% 0%,rgba(139,92,246,.14),transparent 65%)}
+.dash-hoje{grid-column:span 4;margin:0}
+.dash-planos{grid-column:span 4;margin:0}
+.dash-fluxo{grid-column:span 8;margin:0}
+.dash-alerts{grid-column:span 7;margin:0}
+.dash-live{grid-column:span 5;margin:0}
+.dash-big{font-size:clamp(38px,4.5vw,58px);line-height:.95;margin:10px 0 12px}
+.dash-big small,.dash-unit{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.08em;margin-left:10px}
+.meta-track,.oc-track{height:8px;border-radius:99px;background:#0a0a12;border:1px solid var(--line);overflow:hidden;margin:10px 0 6px}
+.meta-fill,.ocup-fill{height:100%;width:0;background:linear-gradient(90deg,var(--violet-deep),var(--violet));border-radius:99px;transition:width .8s cubic-bezier(.32,.72,0,1)}
+.dash-split{display:flex;gap:22px;margin:12px 0;flex-wrap:wrap}
+.dash-split strong{font-size:17px;display:block;margin-top:4px}
+.danger{color:var(--danger)}
+.dash-flex{display:flex;gap:16px;align-items:center}
+.dash-flex-between{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
+.legend{display:flex;flex-direction:column;gap:8px;flex:1}
+.legend-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.legend-row strong{margin-left:auto;font-size:12px}
+.legend-dot{width:10px;height:10px;border-radius:4px;flex-shrink:0}
+.dash-hr{border:none;border-top:1px solid var(--line);margin:14px 0}
+.dash-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.feed{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.feed-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:#0d0d16;font-size:13px}
+.feed-name{font-weight:600;flex:1}
+.feed-row .btn{flex-shrink:0}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px rgba(139,92,246,.9);display:inline-block;animation:pulso 2s ease-in-out infinite}
+.live-dot.sm{width:7px;height:7px}
+.head-meta .live-dot{margin-right:8px;vertical-align:1px}
+/* dashboard do aluno */
+.al-hero{display:flex;gap:18px;align-items:center}
+.al-avatar{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--violet),var(--violet-deep));display:flex;align-items:center;justify-content:center;font-size:24px;color:#0d0a1a;flex-shrink:0;box-shadow:0 0 24px rgba(139,92,246,.35)}
+.al-main{flex:1;min-width:0}
+.al-name{font-size:clamp(24px,3vw,34px);margin:6px 0 8px}
+.al-pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.al-week{display:flex;gap:6px;margin-top:10px}
+.al-day{width:28px;height:28px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.al-day.on{background:var(--violet);color:#0d0a1a;border-color:var(--violet);font-weight:700}
+.al-score{text-align:right;flex-shrink:0}
+.al-score strong{font-size:42px;display:block;line-height:1}
+.al-grid{grid-template-columns:repeat(3,1fr)}
+.al-grid .panel{margin:0}
+@media(max-width:900px){
+  .dash-grid{grid-template-columns:1fr}
+  .dash-hero,.dash-hoje,.dash-planos,.dash-fluxo,.dash-alerts,.dash-live{grid-column:span 1}
+  .al-hero{flex-direction:column;align-items:flex-start}
+  .al-score{text-align:left}
+  .al-grid{grid-template-columns:1fr}
+}
+.desafio-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.desafio-card ul,.panel ul{padding-left:20px;margin:10px 0}
+.forum-msg p{margin:8px 0 0;line-height:1.6}
+.card.green{border-color:rgba(52,211,153,.4)}
+.card.orange{border-color:rgba(251,191,36,.35)}
+#treinos-lista .panel h2 small{font-weight:400}
+textarea:disabled{opacity:.6}
+@media(max-width:900px){.desafio-grid{grid-template-columns:1fr}}
+
+/* FRONT-2 · avatares, membros, seções — Glofox/Mindbody */
+.avatar{border-radius:12px;background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#0d0a1a;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Sora',sans-serif}
+.avatar.sm{width:34px;height:34px;font-size:13px}
+.avatar.xs{width:26px;height:26px;font-size:10px;border-radius:9px}
+.avatar.more{background:var(--panel2);color:var(--violet);border:1px dashed rgba(139,92,246,.5)}
+.member{display:flex;align-items:center;gap:10px}
+.nav-sec{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin:16px 4px 6px;opacity:.8}
+.empty{text-align:left;border-style:dashed}
+/* FRONT-2 · catraca — Smart Fit */
+.check-hero{position:relative;overflow:hidden}
+.check-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(480px 180px at 90% 0%,rgba(139,92,246,.14),transparent 65%)}
+.check-row{display:flex;gap:10px;margin:14px 0 6px}
+.check-select{flex:2;font-size:15px}
+.btn-check{flex:1;font-size:16px;padding:14px 22px}
+.check-foot{margin-top:6px}
+/* FRONT-2 · treinos — Nike Training + agenda Glofox */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s cubic-bezier(.32,.72,0,1)}
+.chip:hover{border-color:var(--violet-strong);color:var(--txt)}
+.chip.on{background:var(--violet);border-color:var(--violet);color:#0d0a1a}
+.work-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.work-card{margin:0;position:relative;transition:transform .25s cubic-bezier(.32,.72,0,1),border-color .25s}
+.work-card:hover{transform:translateY(-3px);border-color:rgba(139,92,246,.45)}
+.work-card.today{border-color:rgba(139,92,246,.55);box-shadow:0 0 30px rgba(139,92,246,.12)}
+.today-tag{position:absolute;top:14px;right:14px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;background:var(--violet);color:#0d0a1a;border-radius:20px;padding:4px 10px;font-weight:700}
+.day-chip{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--violet-wash);border:1px solid rgba(139,92,246,.4);color:var(--violet);border-radius:8px;padding:5px 10px;font-weight:600}
+.work-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.work-title{font-size:26px;margin:0 0 4px}
+.work-list{list-style:none;padding:0;margin:10px 0}
+.work-list li{padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.work-list li:last-child{border-bottom:none}
+.work-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+/* FRONT-2 · desafios — Strava */
+.chal-card{margin:0;transition:transform .25s cubic-bezier(.32,.72,0,1),border-color .25s}
+.chal-card:hover{transform:translateY(-3px);border-color:rgba(139,92,246,.45)}
+.chal-band{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.chal-title{font-size:30px;margin:0 0 6px;line-height:1}
+.stack{display:flex;margin:12px 0}
+.stack .avatar{margin-left:-8px;border:2px solid var(--panel)}
+.stack .avatar:first-child{margin-left:0}
+.chal-actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+/* FRONT-2 · ranking + fórum */
+.dash-rank{grid-column:span 12;margin:0}
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:#0d0d16;margin-bottom:8px}
+.rank-pos{font-size:22px;color:var(--violet);min-width:38px}
+.topic-card{display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:border-color .2s,transform .2s}
+.topic-card:hover{border-color:var(--violet-strong);transform:translateX(3px)}
+.topic-main{flex:1;min-width:0}
+.topic-main h2{margin:0 0 4px}
+.reply-pill{font-size:11px;color:var(--violet);border:1px solid rgba(139,92,246,.4);border-radius:20px;padding:5px 12px;white-space:nowrap}
+/* FRONT-2 · treino de hoje — Smart Fit */
+.al-today{border-color:rgba(139,92,246,.55);background:linear-gradient(180deg,rgba(139,92,246,.1),var(--panel));margin:0}
+@media(max-width:900px){
+  .work-grid{grid-template-columns:1fr}
+  .check-row{flex-direction:column}
+  .dash-rank{grid-column:span 1}
+}
 
 @media(max-width:900px){
   .app{flex-direction:column}
