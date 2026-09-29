@@ -151,6 +151,14 @@
         <div class="dash-flex-between"><span class="tele">RANKING · MAIS FREQUENTES</span><small class="mono muted">presenças totais</small></div>
         <div id="dash-ranking"></div>
       </div>
+      <div class="panel dash-backup">
+        <div class="tele">BACKUP · LEVAR DADOS ENTRE APARELHOS (SEM SERVIDOR)</div>
+        <p class="muted">Cada navegador guarda seu próprio banco. O nutri exporta e manda o arquivo; o admin importa aqui.</p>
+        <div class="dash-actions">
+          <button class="btn small" onclick="exportarBackup()">Exportar backup</button>
+          <span id="backup-import-wrap"><input id="backup-arquivo" type="file" accept=".json" style="max-width:240px"><button class="btn small ghost" id="btn-importar" onclick="importarBackup()">Importar backup</button></span>
+        </div>
+      </div>
     </div>
   </section>
 

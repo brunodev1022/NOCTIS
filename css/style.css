@@ -296,6 +296,7 @@ textarea:disabled{opacity:.6}
 .chal-actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
 /* FRONT-2 · ranking + fórum */
 .dash-rank{grid-column:span 12;margin:0}
+.dash-backup{grid-column:span 12;margin:0}
 .rank-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:#0d0d16;margin-bottom:8px}
 .rank-pos{font-size:22px;color:var(--violet);min-width:38px}
 .topic-card{display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:border-color .2s,transform .2s}
@@ -320,7 +321,7 @@ textarea:disabled{opacity:.6}
 @media(max-width:900px){
   .work-grid{grid-template-columns:1fr}
   .check-row{flex-direction:column}
-  .dash-rank{grid-column:span 1}
+  .dash-rank,.dash-backup{grid-column:span 1}
 }
 
 @media(max-width:900px){
