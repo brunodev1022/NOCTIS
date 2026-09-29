@@ -58,6 +58,7 @@ Abaixo: grid — treino de hoje, próximo treino, plano (nº refeições + autor
 - Aluno: `.al-today` = primeiro treino com `dia === diaHojePT()` ("TREINO DE HOJE")
 - Avatares: `.avatar(.xs/.sm)` com `iniciais(nome)`; listas usam `.member`
 - Fórum: `.topic-card` + `.reply-pill`, mensagens com avatar
+- Tom de produto: subs sem "Tela NN", sem tags "Fase 4", sem "MVP"/"demo" no app; `.nav-sec` some quando vazia p/ o perfil; contas de acesso rápido com `preencherLogin()`
 
 ## Regras de teste
 

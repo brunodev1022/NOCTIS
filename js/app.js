@@ -43,6 +43,9 @@ function tocarVerify() {
   rodarVerificacao(() => {});
 }
 
+function preencherLogin(email, senha) {
+  $('login-email').value = email; $('login-senha').value = senha; $('login-erro').textContent = '';
+}
 // ---------- TELA 1: LOGIN ----------
 function fazerLogin() {
   if (verificando) return;
@@ -50,7 +53,7 @@ function fazerLogin() {
   const email = $('login-email').value.trim().toLowerCase();
   const senha = $('login-senha').value;
   const u = USUARIOS.find(x => x.email === email && x.senha === senha);
-  if (!u) { $('login-erro').textContent = 'E-mail ou senha inválidos. Use um dos usuários demo.'; return; }
+  if (!u) { $('login-erro').textContent = 'E-mail ou senha inválidos. Use uma das contas de acesso rápido abaixo.'; return; }
   usuarioLogado = u;
   sessionStorage.setItem('fit_user', JSON.stringify(u));
   entrar();
@@ -67,6 +70,15 @@ function entrar() {
     const permitido = b.dataset.perfis.split(',').includes(usuarioLogado.perfil);
     b.style.display = permitido ? '' : 'none';
   });
+  // Esconde a seção do menu quando nenhum item dela aparece (ex.: aluno não vê OPERAÇÃO)
+  let sec = null, temItem = false;
+  document.querySelectorAll('#nav > *').forEach(el => {
+    if (el.classList && el.classList.contains && el.classList.contains('nav-sec')) {
+      if (sec) sec.style.display = temItem ? '' : 'none';
+      sec = el; temItem = false;
+    } else if (el.style && el.style.display !== 'none') temItem = true;
+  });
+  if (sec) sec.style.display = temItem ? '' : 'none';
   // Aluno cai direto no dashboard do aluno
   if (usuarioLogado.perfil === 'Aluno') irPara('dashaluno');
   recarregarTudo();
@@ -312,7 +324,7 @@ function renderPlanoResult(alunoId) {
     <p class="muted">Prescrito por ${esc(plan.autor || 'Equipe')} em ${(plan.data || '').split('-').reverse().join('/')}</p>
     <label>Orientações do nutricionista ${editavel ? '' : '(somente leitura)'}<textarea id="plano-orient" rows="3" ${editavel ? '' : 'disabled'} placeholder="Ex: ajustar proteína pós-treino conforme exame...">${esc(plan.orientacoes)}</textarea></label>
     ${editavel ? '<button class="btn small" onclick="salvarOrientacoes()">Salvar orientações</button>' : ''}
-    <div class="panel" style="margin:14px 0 0"><div class="tele">EXAMES DO ALUNO · BASE DO PLANEJAMENTO (${examesAl.length})</div>${examesAl.map(e => `<p><strong>${e.nomeArquivo}</strong> <small class="muted">${(e.data || '').split('-').reverse().join('/')} · ${e.obs || 'sem obs'}</small><br><small>${e.parecer ? 'Parecer: ' + e.parecer : 'Aguardando análise na Tela 08'}</small></p>`).join('') || '<p class="muted">Nenhum exame enviado. Peça ao aluno na Tela 08.</p>'}<button class="btn small ghost" onclick="irPara('exames')">Abrir exames</button></div>
+    <div class="panel" style="margin:14px 0 0"><div class="tele">EXAMES DO ALUNO · BASE DO PLANEJAMENTO (${examesAl.length})</div>${examesAl.map(e => `<p><strong>${e.nomeArquivo}</strong> <small class="muted">${(e.data || '').split('-').reverse().join('/')} · ${e.obs || 'sem obs'}</small><br><small>${e.parecer ? 'Parecer: ' + e.parecer : 'Aguardando análise em Exames'}</small></p>`).join('') || '<p class="muted">Nenhum exame enviado. Peça ao aluno em Exames.</p>'}<button class="btn small ghost" onclick="irPara('exames')">Abrir exames</button></div>
     <br><small style="color:#9aa6b5">Prescrição do nutricionista responsável — sem cardápio automático (ver Riscos/LGPD no README).</small>`;
 }
 function salvarOrientacoes() {
@@ -358,10 +370,10 @@ function verDashAluno() {
     <div class="dash-grid al-grid">
       <div class="panel al-today"><div class="tele">TREINO DE HOJE · ${diaHojePT().toUpperCase()}</div>${treinoHoje.length ? `<h2 class="anton">${treinoHoje[0].tipo}</h2><p class="muted">${(treinoHoje[0].exercicios || []).slice(0, 3).join(' · ')}${(treinoHoje[0].exercicios || []).length > 3 ? ' · ...' : ''}</p><button class="btn small" onclick="irPara('treinos')">Abrir treino</button>` : '<p class="muted">Descanso programado. Aproveita pra revisar o plano alimentar.</p>'}</div>
       <div class="panel"><div class="tele">PRÓXIMO TREINO</div>${prox ? `<h2>${prox.tipo} · ${prox.dia}</h2><p class="muted">${prox.objetivo || ''}</p><ul>${(prox.exercicios || []).slice(0, 4).map(e => `<li>${e}</li>`).join('')}</ul><button class="btn small ghost" onclick="irPara('treinos')">Ver todos</button>` : '<p class="muted">Nenhum treino montado. Fala com o personal.</p>'}</div>
-      <div class="panel"><div class="tele">PLANO · ${plan && plan.itens ? 'PRESCRITO' : 'A PRESCREVER'}</div>${plan && plan.itens ? `<h2>${plan.itens.length} refeições</h2><p class="muted">por ${plan.autor || 'Equipe'}</p><button class="btn small ghost" onclick="irPara('plano')">Abrir plano</button>` : '<p class="muted">O nutricionista monta teu plano na Tela 05.</p>'}</div>
-      <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${d.titulo}</span><span class="badge paga">${d.perfilAlvo}</span></div>`).join('') || '<p class="muted">Entra num desafio na Tela 09.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
+      <div class="panel"><div class="tele">PLANO · ${plan && plan.itens ? 'PRESCRITO' : 'A PRESCREVER'}</div>${plan && plan.itens ? `<h2>${plan.itens.length} refeições</h2><p class="muted">por ${plan.autor || 'Equipe'}</p><button class="btn small ghost" onclick="irPara('plano')">Abrir plano</button>` : '<p class="muted">Aguardando prescrição do nutricionista.</p>'}</div>
+      <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${d.titulo}</span><span class="badge paga">${d.perfilAlvo}</span></div>`).join('') || '<p class="muted">Nenhum desafio ativo. Explore em Desafios.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
     </div>
-    <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${anam.objetivo} · ${anam.refeicoes} refeições/dia · ${anam.restricoes || 'sem restrições'}` : 'Anamnese ainda não preenchida (Fase 4).'}</p></div>`;
+    <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${anam.objetivo} · ${anam.refeicoes} refeições/dia · ${anam.restricoes || 'sem restrições'}` : 'Anamnese ainda não preenchida.'}</p></div>`;
 }
 
 // ---------- TELA 07: TREINOS (personal planeja por perfil/objetivo) ----------

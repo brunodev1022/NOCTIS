@@ -45,11 +45,11 @@
         <li><span>02</span>Check-in com validação de pagamento</li>
         <li><span>03</span>Financeiro e dashboard em tempo real</li>
       </ul>
-      <div class="brand-foot">MVP · v0.2 · HTML + CSS + JS · GitHub Pages</div>
+      <div class="brand-foot">v1.0 · HTML + CSS + JS · GitHub Pages</div>
     </div>
     <div class="login-form">
       <h2>Acesso ao painel</h2>
-      <p class="sub">Autenticação de 5 perfis — escolha um usuário demo.</p>
+      <p class="sub">Autenticação por perfil — toque numa conta para entrar.</p>
       <label>E-mail<input id="login-email" value="admin@noctis" autocomplete="username"></label>
       <label>Senha<input id="login-senha" type="password" value="admin123" autocomplete="current-password"></label>
       <div id="login-verify" class="verify-widget sm" onclick="tocarVerify()" title="Confirmar que sou humano">
@@ -60,12 +60,12 @@
       <button class="btn btn-block" onclick="fazerLogin()">Entrar no painel</button>
       <p id="login-erro" class="erro"></p>
       <div class="demo">
-        <strong>Acessos demo</strong>
-        <div><code>admin@noctis / admin123</code><span>Administrador — acesso total</span></div>
-        <div><code>recepcao@noctis / recepcao123</code><span>Funcionário — matrícula, check-in, financeiro</span></div>
-        <div><code>aluno@noctis / aluno123</code><span>Aluno — dashboard, exames, treinos, desafios, fórum</span></div>
-        <div><code>nutri@noctis / nutri123</code><span>Nutricionista — anamnese, plano alimentar, exames</span></div>
-        <div><code>personal@noctis / personal123</code><span>Personal — treinos, alunos, desafios</span></div>
+        <strong>Acesso rápido</strong>
+        <div onclick="preencherLogin('admin@noctis','admin123')"><code>admin@noctis / admin123</code><span>Administrador — acesso total</span></div>
+        <div onclick="preencherLogin('recepcao@noctis','recepcao123')"><code>recepcao@noctis / recepcao123</code><span>Atendimento — matrícula, check-in, financeiro</span></div>
+        <div onclick="preencherLogin('aluno@noctis','aluno123')"><code>aluno@noctis / aluno123</code><span>Aluno — treinos, exames, desafios, fórum</span></div>
+        <div onclick="preencherLogin('nutri@noctis','nutri123')"><code>nutri@noctis / nutri123</code><span>Nutricionista — anamnese, plano alimentar, exames</span></div>
+        <div onclick="preencherLogin('personal@noctis','personal123')"><code>personal@noctis / personal123</code><span>Personal — treinos e acompanhamento</span></div>
       </div>
     </div>
   </div>
@@ -73,7 +73,7 @@
 
 <div id="app" class="app hidden">
 <aside class="sidebar">
-  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>MVP</small></div>
+  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>v1.0</small></div>
   <div class="userbox"><span class="avatar sm" id="user-avatar">N</span><div style="flex:1;min-width:0"><strong id="user-nome"></strong><small id="user-perfil"></small></div><button class="mini-logout" onclick="sair()" title="Encerrar sessão">Sair</button></div>
   <nav id="nav" aria-label="Navegação principal">
     <div class="nav-sec">Operação</div>
@@ -82,8 +82,8 @@
     <button class="nav-btn" data-route="checkin" data-perfis="Administrador,Funcionário"><span class="num">02</span>Check-in</button>
     <button class="nav-btn" data-route="financeiro" data-perfis="Administrador,Funcionário"><span class="num">03</span>Financeiro</button>
     <div class="nav-sec">Nutrição</div>
-    <button class="nav-btn" data-route="anamnese" data-perfis="Administrador,Funcionário,Nutricionista"><span class="num">04</span>Anamnese<em class="tag">Fase 4</em></button>
-    <button class="nav-btn" data-route="plano" data-perfis="Administrador,Funcionário,Nutricionista,Aluno"><span class="num">05</span>Plano alimentar<em class="tag">Fase 4</em></button>
+    <button class="nav-btn" data-route="anamnese" data-perfis="Administrador,Funcionário,Nutricionista"><span class="num">04</span>Anamnese</button>
+    <button class="nav-btn" data-route="plano" data-perfis="Administrador,Funcionário,Nutricionista,Aluno"><span class="num">05</span>Plano alimentar</button>
     <button class="nav-btn" data-route="exames" data-perfis="Administrador,Nutricionista,Funcionário,Aluno"><span class="num">08</span>Exames</button>
     <div class="nav-sec">Treino</div>
     <button class="nav-btn" data-route="dashaluno" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">06</span>Dashboard do aluno</button>
@@ -136,7 +136,7 @@
       </div>
       <div class="panel dash-fluxo">
         <div class="dash-flex-between"><span class="tele">FLUXO · 7 DIAS</span><small class="mono muted"><span id="checkins-7d">0</span> total · média <span id="checkins-media">0</span>/dia</small></div>
-        <div class="chart-box"><canvas id="chart-checkins"></canvas><div id="fluxo-vazio" class="chart-empty hidden">Sem movimento nos últimos 7 dias.<br>Registre check-ins na Tela 02.</div></div>
+        <div class="chart-box"><canvas id="chart-checkins"></canvas><div id="fluxo-vazio" class="chart-empty hidden">Sem movimento nos últimos 7 dias.<br>Registre check-ins na catraca.</div></div>
       </div>
       <div class="panel dash-alerts" id="dash-alerts">
         <div class="tele">ATENÇÃO · COBRANÇA</div>
@@ -156,7 +156,7 @@
 
   <section id="view-matricula" class="view">
     <div class="page-head">
-      <div><h1>Matrícula</h1><p class="sub">Tela 01 — Cadastro completo do aluno</p></div>
+      <div><h1>Matrícula</h1><p class="sub">Cadastro completo do aluno</p></div>
     </div>
     <div class="toolbar">
       <input id="busca-aluno" type="search" placeholder="Buscar por nome...">
@@ -173,7 +173,7 @@
 
   <section id="view-checkin" class="view">
     <div class="page-head">
-      <div><h1>Check-in</h1><p class="sub">Tela 02 — Catraca: validação de pagamento + acesso</p></div>
+      <div><h1>Check-in</h1><p class="sub">Catraca: validação de pagamento + acesso</p></div>
       <div class="head-meta"><span class="live-dot"></span>CATRACA ABERTA</div>
     </div>
     <div class="panel check-hero">
@@ -192,7 +192,7 @@
 
   <section id="view-financeiro" class="view">
     <div class="page-head">
-      <div><h1>Financeiro</h1><p class="sub">Tela 03 — Gestão de mensalidades</p></div>
+      <div><h1>Financeiro</h1><p class="sub">Gestão de mensalidades</p></div>
     </div>
     <div class="cards">
       <div class="card"><span class="label">Recebido</span><strong id="fin-recebido">R$ 0</strong></div>
@@ -207,7 +207,7 @@
 
   <section id="view-anamnese" class="view">
     <div class="page-head">
-      <div><h1>Anamnese <em class="tag">Fase 4</em></h1><p class="sub">Tela 04 — Coleta de dados alimentares</p></div>
+      <div><h1>Anamnese</h1><p class="sub">Coleta de dados alimentares</p></div>
     </div>
     <div class="toolbar"><select id="anam-aluno"></select></div>
     <div class="panel">
@@ -223,7 +223,7 @@
 
   <section id="view-plano" class="view">
     <div class="page-head">
-      <div><h1>Plano alimentar</h1><p class="sub">Tela 05 — Prescrição manual do nutricionista</p></div>
+      <div><h1>Plano alimentar</h1><p class="sub">Prescrição manual do nutricionista</p></div>
     </div>
     <div class="toolbar"><select id="plano-aluno"></select></div>
     <div class="panel" id="plano-form">
@@ -238,7 +238,7 @@
 
   <section id="view-dashaluno" class="view">
     <div class="page-head">
-      <div><h1>Dashboard do aluno</h1><p class="sub">Tela 06 — Tela inicial do aluno</p></div>
+      <div><h1>Dashboard do aluno</h1><p class="sub">Acompanhamento, treinos e evolução</p></div>
     </div>
     <div class="toolbar"><select id="dash-aluno"></select></div>
     <div id="dash-aluno-box"></div>
@@ -246,7 +246,7 @@
 
   <section id="view-treinos" class="view">
     <div class="page-head">
-      <div><h1>Treinos</h1><p class="sub">Tela 07 — Personal monta o planejamento por perfil e objetivo</p></div>
+      <div><h1>Treinos</h1><p class="sub">Planejamento por perfil e objetivo</p></div>
       <button class="btn" id="btn-novo-treino" onclick="abrirModalTreino()">Novo treino</button>
     </div>
     <div class="toolbar">
@@ -267,7 +267,7 @@
 
   <section id="view-exames" class="view">
     <div class="page-head">
-      <div><h1>Exames</h1><p class="sub">Tela 08 — Aluno envia exames, nutricionista analisa e orienta o plano</p></div>
+      <div><h1>Exames</h1><p class="sub">Envio do aluno, análise da nutrição</p></div>
     </div>
     <div class="toolbar"><select id="exame-aluno"></select></div>
     <div class="panel">
@@ -277,7 +277,7 @@
         <label>Observação do aluno<input id="exame-obs" placeholder="Ex: hemograma de rotina, jejum de 12h..."></label>
       </div>
       <button class="btn" onclick="uploadExame()">Enviar exame</button>
-      <small class="muted">MVP sem backend: o arquivo fica salvo no navegador (localStorage). No pós-MVP vai para um servidor com controle LGPD.</small>
+      <small class="muted">Arquivo salvo neste navegador (sem servidor). Limite de 1,5 MB por arquivo.</small>
     </div>
     <div class="panel nopad"><table>
       <thead><tr><th>Arquivo</th><th>Aluno</th><th>Data</th><th>Parecer da nutrição</th><th>Ações</th></tr></thead>
@@ -287,7 +287,7 @@
 
   <section id="view-desafios" class="view">
     <div class="page-head">
-      <div><h1>Desafios</h1><p class="sub">Tela 09 — Academia sugere por perfil, aluno cria os próprios e participa</p></div>
+      <div><h1>Desafios</h1><p class="sub">Metas da academia e dos alunos</p></div>
       <button class="btn" onclick="abrirModalDesafio()">Novo desafio</button>
     </div>
     <div class="toolbar">
@@ -298,7 +298,7 @@
 
   <section id="view-forum" class="view">
     <div class="page-head">
-      <div><h1>Fórum</h1><p class="sub">Tela 10 — Clientes e equipe interagem: dúvidas, dicas e desafios</p></div>
+      <div><h1>Fórum</h1><p class="sub">Dúvidas, dicas e desafios da comunidade</p></div>
       <button class="btn" onclick="abrirModalTopico()">Novo tópico</button>
     </div>
     <div id="forum-lista"></div>
