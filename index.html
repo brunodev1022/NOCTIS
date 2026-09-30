@@ -45,7 +45,7 @@
         <li><span>02</span>Check-in com validação de pagamento</li>
         <li><span>03</span>Financeiro e dashboard em tempo real</li>
       </ul>
-      <div class="brand-foot">v1.0 · HTML + CSS + JS · GitHub Pages</div>
+      <div class="brand-foot">v1.1 · HTML + CSS + JS · GitHub Pages</div>
     </div>
     <div class="login-form">
       <h2>Acesso ao painel</h2>
@@ -73,7 +73,7 @@
 
 <div id="app" class="app hidden">
 <aside class="sidebar">
-  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>v1.0</small></div>
+  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>v1.1</small></div>
   <div class="userbox"><span class="avatar sm" id="user-avatar">N</span><div style="flex:1;min-width:0"><strong id="user-nome"></strong><small id="user-perfil"></small></div><button class="mini-logout" onclick="sair()" title="Encerrar sessão">Sair</button></div>
   <nav id="nav" aria-label="Navegação principal">
     <div class="nav-sec">Operação</div>
@@ -92,6 +92,7 @@
     <button class="nav-btn" data-route="desafios" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">09</span>Desafios</button>
     <button class="nav-btn" data-route="forum" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">10</span>Fórum</button>
   </nav>
+  <button class="kbd-hint" onclick="abrirCmdk()" title="Busca rápida"><span class="kbd">Ctrl K</span> Buscar telas e ações</button>
 </aside>
 
 <main class="content">
@@ -351,6 +352,14 @@
   <label>Mensagem<textarea id="f-topico-msg" rows="4" placeholder="Escreva a primeira mensagem do tópico..."></textarea></label>
   <div class="actions"><button class="btn ghost" onclick="fecharModalTopico()">Cancelar</button><button class="btn" onclick="salvarTopico()">Publicar</button></div>
 </div></div>
+
+<div id="cmdk-overlay" class="cmdk-overlay hidden" onclick="fecharCmdkFundo(event)">
+  <div class="cmdk-box">
+    <input id="cmdk-input" placeholder="Buscar telas e ações..." oninput="filtrarCmdk()" autocomplete="off">
+    <div id="cmdk-list"></div>
+    <div class="cmdk-foot mono">Enter abre · ↑↓ navega · Esc fecha</div>
+  </div>
+</div>
 
 <script src="js/store.js?v=1.1"></script>
 <script src="js/bg3d.js?v=1.1"></script>

@@ -58,6 +58,9 @@ Abaixo: grid — treino de hoje, próximo treino, plano (nº refeições + autor
 - Aluno: `.al-today` = primeiro treino com `dia === diaHojePT()` ("TREINO DE HOJE")
 - Avatares: `.avatar(.xs/.sm)` com `iniciais(nome)`; listas usam `.member`
 - Fórum: `.topic-card` + `.reply-pill`, mensagens com avatar
+- Radius curto (anti-IA): `--r-lg:12px --r-md:8px --r-sm:6px`; botões/modais/panels quadrados, pills só em labels minúsculas (badge/chip/tag)
+- Navegação: paleta Ctrl K (`abrirCmdk`, `cmdkGo`) com rotas visíveis ao perfil + 6 ações; `.kbd-hint` na sidebar; mobile com `#nav` em scroll horizontal
+- Movimento: `.view.active>*` rise escalonado, `animarNumero()` (texto final síncrono + rAF por cima, respeita reduced-motion), `irPara()` com View Transitions + fallback
 - Tom de produto: subs sem "Tela NN", sem tags "Fase 4", sem "MVP"/"demo" no app; `.nav-sec` some quando vazia p/ o perfil; contas de acesso rápido com `preencherLogin()`
 
 ## Regras de teste

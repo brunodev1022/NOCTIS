@@ -107,10 +107,28 @@ const DIAS_PT = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'S
 const diaHojePT = () => DIAS_PT[new Date().getDay()];
 function presencasTotais() { const m = {}; Object.values(Store.db.checkins).flat().forEach(c => { m[c.alunoId] = (m[c.alunoId] || 0) + 1; }); return m; }
 function filtrarDia(dia) { $('treino-filtro-dia').value = dia; listarTreinos(); }
+// Números com física: exibe o valor final na hora e anima por cima (respeita reduced-motion)
+const fmtInt = (v) => String(Math.round(v));
+function animarNumero(el, para, fmt) {
+  if (!el) return;
+  const de = parseFloat((el.dataset && el.dataset.v) || '0');
+  if (el.dataset) el.dataset.v = para;
+  el.textContent = fmt(para);
+  try {
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (typeof requestAnimationFrame === 'undefined') return;
+    const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    const passo = (t) => { const agora = (t === undefined ? Date.now() : t); const p = Math.min(1, (agora - t0) / 600); const v = de + (para - de) * (1 - Math.pow(1 - p, 3)); el.textContent = fmt(v); if (p < 1) requestAnimationFrame(passo); };
+    requestAnimationFrame(passo);
+  } catch (e) {}
+}
 function irPara(route) {
-  document.querySelectorAll('#nav .nav-btn').forEach(b => b.classList.toggle('active', b.dataset.route === route));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  $('view-' + route).classList.add('active');
+  const troca = () => {
+    document.querySelectorAll('#nav .nav-btn').forEach(b => b.classList.toggle('active', b.dataset.route === route));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    $('view-' + route).classList.add('active');
+  };
+  if (document.startViewTransition) document.startViewTransition(troca); else troca();
 }
 document.querySelectorAll('#nav .nav-btn').forEach(b => b.addEventListener('click', () => irPara(b.dataset.route)));
 
@@ -128,13 +146,13 @@ function atualizarDashboard() {
   const hojeLista = checkins[hojeISO()] || [];
   $('hoje').textContent = new Date().toLocaleDateString('pt-BR');
   const dt = $('dash-turno'); if (dt) dt.textContent = 'TURNO ' + turnoAtual();
-  $('kpi-alunos').textContent = alunos.length;
+  animarNumero($('kpi-alunos'), alunos.length, fmtInt);
   $('kpi-ativos').textContent = ativos.length + ' ativos';
-  $('kpi-checkins').textContent = hojeLista.length;
-  $('kpi-receita').textContent = BRL(recebido);
-  $('kpi-pendente').textContent = BRL(pendente);
-  const tk = $('kpi-ticket'); if (tk) tk.textContent = BRL(pagantes ? recebido / pagantes : 0);
-  const ki = $('kpi-inad'); if (ki) ki.textContent = inad.length;
+  animarNumero($('kpi-checkins'), hojeLista.length, fmtInt);
+  animarNumero($('kpi-receita'), recebido, BRL);
+  animarNumero($('kpi-pendente'), pendente, BRL);
+  animarNumero($('kpi-ticket'), pagantes ? recebido / pagantes : 0, BRL);
+  animarNumero($('kpi-inad'), inad.length, fmtInt);
   const pct = potencial ? Math.round(recebido / potencial * 100) : 0;
   const d = $('kpi-receita-delta'); if (d) d.textContent = pct + '% DA META';
   const mf = $('meta-bar-fill'); if (mf) mf.style.width = pct + '%';
@@ -253,7 +271,7 @@ function fazerCheckin() {
 }
 function listarCheckins() {
   const lista = Store.db.checkins[hojeISO()] || [];
-  $('checkin-hoje-total').textContent = lista.length;
+  animarNumero($('checkin-hoje-total'), lista.length, fmtInt);
   $('tb-checkins').innerHTML = lista.map((c, i) => { const al = Store.db.alunos.find(a => a.id === c.alunoId);
     return `<tr><td><div class="member"><span class="avatar sm">${iniciais(al ? al.nome : '?')}</span><span>${al ? al.nome : '—'}</span></div></td><td class="mono">${c.hora}</td><td><button class="btn small danger" onclick="removerCheckin(${i})">Remover</button></td></tr>`; }).join('')
     || '<tr><td colspan="3">Nenhum acesso hoje</td></tr>';
@@ -265,9 +283,9 @@ function listarFinanceiro() {
   const alunos = Store.db.alunos.filter(a => a.status === 'Ativo');
   const recebido = alunos.filter(a => a.mensalidade === 'Paga').reduce((s, a) => s + PLANOS[a.plano], 0);
   const areceber = alunos.filter(a => a.mensalidade === 'Pendente').reduce((s, a) => s + PLANOS[a.plano], 0);
-  $('fin-recebido').textContent = BRL(recebido);
-  $('fin-areceber').textContent = BRL(areceber);
-  $('fin-inad').textContent = alunos.filter(a => a.mensalidade === 'Pendente').length;
+  animarNumero($('fin-recebido'), recebido, BRL);
+  animarNumero($('fin-areceber'), areceber, BRL);
+  animarNumero($('fin-inad'), alunos.filter(a => a.mensalidade === 'Pendente').length, fmtInt);
   $('tb-financeiro').innerHTML = alunos.map(a => `
     <tr><td>${a.nome}</td><td>${a.plano}</td><td>${BRL(PLANOS[a.plano])}</td>
     <td><span class="badge ${a.mensalidade === 'Paga' ? 'paga' : 'pendente'}">${a.mensalidade}</span></td>
@@ -589,6 +607,44 @@ function responderTopico() {
   t.mensagens.push({ autorNome: usuarioLogado.nome, autorPerfil: usuarioLogado.perfil, texto, data: hojeISO() });
   Store.salvar(); recarregarTudo();
 }
+
+// ---------- COMMAND PALETTE (Ctrl K): teleporte entre telas e ações ----------
+let cmdkLista = [], cmdkIndex = 0;
+function cmdkAberto() { return !$('cmdk-overlay').classList.contains('hidden'); }
+function cmdkItens() {
+  const rotas = [];
+  document.querySelectorAll('#nav .nav-btn').forEach(b => {
+    if (b.style.display !== 'none') rotas.push({ titulo: b.textContent.trim().replace(/^[0-9]+/, '').trim(), hint: 'Tela', route: b.dataset.route, run: () => irPara(b.dataset.route) });
+  });
+  const acoes = [
+    { titulo: 'Nova matrícula', hint: 'Ação', route: 'matricula', quando: podeMatricular, run: () => { irPara('matricula'); abrirModalAluno(); } },
+    { titulo: 'Registrar check-in', hint: 'Ação', route: 'checkin', quando: podeGerenciarFinanceiro, run: () => irPara('checkin') },
+    { titulo: 'Novo treino', hint: 'Ação', route: 'treinos', quando: podeGerenciarTreinos, run: () => { irPara('treinos'); abrirModalTreino(); } },
+    { titulo: 'Novo desafio', hint: 'Ação', route: 'desafios', quando: () => true, run: () => { irPara('desafios'); abrirModalDesafio(); } },
+    { titulo: 'Novo tópico', hint: 'Ação', route: 'forum', quando: () => true, run: () => { irPara('forum'); abrirModalTopico(); } },
+    { titulo: 'Exportar matrículas (CSV)', hint: 'Ação', route: 'matricula', quando: podeMatricular, run: () => exportarAlunosCSV() },
+  ].filter(a => { try { return a.quando(); } catch (e) { return false; } });
+  return rotas.concat(acoes);
+}
+function cmdkRender() {
+  const q = ($('cmdk-input').value || '').toLowerCase();
+  cmdkLista = cmdkItens().filter(it => it.titulo.toLowerCase().includes(q));
+  if (cmdkIndex >= cmdkLista.length) cmdkIndex = 0;
+  $('cmdk-list').innerHTML = cmdkLista.map((it, i) => `<button class="cmdk-item${i === cmdkIndex ? ' sel' : ''}" onclick="cmdkGo(${i})">${it.titulo}<small>${it.hint}</small></button>`).join('') || '<p class="muted" style="padding:12px">Nada encontrado. Tente "treino" ou "plano".</p>';
+}
+function abrirCmdk() { cmdkIndex = 0; $('cmdk-input').value = ''; cmdkRender(); $('cmdk-overlay').classList.remove('hidden'); const i = $('cmdk-input'); if (i && i.focus) i.focus(); }
+function fecharCmdk() { $('cmdk-overlay').classList.add('hidden'); }
+function fecharCmdkFundo(e) { if (e && e.target && e.target.id === 'cmdk-overlay') fecharCmdk(); }
+function filtrarCmdk() { cmdkIndex = 0; cmdkRender(); }
+function cmdkMover(d) { if (!cmdkLista.length) return; cmdkIndex = (cmdkIndex + d + cmdkLista.length) % cmdkLista.length; cmdkRender(); }
+function cmdkGo(i) { const it = cmdkLista[i]; if (!it) return null; fecharCmdk(); it.run(); return it.route; }
+if (document.addEventListener) document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && (e.key || '').toLowerCase() === 'k') { e.preventDefault(); cmdkAberto() ? fecharCmdk() : abrirCmdk(); }
+  else if (e.key === 'Escape') { fecharCmdk(); fecharModalAluno(); fecharModalTreino(); fecharModalDesafio(); fecharModalTopico(); }
+  else if (cmdkAberto() && e.key === 'ArrowDown') { e.preventDefault(); cmdkMover(1); }
+  else if (cmdkAberto() && e.key === 'ArrowUp') { e.preventDefault(); cmdkMover(-1); }
+  else if (cmdkAberto() && e.key === 'Enter') { cmdkGo(cmdkIndex); }
+});
 
 // ---------- INIT ----------
 function preencherSelects() {

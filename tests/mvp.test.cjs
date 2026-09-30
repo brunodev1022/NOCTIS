@@ -144,7 +144,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext('listarFinanceiro()', sandbox);
   const expRec = (89.90 + 239.90).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   ok($('fin-recebido').textContent === expRec, `recebido = ${expRec} (Ana + Carlos)`);
-  ok($('fin-inad').textContent === 1, '1 inadimplente ativo (Beatriz; Diego é inativo)');
+  ok(String($('fin-inad').textContent) === '1', '1 inadimplente ativo (Beatriz; Diego é inativo)');
   vm.runInContext(`alternarMensalidade('a3')`, sandbox);
   ok(vm.runInContext(`Store.db.alunos.find(a=>a.id==='a3').mensalidade`, sandbox) === 'Paga', 'alternar muda Pendente→Paga');
 
@@ -263,6 +263,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok($('dash-fin-note').style.display === '', 'personal vê aviso operacional');
   vm.runInContext(`usuarioLogado = USUARIOS[0]; atualizarDashboard()`, sandbox);
   ok($('dash-hero').style.display === '', 'admin continua vendo receita');
+
+  console.log('-- navegacao rapida (Ctrl K) --');
+  vm.runInContext(`usuarioLogado = USUARIOS[0]; abrirCmdk()`, sandbox);
+  ok($('cmdk-list').innerHTML.includes('Nova matrícula'), 'paleta lista ações do perfil');
+  $('cmdk-input').value = 'check';
+  vm.runInContext(`filtrarCmdk()`, sandbox);
+  ok($('cmdk-list').innerHTML.includes('Registrar check-in') && !$('cmdk-list').innerHTML.includes('Novo treino'), 'filtro afunila resultados');
+  ok(vm.runInContext(`cmdkGo(0)`, sandbox) === 'checkin', 'Enter navega para a rota');
+  vm.runInContext(`irPara('forum')`, sandbox);
+  ok(true, 'troca de tela com view transition roda sem erro');
   vm.runInContext(`usuarioLogado = USUARIOS.find(u=>u.perfil==='Nutricionista'); atualizarDashboard()`, sandbox);
   ok($('dash-hero').style.display === 'none', 'nutri não vê receita');
   ok($('dash-alerts').style.display === 'none', 'nutri não vê cobrança');

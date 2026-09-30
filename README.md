@@ -59,7 +59,7 @@ O trabalho passou por seis fases: descoberta dos requisitos e wireframes (feito 
 - Treinos (Maristela): personal monta por aluno/perfil/objetivo
 - Engajamento (Maristela): desafios por perfil + desafios do aluno · fórum com tópicos e respostas
 - Lançamento: testes internos · testes com alunos reais · deploy
-- Testes automatizados: `node tests/mvp.test.cjs` (67 asserts, zero dependências)
+- Testes automatizados: `node tests/mvp.test.cjs` (71 asserts, zero dependências)
 
 ## 5. Riscos e decisões (do Loop)
 
@@ -104,7 +104,7 @@ Bruno abre com problema, solução e login; Rafael mostra matrícula + check-in;
 | Nome | Responsável por |
 |---|---|
 | Bruno Campos | Login (5 perfis + acesso rápido), intro, verificação anti-robôs, Dashboards bento com sigilo financeiro e deploy no GitHub Pages |
-| Rafael Santos | Matrícula (só atendimento/admin), Check-in com validação de pagamento (RN01) e suite de testes (67 asserts) |
+| Rafael Santos | Matrícula (só atendimento/admin), Check-in com validação de pagamento (RN01) e suite de testes (71 asserts) |
 | Tiago Ribeiro | Financeiro, nutrição (Anamnese + Plano manual + Exames com parecer) e apresentação |
 | Lucas Mynssem | Identidade visual e front-end (bento, cards, ranking, Treino de Hoje, responsivo), `style.css`, Dashboard do Aluno e Treinos |
 | Enzo Guimaraes | Documentação (`docs/documentacao.html`, README), roteiros dos 5, Desafios, Fórum e apoio nos testes |
