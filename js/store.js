@@ -1,6 +1,4 @@
-// store.js — camada de dados (espelha o Loop: 7 telas)
-// MVP = Matrícula + Check-in (+ Login e Financeiro do backlog)
-// Fase 4 = Anamnese + Plano alimentar + Dashboard do aluno
+// store.js — camada de dados (11 telas: operação + nutrição + treinos + comunidade)
 const DB_KEY = 'noctis_mvp_v1';
 
 const PLANOS = { Mensal: 89.90, Trimestral: 239.90, Anual: 799.90 };
@@ -28,7 +26,7 @@ function seedInicial() {
       { id: 't2', alunoId: 'a2', tipo: 'Funcional', dia: 'Quarta', exercicios: ['Burpee 4x15', 'Kettlebell swing 3x20', 'Prancha 3x1min'] }
     ],
     checkins: {},
-    // Fase 4 — Módulo Nutricional (estrutura pronta, tela marca "Fase 4")
+    // Módulo nutricional (nutricionista real prescreve; sem cardápio automático)
     anamneses: {},
     planosAlimentares: {},
     // Pedidos da profa. Maristela (pós-MVP): exames, treinos planejados, desafios e fórum
