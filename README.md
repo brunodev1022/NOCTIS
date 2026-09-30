@@ -11,7 +11,7 @@ Identidade visual em roxo e preto, com Sora e Anton nos títulos e JetBrains Mon
 
 ## 1. Visão geral
 
-Sistema para academia pequena sair do caderno: matrícula, check-in com validação de pagamento e financeiro no MVP; nutrição entra na Fase 4. Pedidos da profa. Maristela já implementados: nutricionista prescreve o plano por perfil/objetivo, aluno envia exames para análise, personal monta treinos por aluno, desafios da academia + desafios do aluno, e fórum para todos interagirem. Roda 100% no navegador (sem backend) para funcionar no GitHub Pages.
+Sistema para academia pequena sair do caderno: matrícula, check-in com validação de pagamento, financeiro, nutrição com nutricionista real, treinos do personal e comunidade. Roda 100% no navegador (sem backend) para funcionar no GitHub Pages. Pedidos da profa. Maristela já implementados: nutricionista prescreve o plano manual por perfil/objetivo, aluno envia exames para análise, personal monta treinos por aluno, desafios da academia + desafios do aluno, e fórum para todos interagirem.
 
 Nessa entrega fechamos: login com cinco perfis (admin, funcionário, aluno, nutricionista e personal), matrícula completa, check-in com validação automática (só libera com aluno ativo e mensalidade em dia) e financeiro controlando quem pagou e quem está pendente.
 
