@@ -884,10 +884,10 @@ function salvarPerfil() {
 // ---------- NOTIFICAÇÕES (sino) ----------
 function listaNotificacoes() {
   const l = [];
-  Store.db.alunos.filter(a => a.status === 'Ativo' && a.mensalidade === 'Pendente').forEach(a => l.push({ t: `${a.nome} está com mensalidade pendente`, r: 'financeiro' }));
-  (Store.db.exames || []).filter(e => !e.parecer).forEach(e => l.push({ t: `Exame "${e.nomeArquivo}" aguarda parecer`, r: 'exames' }));
+  Store.db.alunos.filter(a => a.status === 'Ativo' && a.mensalidade === 'Pendente').forEach(a => l.push({ t: `${a.nome} está com mensalidade pendente`, r: 'financeiro', dot: 'warn' }));
+  (Store.db.exames || []).filter(e => !e.parecer).forEach(e => l.push({ t: `Exame "${e.nomeArquivo}" aguarda parecer`, r: 'exames', dot: 'info' }));
   const hj = (Store.db.treinos || []).filter(t => t.dia === diaHojePT()).length;
-  if (hj) l.push({ t: `${hj} treino(s) programado(s) para hoje`, r: 'treinos' });
+  if (hj) l.push({ t: `${hj} treino(s) programado(s) para hoje`, r: 'treinos', dot: 'ok' });
   return l;
 }
 function renderNotif() {
@@ -895,7 +895,9 @@ function renderNotif() {
   const tb = $('top-notif-badge');
   if (tb) { tb.textContent = l.length; tb.classList.toggle('hidden', l.length === 0); }
   const box = $('notif-lista');
-  if (box) box.innerHTML = l.map(n => `<div class="feed-row"><span class="live-dot sm"></span><span class="feed-name">${esc(n.t)}</span><button class="btn small ghost" onclick="irPara('${n.r}');fecharNotificacoes()">Abrir</button></div>`).join('') || '<p class="muted">Tudo em dia. Nenhuma pendência.</p>';
+  if (box) box.innerHTML = l.length
+    ? l.map(n => `<div class="notif-item"><span class="dot ${n.dot || 'info'}"></span><span class="notif-text">${esc(n.t)}</span><button class="btn small ghost" onclick="irPara('${n.r}');fecharNotificacoes()">Abrir</button></div>`).join('')
+    : '<div class="notif-empty">✓ Tudo em dia. Nenhuma pendência.</div>';
 }
 function abrirNotificacoes() { renderNotif(); $('modal-notif').classList.add('open'); }
 function fecharNotificacoes() { $('modal-notif').classList.remove('open'); }

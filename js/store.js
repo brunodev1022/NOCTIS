@@ -39,7 +39,13 @@ function seedInicial() {
       { id: 'a7', nome: 'Diego Faria', idade: 41, fone: '(11) 92211-6655', plano: 'Anual', status: 'Ativo', mensalidade: 'Pendente', desde: '2026-04-10' },
       { id: 'a8', nome: 'Eduarda Lima', idade: 26, fone: '(11) 91100-2233', plano: 'Mensal', status: 'Inativo', mensalidade: 'Paga', desde: '2026-03-05' },
       { id: 'a9', nome: 'Felipe Rocha', idade: 33, fone: '(11) 90099-4455', plano: 'Trimestral', status: 'Ativo', mensalidade: 'Paga', desde: '2026-06-28' },
-      { id: 'a10', nome: 'Gabriela Dias', idade: 24, fone: '(11) 98877-9900', plano: 'Anual', status: 'Ativo', mensalidade: 'Paga', desde: '2026-05-12' }
+      { id: 'a10', nome: 'Gabriela Dias', idade: 24, fone: '(11) 98877-9900', plano: 'Anual', status: 'Ativo', mensalidade: 'Paga', desde: '2026-05-12' },
+      { id: 'a11', nome: 'Helena Prado', idade: 38, fone: '(11) 97766-1122', plano: 'Anual', status: 'Ativo', mensalidade: 'Paga', desde: '2026-04-22' },
+      { id: 'a12', nome: 'Igor Salles', idade: 27, fone: '(11) 96655-3344', plano: 'Mensal', status: 'Ativo', mensalidade: 'Pendente', desde: '2026-09-01' },
+      { id: 'a13', nome: 'Julia Mota', idade: 23, fone: '(11) 95544-7788', plano: 'Trimestral', status: 'Ativo', mensalidade: 'Paga', desde: '2026-07-09' },
+      { id: 'a14', nome: 'Kevin Alves', idade: 30, fone: '(11) 94433-9900', plano: 'Mensal', status: 'Inativo', mensalidade: 'Pendente', desde: '2026-02-14' },
+      { id: 'a15', nome: 'Larissa Pinto', idade: 25, fone: '(11) 93322-1122', plano: 'Anual', status: 'Ativo', mensalidade: 'Paga', desde: '2026-03-30' },
+      { id: 'a16', nome: 'Marcelo Reis', idade: 45, fone: '(11) 92211-5566', plano: 'Trimestral', status: 'Ativo', mensalidade: 'Paga', desde: '2026-06-05' }
     ],
     treinos: [
       { id: 't1', alunoId: 'a1', tipo: 'Musculação', dia: 'Segunda', objetivo: 'Hipertrofia — membros superiores', exercicios: ['Supino reto 3x12', 'Agachamento 4x10', 'Puxada alta 3x12'] },

@@ -325,7 +325,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const nl = vm.runInContext('listaNotificacoes().length', sandbox);
   ok(nl >= 1, 'notificações listam pendências (mensalidade/exame/treino)');
   vm.runInContext('renderNotif()', sandbox);
-  ok($('notif-lista').innerHTML.includes('feed-row') || nl === 0, 'painel de notificações renderiza');
+  ok($('notif-lista').innerHTML.includes('notif-item') || nl === 0, 'painel de notificações renderiza');
   $('dash-aluno').value = 'a1';
   vm.runInContext('verDashAluno()', sandbox);
   ok($('dash-aluno-box').innerHTML.includes('HIST'), 'dashboard do aluno mostra histórico de check-ins');
