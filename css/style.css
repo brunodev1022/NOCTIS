@@ -508,6 +508,9 @@ textarea:disabled{opacity:.6}
 /* agenda */
 .agenda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
 .agenda-grid .panel{margin:0}
+.agenda-grid .tele{margin-bottom:10px}
+.agenda-grid .feed-row{margin-top:6px}
+.agenda-grid .feed-row:first-of-type{margin-top:0}
 .agenda-reg{margin-top:18px}
 @media(max-width:900px){.agenda-grid{grid-template-columns:1fr}}
 
