@@ -516,6 +516,13 @@ textarea:disabled{opacity:.6}
 .agenda-grid .panel{margin:0}
 @media(max-width:900px){.agenda-grid{grid-template-columns:1fr}}
 
+/* userbox limpo */
+.userbox-info{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.userbox-info strong{font-family:'Sora',sans-serif;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.userbox-info small{color:var(--violet);font-size:11.5px;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-logout{display:inline-flex;align-items:center;justify-content:center;padding:7px;border-radius:8px;flex-shrink:0}
+.mini-logout:hover{background:rgba(240,123,123,.12)}
+
 /* modo treino */
 .sessao-row{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .sessao-row:last-child{border-bottom:none}

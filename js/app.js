@@ -892,8 +892,6 @@ function listaNotificacoes() {
 }
 function renderNotif() {
   const l = listaNotificacoes();
-  const b = $('notif-badge');
-  if (b) { b.textContent = l.length; b.classList.toggle('hidden', l.length === 0); }
   const tb = $('top-notif-badge');
   if (tb) { tb.textContent = l.length; tb.classList.toggle('hidden', l.length === 0); }
   const box = $('notif-lista');
