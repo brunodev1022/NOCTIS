@@ -1,0 +1,13 @@
+{
+  "name": "NOCTIS — Gestão de academias",
+  "short_name": "NOCTIS",
+  "description": "Sistema de gestão para academias (demonstração).",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#08080d",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

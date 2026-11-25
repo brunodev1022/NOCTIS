@@ -60,7 +60,7 @@ Esta versão inicia o overhaul para um produto comercial. Já entregue e verific
 - **Agenda:** compromissos derivados dos treinos/avaliações/pagamentos (sem dados fictícios).
 - **Testes:** 109 asserts passando.
 
-**Roadmap (próximas fases):** módulo de planos/assinaturas, financeiro estruturado (pagamentos/vencimentos), treinos avançados + modo treino, avaliações físicas, agenda, PWA/offline, migração para IndexedDB e repositórios. Cada fase será entregue mantendo o projeto funcional e os testes verdes.
+**Roadmap (próximas fases):** treinos avançados + modo treino ativo (registro de séries), migração para IndexedDB + camada de repositórios, autenticação/autorização server-side (backend real) e notificações externas (e-mail/push/WhatsApp). Cada fase será entregue mantendo o projeto funcional e os testes verdes.
 
 ## 2. Escopo com requisitos (do Loop + Maristela)
 
