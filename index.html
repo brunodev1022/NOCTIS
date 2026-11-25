@@ -93,6 +93,7 @@
     <button class="nav-btn" data-route="dashaluno" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">06</span>Dashboard do aluno</button>
     <button class="nav-btn" data-route="treinos" data-perfis="Administrador,Personal,Funcionário,Aluno"><span class="num">07</span>Treinos</button>
     <button class="nav-btn" data-route="avaliacoes" data-perfis="Administrador,Personal,Funcionário,Nutricionista"><span class="num">07b</span>Avaliações</button>
+    <button class="nav-btn" data-route="agenda" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">07c</span>Agenda</button>
     <div class="nav-sec">Comunidade</div>
     <button class="nav-btn" data-route="desafios" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">09</span>Desafios</button>
     <button class="nav-btn" data-route="forum" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">10</span>Fórum</button>
@@ -340,6 +341,13 @@
       <thead><tr><th>Data</th><th>Peso</th><th>Altura</th><th>% Gord.</th><th>Observação</th><th>Ação</th></tr></thead>
       <tbody id="tb-avaliacoes"></tbody>
     </table></div>
+  </section>
+
+  <section id="view-agenda" class="view">
+    <div class="page-head">
+      <div><h1>Agenda</h1><p class="sub">Compromissos derivados dos dados da academia</p></div>
+    </div>
+    <div id="agenda-lista"></div>
   </section>
 
   <section id="view-exames" class="view">

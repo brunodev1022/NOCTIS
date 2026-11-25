@@ -553,6 +553,21 @@ function excluirTreino(id) {
   Store.salvar(); recarregarTudo();
 }
 
+// ---------- AGENDA (derivada de dados reais) ----------
+function listarAgenda() {
+  const box = $('agenda-lista'); if (!box) return;
+  const dias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  const treinos = Store.db.treinos || [];
+  let html = '<div class="agenda-grid">' + dias.map(d => {
+    const ts = treinos.filter(t => t.dia === d);
+    return `<div class="panel"><div class="tele">${d.toUpperCase()}</div>${ts.length ? ts.map(t => { const al = Store.db.alunos.find(a => a.id === t.alunoId); return `<div class="feed-row"><span class="feed-name">${esc(t.tipo)}</span><span class="badge paga">${al ? esc(al.nome) : '—'}</span></div>`; }).join('') : '<p class="muted">Sem treinos.</p>'}</div>`;
+  }).join('') + '</div>';
+  const av = (Store.db.avaliacoes || []).length;
+  const pg = (Store.db.pagamentos || []).length;
+  html += `<div class="panel"><div class="tele">REGISTROS</div><p class="muted">${av} avaliação(ões) física(s) · ${pg} pagamento(s) registrado(s).</p></div>`;
+  box.innerHTML = html;
+}
+
 // ---------- AVALIAÇÕES FÍSICAS ----------
 function listarAvaliacoes() {
   const box = $('tb-avaliacoes'); if (!box) return;
@@ -949,7 +964,7 @@ function preencherSelects() {
   preencherFormPlano(idAlvoPessoal('plano-aluno'));
   renderPlanoResult(idAlvoPessoal('plano-aluno'));
 }
-function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); listarPagamentos(); listarPlanos(); listarAvaliacoes(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
+function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); listarPagamentos(); listarPlanos(); listarAvaliacoes(); listarAgenda(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();

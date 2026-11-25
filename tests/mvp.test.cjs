@@ -401,6 +401,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext('listarAvaliacoes()', sandbox);
   ok($('tb-avaliacoes').innerHTML.includes('78'), 'tabela de avaliações lista os registros');
 
+  vm.runInContext(`listarAgenda()`, sandbox);
+  ok($('agenda-lista').innerHTML.includes('Segunda'), 'agenda deriva compromissos dos dados reais');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);
