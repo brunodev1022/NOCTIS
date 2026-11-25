@@ -9,11 +9,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Anton&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=1.2">
+<link rel="stylesheet" href="css/style.css?v=2.0">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+
+<a href="#conteudo" class="skip-link">Pular para o conteúdo</a>
 
 <!-- Fundo 3D (Three.js): halter em wireframe + partículas, só nas telas de entrada -->
 <canvas id="bg3d"></canvas>
@@ -45,16 +47,16 @@
         <li><span>02</span>Check-in com validação de pagamento</li>
         <li><span>03</span>Financeiro e dashboard em tempo real</li>
       </ul>
-      <div class="brand-foot">v1.2 · HTML + CSS + JS · GitHub Pages</div>
+      <div class="brand-foot">v2.0 · HTML + CSS + JS · GitHub Pages</div>
     </div>
     <div class="login-form">
       <h2>Acesso ao painel</h2>
       <p class="sub">Autenticação por perfil — toque numa conta para entrar.</p>
       <label>E-mail<input id="login-email" value="admin@noctis" autocomplete="username"></label>
-      <label>Senha<input id="login-senha" type="password" value="admin123" autocomplete="current-password"></label>
-      <div id="login-verify" class="verify-widget sm" onclick="tocarVerify()" title="Confirmar que sou humano">
+      <label>Senha<span class="pw-wrap"><input id="login-senha" type="password" value="admin123" autocomplete="current-password"><button type="button" class="pw-toggle" id="pw-toggle" onclick="toggleSenha()" aria-label="Mostrar senha">Mostrar</button></span></label>
+      <div id="login-verify" class="verify-widget sm" onclick="tocarVerify()" title="Verificação local do ambiente demo">
         <span id="verify-check" class="verify-check"></span>
-        <span id="verify-label">Sou humano</span>
+        <span id="verify-label">Confirmar sessão demo</span>
         <span id="verify-spinner" class="verify-spinner hidden"></span>
       </div>
       <button class="btn btn-block" onclick="fazerLogin()">Entrar no painel</button>
@@ -73,7 +75,7 @@
 
 <div id="app" class="app hidden">
 <aside class="sidebar">
-  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>v1.2</small></div>
+  <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>v2.0</small></div>
   <div class="userbox"><span class="avatar sm" id="user-avatar">N</span><div style="flex:1;min-width:0"><strong id="user-nome"></strong><small id="user-perfil"></small></div><button class="mini-logout" onclick="abrirPerfil()" title="Editar meu perfil">Perfil</button><button class="mini-logout" onclick="sair()" title="Encerrar sessão">Sair</button></div>
   <button class="bell-btn" onclick="abrirNotificacoes()" aria-label="Abrir notificações" title="Notificações"><svg class="bell-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-txt">Notificações</span><span id="notif-badge" class="notif-badge hidden">0</span></button>
   <nav id="nav" aria-label="Navegação principal">
@@ -98,11 +100,30 @@
   <p class="lgpd-note">Dados fictícios de demonstração · conforme LGPD</p>
 </aside>
 
-<main class="content">
+<main class="content" id="conteudo">
+  <header class="topbar">
+    <button class="icon-btn" onclick="toggleSidebar()" aria-label="Recolher ou expandir menu" title="Menu">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <button class="topbar-search" onclick="abrirCmdk()" aria-label="Buscar telas, alunos e ações">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <span>Buscar…</span><span class="kbd">Ctrl K</span>
+    </button>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="abrirNotificacoes()" aria-label="Notificações" title="Notificações">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span id="top-notif-badge" class="notif-badge hidden">0</span>
+      </button>
+      <button class="user-chip" onclick="abrirPerfil()" aria-label="Meu perfil">
+        <span class="avatar xs" id="top-avatar">N</span>
+        <span class="user-chip-name" id="top-nome">Admin</span>
+      </button>
+    </div>
+  </header>
 
   <section id="view-dashboard" class="view active">
     <div class="page-head">
-      <div><h1>Dashboard</h1><p class="sub">Operação de hoje — <span id="hoje"></span> · <span id="dash-turno" class="mono"></span></p></div>
+      <div><h1 id="dash-title">Dashboard</h1><p class="sub">Operação de hoje — <span id="hoje"></span> · <span id="dash-turno" class="mono"></span></p></div>
       <div class="head-meta"><span class="live-dot"></span>NOCTIS / TEMPO REAL</div>
       <button class="btn small ghost" onclick="imprimirRelatorio()" title="Imprimir relatório gerencial">Relatório</button>
     </div>
@@ -330,6 +351,14 @@
 
 </main>
 
+  <nav class="mobile-nav" aria-label="Navegação principal (mobile)">
+    <button class="mobile-nav-btn active" data-route="dashboard" onclick="irPara('dashboard')"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Início</span></button>
+    <button class="mobile-nav-btn" data-route="checkin" onclick="irPara('checkin')"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg><span>Check-in</span></button>
+    <button class="mobile-nav-btn" data-route="treinos" onclick="irPara('treinos')"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg><span>Treinos</span></button>
+    <button class="mobile-nav-btn" data-route="desafios" onclick="irPara('desafios')"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg><span>Desafios</span></button>
+    <button class="mobile-nav-btn" data-route="forum" onclick="irPara('forum')"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Comunidade</span></button>
+  </nav>
+
   <button id="tour-btn" class="tour-btn" onclick="abrirTour()" title="Modo apresentação: guia passo a passo">▶ Apresentar</button>
   <div id="tour-overlay" class="tour-overlay hidden" onclick="tourFundo(event)">
     <div class="tour-box">
@@ -418,8 +447,10 @@
   </div>
 </div>
 
-<script src="js/store.js?v=1.2"></script>
-<script src="js/bg3d.js?v=1.2"></script>
-<script src="js/app.js?v=1.2"></script>
+<div id="toast-box" class="toast-box" aria-live="polite"></div>
+
+<script src="js/store.js?v=2.0"></script>
+<script src="js/bg3d.js?v=2.0"></script>
+<script src="js/app.js?v=2.0"></script>
 </body>
 </html>

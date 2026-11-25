@@ -42,6 +42,20 @@ A parte de nutrição (anamnese e plano alimentar) saiu do ilustrativo: tem auto
 - **Acessibilidade:** ícones em SVG com `aria-label`, foco visível e respeito a `prefers-reduced-motion`.
 - **Testes:** subiu de 71 para **97 asserts**, todos passando (`node tests/mvp.test.cjs`).
 
+## NOCTIS 2.0 — overhaul (fases 1–2 entregues)
+
+Esta versão inicia o overhaul para um produto comercial. Já entregue e verificado:
+
+- **Design system** centralizado (tokens de cor/espaçamento/sombra/elevação, estados semânticos ok/err/warn/info, skeleton, empty states, status dots).
+- **App shell profissional:** topbar fixa (busca global, notificações, menu do usuário), **sidebar recolhível** com preferência persistida e **navegação inferior no mobile**.
+- **Login repaginado:** mostrar/ocultar senha, verificação rotulada como "sessão demo" (sem fingir proteção anti-robô), seletor de contas de demonstração.
+- **Toasts** de sucesso no lugar de `alert()`.
+- **Acessibilidade:** skip link, `aria-label` em ícones, foco visível, respeito a `prefers-reduced-motion`.
+- **Dashboards por perfil:** títulos/contexto próprios (Central nutricional, Central do personal, Dashboard).
+- **Testes:** 97 asserts passando.
+
+**Roadmap (próximas fases):** módulo de planos/assinaturas, financeiro estruturado (pagamentos/vencimentos), ficha do aluno em abas, treinos avançados + modo treino, avaliações físicas, agenda, PWA/offline, migração para IndexedDB e repositórios. Cada fase será entregue mantendo o projeto funcional e os testes verdes.
+
 ## 2. Escopo com requisitos (do Loop + Maristela)
 
 | Nº | Tela | Descrição | Status |

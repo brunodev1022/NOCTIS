@@ -11,6 +11,9 @@ const hojeISO = () => new Date().toISOString().slice(0, 10);
 const BRL = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 function mascaraFone(el) { const d = (el.value || '').replace(/\D/g, '').slice(0, 11); if (!d) { el.value = ''; return; } let o = '(' + d.slice(0, 2); if (d.length >= 2) o += ') '; if (d.length > 2) o += d.slice(2, 7); if (d.length >= 7) o += '-' + d.slice(7, 11); el.value = o; }
 function mascaraCPF(el) { const d = (el.value || '').replace(/\D/g, '').slice(0, 11); let o = d; if (d.length > 9) o = d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,4})/, '$1.$2.$3-$4'); else if (d.length > 6) o = d.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3'); else if (d.length > 3) o = d.replace(/(\d{3})(\d{1,3})/, '$1.$2'); el.value = o; }
+function toggleSenha() { const i = $('login-senha'); const b = $('pw-toggle'); if (!i) return; const show = i.type === 'password'; i.type = show ? 'text' : 'password'; if (b) { b.textContent = show ? 'Ocultar' : 'Mostrar'; b.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha'); } }
+function toggleSidebar() { const app = $('app'); if (!app) return; const c = app.classList.toggle('collapsed'); try { localStorage.setItem('noctis_sidebar', c ? '1' : '0'); } catch (e) {} }
+function toast(msg, tipo) { try { if (typeof document === 'undefined' || !document.body || typeof document.createElement !== 'function') return; let box = $('toast-box'); if (!box) { box = document.createElement('div'); box.id = 'toast-box'; box.className = 'toast-box'; document.body.appendChild(box); } const t = document.createElement('div'); t.className = 'toast' + (tipo ? ' ' + tipo : ''); t.textContent = msg; box.appendChild(t); setTimeout(() => t.classList.add('show'), 10); setTimeout(() => { t.classList.remove('show'); setTimeout(() => { try { t.remove(); } catch (e) {} }, 300); }, 2600); } catch (e) {} }
 
 // ---------- VERIFICAÇÃO ANTI-ROBÔS (dispara no clique em Entrar) ----------
 // MVP 100% front-end: ao tentar logar, roda a checagem e só então valida.
@@ -67,6 +70,8 @@ function entrar() {
   if (typeof window !== 'undefined' && window.NOCTIS_BG) window.NOCTIS_BG.parar(); // desliga o 3D dentro do painel
   $('user-nome').textContent = usuarioLogado.nome;
   $('user-perfil').textContent = usuarioLogado.perfil;
+  const tn = $('top-nome'); if (tn) tn.textContent = usuarioLogado.nome;
+  const ta = $('top-avatar'); if (ta) ta.textContent = iniciais(usuarioLogado.nome);
   const ua = $('user-avatar'); if (ua) ua.textContent = iniciais(usuarioLogado.nome);
   // Controle de acesso por perfil (regra simples de explicar)
   document.querySelectorAll('#nav .nav-btn').forEach(b => {
@@ -130,6 +135,7 @@ function animarNumero(el, para, fmt) {
 function irPara(route) {
   const troca = () => {
     document.querySelectorAll('#nav .nav-btn').forEach(b => b.classList.toggle('active', b.dataset.route === route));
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.route === route));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     $('view-' + route).classList.add('active');
   };
@@ -142,6 +148,8 @@ let chartSpark = null;
 function turnoAtual() { const h = new Date().getHours(); return h < 12 ? 'MANHÃ' : h < 18 ? 'TARDE' : 'NOITE'; }
 function atualizarDashboard() {
   const { alunos, checkins } = Store.db;
+  const dt0 = $('dash-title');
+  if (dt0) dt0.textContent = usuarioLogado && usuarioLogado.perfil === 'Nutricionista' ? 'Central nutricional' : usuarioLogado && usuarioLogado.perfil === 'Personal' ? 'Central do personal' : 'Dashboard';
   const ativos = alunos.filter(a => a.status === 'Ativo');
   const recebido = alunos.filter(a => a.mensalidade === 'Paga').reduce((s, a) => s + (PLANOS[a.plano] || 0), 0);
   const pendente = alunos.filter(a => a.mensalidade === 'Pendente').reduce((s, a) => s + (PLANOS[a.plano] || 0), 0);
@@ -318,7 +326,7 @@ function salvarAnamnese() {
   if (!alunoId) return alert('Escolha um aluno');
   Store.db.anamneses[alunoId] = { objetivo: $('anam-objetivo').value, refeicoes: $('anam-refeicoes').value,
     restricoes: $('anam-restricoes').value, obs: $('anam-obs').value };
-  Store.salvar(); alert('Anamnese salva!');
+  Store.salvar(); toast('Anamnese salva');
 }
 // ---------- TELA 05: PLANO ALIMENTAR (100% manual — nutricionista real prescreve) ----------
 const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -343,7 +351,7 @@ function salvarPlanoManual() {
   })).filter(x => x.refeicao || x.detalhe);
   if (!itens.length) return alert('Adicione ao menos uma refeição ao plano.');
   Store.db.planosAlimentares[alunoId] = { data: hojeISO(), autor: `${usuarioLogado.nome} (${usuarioLogado.perfil})`, itens, orientacoes: $('plano-orientacoes').value.trim() };
-  Store.salvar(); renderPlanoResult(alunoId); alert('Plano salvo!');
+  Store.salvar(); renderPlanoResult(alunoId); toast('Plano salvo');
 }
 function renderPlanoResult(alunoId) {
   const al = Store.db.alunos.find(a => a.id === alunoId);
@@ -365,7 +373,7 @@ function salvarOrientacoes() {
   if (Store.db.planosAlimentares[alunoId]) {
     Store.db.planosAlimentares[alunoId].orientacoes = $('plano-orient').value;
     Store.db.planosAlimentares[alunoId].autor = `${usuarioLogado.nome} (${usuarioLogado.perfil})`;
-    Store.salvar(); alert('Orientações salvas!');
+    Store.salvar(); toast('Orientações salvas');
   }
 }
 
@@ -716,7 +724,7 @@ function salvarPerfil() {
   fecharPerfil();
   const un = $('user-nome'); if (un) un.textContent = usuarioLogado.nome;
   const ua = $('user-avatar'); if (ua) ua.textContent = iniciais(usuarioLogado.nome);
-  alert('Perfil atualizado.');
+  toast('Perfil atualizado');
 }
 
 // ---------- NOTIFICAÇÕES (sino) ----------
@@ -732,6 +740,8 @@ function renderNotif() {
   const l = listaNotificacoes();
   const b = $('notif-badge');
   if (b) { b.textContent = l.length; b.classList.toggle('hidden', l.length === 0); }
+  const tb = $('top-notif-badge');
+  if (tb) { tb.textContent = l.length; tb.classList.toggle('hidden', l.length === 0); }
   const box = $('notif-lista');
   if (box) box.innerHTML = l.map(n => `<div class="feed-row"><span class="live-dot sm"></span><span class="feed-name">${esc(n.t)}</span><button class="btn small ghost" onclick="irPara('${n.r}');fecharNotificacoes()">Abrir</button></div>`).join('') || '<p class="muted">Tudo em dia. Nenhuma pendência.</p>';
 }
@@ -838,6 +848,8 @@ function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins()
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();
+// Preferências de interface (sidebar recolhível)
+try { if (localStorage.getItem('noctis_sidebar') === '1') { const ap = $('app'); if (ap) ap.classList.add('collapsed'); } } catch (e) {}
 // Aplica overrides de perfil salvos (nome/senha) por e-mail
 try { const ov = JSON.parse(localStorage.getItem('noctis_profile') || '{}'); Object.keys(ov).forEach(email => { const u = USUARIOS.find(x => x.email === email); if (u) { if (ov[email] && ov[email].nome) u.nome = ov[email].nome; if (ov[email] && ov[email].senha) u.senha = ov[email].senha; } }); } catch (e) {}
 // Intro cinematográfica: 1x por sessão (clique pula direto)
