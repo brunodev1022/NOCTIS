@@ -235,7 +235,8 @@ function listarAlunos() {
     <td><span class="badge paga">${a.plano}</span></td>
     <td><span class="badge ${a.status.toLowerCase()}">${a.status}</span></td>
     <td><span class="badge ${a.mensalidade === 'Paga' ? 'paga' : 'pendente'}">${a.mensalidade}</span></td>
-    <td><button class="btn small ghost" onclick="editarAluno('${a.id}')">Editar</button>
+    <td><button class="btn small ghost" onclick="abrirFicha('${a.id}')">Ficha</button>
+    <button class="btn small ghost" onclick="editarAluno('${a.id}')">Editar</button>
     <button class="btn small danger" onclick="excluirAluno('${a.id}')">Excluir</button></td></tr>`).join('')
     || '<tr><td colspan="5">Nenhum aluno encontrado</td></tr>';
 }
@@ -273,6 +274,41 @@ function exportarAlunosCSV() {
   const csv = 'nome,idade,telefone,plano,status,mensalidade\n' + Store.db.alunos.map(a => `${a.nome},${a.idade},${a.fone},${a.plano},${a.status},${a.mensalidade}`).join('\n');
   const el = document.createElement('a');
   el.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); el.download = 'matriculas.csv'; el.click();
+}
+
+// ---------- FICHA DO ALUNO (abas) ----------
+let fichaId = null, fichaTabAtual = 'resumo';
+function abrirFicha(id) { fichaId = id; fichaTabAtual = 'resumo'; const a = Store.db.alunos.find(x => x.id === id); if ($('ficha-nome')) $('ficha-nome').textContent = a ? a.nome : 'Ficha do aluno'; $('modal-ficha').classList.add('open'); renderFicha(); }
+function fecharFicha() { $('modal-ficha').classList.remove('open'); }
+function fichaTab(t) { fichaTabAtual = t; renderFicha(); }
+function renderFicha() {
+  const a = Store.db.alunos.find(x => x.id === fichaId);
+  const box = $('ficha-body');
+  if (!a || !box) { if (box) box.innerHTML = '<p class="muted">Aluno não encontrado.</p>'; return; }
+  const tabs = [['resumo', 'Visão geral'], ['dados', 'Dados'], ['financeiro', 'Financeiro'], ['presencas', 'Presenças'], ['treinos', 'Treinos'], ['nutri', 'Nutrição'], ['exames', 'Exames']];
+  const tabsHtml = tabs.map(([k, l]) => `<button class="tab${k === fichaTabAtual ? ' on' : ''}" onclick="fichaTab('${k}')">${l}</button>`).join('');
+  const podeFin = podeGerenciarFinanceiro();
+  let body = '';
+  if (fichaTabAtual === 'resumo') {
+    body = `<div class="ficha-grid"><div><span class="tele">PLANO</span><strong>${a.plano}</strong></div><div><span class="tele">STATUS</span><strong>${a.status}</strong></div><div><span class="tele">MENSALIDADE</span><strong>${a.mensalidade}</strong></div><div><span class="tele">DESDE</span><strong>${(a.desde || '').split('-').reverse().join('/')}</strong></div></div><div class="panel" style="margin-top:14px"><div class="tele">CONTATO</div><p>${esc(a.nome)} · ${esc(a.fone)} · ${a.idade} anos${a.cpf ? ' · CPF ' + esc(a.cpf) : ''}</p></div>`;
+  } else if (fichaTabAtual === 'dados') {
+    body = `<div class="panel"><p><strong>Nome:</strong> ${esc(a.nome)}</p><p><strong>Idade:</strong> ${a.idade}</p><p><strong>Telefone:</strong> ${esc(a.fone)}</p><p><strong>CPF:</strong> ${a.cpf ? esc(a.cpf) : '—'}</p></div>`;
+  } else if (fichaTabAtual === 'financeiro') {
+    body = podeFin ? `<div class="panel"><p><strong>Plano:</strong> ${a.plano} — ${BRL(PLANOS[a.plano] || 0)}</p><p><strong>Situação:</strong> ${a.mensalidade}</p></div>` : '<p class="muted">Sem permissão para ver o financeiro.</p>';
+  } else if (fichaTabAtual === 'presencas') {
+    const n = presencasTotais()[a.id] || 0; body = `<div class="panel"><p><strong>Presenças totais:</strong> ${n}</p></div>`;
+  } else if (fichaTabAtual === 'treinos') {
+    const ts = Store.db.treinos.filter(t => t.alunoId === a.id);
+    body = `<div class="panel">${ts.length ? ts.map(t => `<p><strong>${esc(t.tipo)}</strong> · ${t.dia} — ${(t.exercicios || []).length} mov.</p>`).join('') : '<p class="muted">Nenhum treino atribuído.</p>'}</div>`;
+  } else if (fichaTabAtual === 'nutri') {
+    const an = Store.db.anamneses[a.id], pl = Store.db.planosAlimentares[a.id];
+    body = `<div class="panel"><p><strong>Anamnese:</strong> ${an ? esc(an.objetivo) : '—'}</p><p><strong>Plano alimentar:</strong> ${pl && pl.itens ? pl.itens.length + ' refeições' : '—'}</p></div>`;
+  } else if (fichaTabAtual === 'exames') {
+    const ex = (Store.db.exames || []).filter(e => e.alunoId === a.id);
+    body = `<div class="panel">${ex.length ? ex.map(e => `<p>${esc(e.nomeArquivo)} — ${e.parecer ? 'com parecer' : 'aguardando análise'}</p>`).join('') : '<p class="muted">Nenhum exame enviado.</p>'}</div>`;
+  }
+  box.innerHTML = `<div class="tabs">${tabsHtml}</div>` + body;
+  if (box.querySelectorAll) box.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.textContent === (tabs.find(t => t[0] === fichaTabAtual) || [])[1]));
 }
 
 // ---------- TELA 3: CHECK-IN (valida pagamento + acesso) ----------

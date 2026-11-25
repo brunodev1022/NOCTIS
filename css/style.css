@@ -498,3 +498,15 @@ textarea:disabled{opacity:.6}
 @media (prefers-reduced-motion:reduce){.skeleton{animation:none}}
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
 .dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.err{background:var(--err)}.dot.info{background:var(--info)}
+
+/* ficha do aluno */
+.modal .box.wide{max-width:720px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
+.modal-head h2{margin:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:9px 12px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:color .2s,border-color .2s}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--violet);border-bottom-color:var(--violet)}
+.ficha-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ficha-grid strong{display:block;margin-top:4px;font-size:15px}
+@media(max-width:900px){.ficha-grid{grid-template-columns:1fr 1fr}}

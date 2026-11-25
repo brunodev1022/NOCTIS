@@ -369,6 +369,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext('resetarDemo()', sandbox);
   ok(sandbox.localStorage.getItem('noctis_mvp_v1') === null, 'reset de demonstração limpa os dados');
 
+  console.log('-- ficha do aluno + dashboards por perfil --');
+  vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]`, sandbox);
+  vm.runInContext(`abrirFicha('a1')`, sandbox);
+  ok($('ficha-body').innerHTML.includes('PLANO'), 'ficha do aluno abre com abas');
+  vm.runInContext(`fichaTab('treinos')`, sandbox);
+  ok($('ficha-body').innerHTML.includes('mov.'), 'ficha troca para a aba de treinos');
+  vm.runInContext(`usuarioLogado=USUARIOS.find(u=>u.perfil==='Nutricionista'); atualizarDashboard()`, sandbox);
+  ok($('dash-title').textContent==='Central nutricional', 'dashboard do nutri tem título próprio');
+  vm.runInContext(`usuarioLogado=USUARIOS.find(u=>u.perfil==='Personal'); atualizarDashboard()`, sandbox);
+  ok($('dash-title').textContent==='Central do personal', 'dashboard do personal tem título próprio');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);
