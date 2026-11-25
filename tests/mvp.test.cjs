@@ -317,7 +317,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext('imprimirFicha()', sandbox);
   ok(true, 'imprimir ficha não lança erro');
 
-  console.log('-- novidades v1.2 (notif, conquistas, ranking, cpf, busca) --');
+  console.log('-- novidades v1.2 (notif, ranking, cpf, busca) --');
   vm.runInContext(`Store.db = seedInicial(); Store.salvar(); usuarioLogado = USUARIOS[0]`, sandbox);
   const nl = vm.runInContext('listaNotificacoes().length', sandbox);
   ok(nl >= 1, 'notificações listam pendências (mensalidade/exame/treino)');
@@ -325,7 +325,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok($('notif-lista').innerHTML.includes('feed-row') || nl === 0, 'painel de notificações renderiza');
   $('dash-aluno').value = 'a1';
   vm.runInContext('verDashAluno()', sandbox);
-  ok($('dash-aluno-box').innerHTML.includes('CONQUISTAS'), 'dashboard do aluno mostra conquistas');
   ok($('dash-aluno-box').innerHTML.includes('HIST'), 'dashboard do aluno mostra histórico de check-ins');
   vm.runInContext(`setRankModo('semana')`, sandbox);
   ok(vm.runInContext('rankModo', sandbox) === 'semana', 'ranking alterna para semana');
@@ -357,8 +356,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`Store.db = seedInicial(); usuarioLogado = USUARIOS[0]`, sandbox);
   $('checkin-aluno').value = '';
   vm.runInContext('modoBeatriz()', sandbox);
-  ok($('checkin-msg').textContent.includes('PENDENTE') || $('checkin-msg').textContent.includes('INATIVO'), 'Modo Beatriz demonstra o bloqueio ao vivo');
-  ok(vm.runInContext(`conquistasDoAluno('a1').includes('Primeiro passo')`, sandbox) === false, 'conquistas baseadas em dados reais');
+  ok($('checkin-msg').textContent.includes('PENDENTE') || $('checkin-msg').textContent.includes('INATIVO'), 'Simular acesso pendente demonstra o bloqueio');
+
+  console.log('-- profissional (reset, relatório, perfil) --');
+  vm.runInContext('imprimirRelatorio()', sandbox);
+  ok(true, 'relatório gerencial não lança erro');
+  vm.runInContext(`usuarioLogado = USUARIOS[0]; abrirPerfil()`, sandbox);
+  $('f-perfil-nome').value = 'Admin Teste'; $('f-perfil-senha').value = '';
+  vm.runInContext('salvarPerfil()', sandbox);
+  ok(vm.runInContext('USUARIOS[0].nome', sandbox) === 'Admin Teste', 'editar perfil atualiza o nome');
+  vm.runInContext('Store.salvar()', sandbox);
+  vm.runInContext('resetarDemo()', sandbox);
+  ok(sandbox.localStorage.getItem('noctis_mvp_v1') === null, 'reset de demonstração limpa os dados');
 
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);

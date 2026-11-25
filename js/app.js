@@ -268,16 +268,6 @@ function exportarAlunosCSV() {
 }
 
 // ---------- TELA 3: CHECK-IN (valida pagamento + acesso) ----------
-function confete() {
-  try {
-    if (typeof document === 'undefined' || !document.body || typeof document.createElement !== 'function') return;
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const c = document.createElement('div'); c.className = 'confete';
-    for (let i = 0; i < 26; i++) { const p = document.createElement('i'); p.style.setProperty('--x', (Math.random() * 100) + 'vw'); p.style.setProperty('--d', (Math.random() * 0.5).toFixed(2) + 's'); p.style.setProperty('--c', 'hsl(' + Math.floor(Math.random() * 360) + ',85%,62%)'); c.appendChild(p); }
-    document.body.appendChild(c);
-    setTimeout(() => { try { c.remove(); } catch (e) {} }, 1800);
-  } catch (e) {}
-}
 function fazerCheckin() {
   const alunoId = $('checkin-aluno').value;
   const msg = $('checkin-msg');
@@ -291,7 +281,7 @@ function fazerCheckin() {
   const jaEntrou = Store.db.checkins[hoje].find(c => c.alunoId === alunoId);
   if (jaEntrou) { msg.textContent = `${a.nome} já registrou check-in hoje às ${jaEntrou.hora}.`; return; }
   Store.db.checkins[hoje].push({ alunoId, hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
-  Store.salvar(); msg.textContent = `Acesso liberado: ${a.nome}. Bom treino.`; confete(); recarregarTudo();
+  Store.salvar(); msg.textContent = `Acesso liberado: ${a.nome}. Bom treino.`; recarregarTudo();
 }
 function listarCheckins() {
   const lista = Store.db.checkins[hojeISO()] || [];
@@ -398,7 +388,6 @@ function verDashAluno() {
   const prox = treinos[0];
   const treinoHoje = treinos.filter(t => t.dia === diaHojePT());
   const nivel = totalCheckins >= 20 ? 'ELITE' : totalCheckins >= 10 ? 'RITMO' : totalCheckins >= 4 ? 'EMBALO' : 'BASE';
-  const conquistas = conquistasDoAluno(id);
   $('dash-aluno-box').innerHTML = `
     <div class="panel al-hero">
       <div class="al-avatar anton">${iniciais(a.nome)}</div>
@@ -417,10 +406,7 @@ function verDashAluno() {
       <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${esc(d.titulo)}</span><span class="badge paga">${esc(d.perfilAlvo)}</span></div>`).join('') || '<p class="muted">Nenhum desafio ativo. Explore em Desafios.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
     </div>
     <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${esc(anam.objetivo)} · ${esc(anam.refeicoes)} refeições/dia · ${esc(anam.restricoes || 'sem restrições')}` : 'Anamnese ainda não preenchida.'}</p></div>
-    <div class="al-grid2">
-      <div class="panel"><div class="tele">CONQUISTAS</div><div class="badges">${conquistas.map(c => `<span class="badge paga">${esc(c)}</span>`).join('') || '<p class="muted">Faça check-ins, treinos e desafios para desbloquear.</p>'}</div><button class="btn small ghost" style="margin-top:10px" onclick="compartilharConquistas()">Compartilhar conquistas</button></div>
-      <div class="panel"><div class="tele">HISTÓRICO · ÚLTIMOS CHECK-INS</div>${allChecks.length ? `<ul class="hist-list">${allChecks.slice().reverse().slice(0, 12).map(c => `<li><span class="mono">${(c.data || '').split('-').reverse().join('/')}</span><span class="muted">· ${c.hora || ''}</span></li>`).join('')}</ul>` : '<p class="muted">Nenhum check-in ainda.</p>'}</div>
-    </div>`;
+    <div class="panel"><div class="tele">HISTÓRICO · ÚLTIMOS CHECK-INS</div>${allChecks.length ? `<ul class="hist-list">${allChecks.slice().reverse().slice(0, 12).map(c => `<li><span class="mono">${(c.data || '').split('-').reverse().join('/')}</span><span class="muted">· ${c.hora || ''}</span></li>`).join('')}</ul>` : '<p class="muted">Nenhum check-in ainda.</p>'}</div>`;
 }
 
 // ---------- TELA 07: TREINOS (personal planeja por perfil/objetivo) ----------
@@ -581,7 +567,7 @@ function participarDesafio(id) {
   const meuId = meuAlunoId();
   d.participantes = d.participantes || [];
   if (!d.participantes.includes(meuId)) d.participantes.push(meuId);
-  Store.salvar(); confete(); recarregarTudo();
+  Store.salvar(); recarregarTudo();
 }
 function sairDesafio(id) {
   if (!ehAluno()) return alert('Entre como Aluno para sair de desafios.');
@@ -703,32 +689,35 @@ function timerStart() { if (timerId) return; if (timerRest <= 0) timerRest = 60;
 function timerPause() { if (timerId) { clearInterval(timerId); timerId = null; } }
 function timerReset() { if (timerId) { clearInterval(timerId); timerId = null; } timerRest = 0; timerRender(); }
 
-// ---------- CONQUISTAS (gamificação) ----------
-function conquistasDoAluno(id) {
-  const c = [];
-  const checks = Object.entries(Store.db.checkins).flatMap(([d, a]) => (a || []).map(x => ({ ...x, data: d }))).filter(x => x.alunoId === id).length;
-  const treinos = (Store.db.treinos || []).filter(t => t.alunoId === id).length;
-  const desafios = (Store.db.desafios || []).filter(d => (d.participantes || []).includes(id)).length;
-  const exames = (Store.db.exames || []).filter(e => e.alunoId === id).length;
-  if (checks >= 1) c.push('Primeiro passo');
-  if (checks >= 10) c.push('10 presenças');
-  if (checks >= 20) c.push('Elite');
-  if (treinos >= 3) c.push('3+ treinos');
-  if (desafios >= 1) c.push('Desafiante');
-  if (exames >= 1) c.push('Exames em dia');
-  return c;
-}
-function compartilharConquistas() {
-  const id = idAlvoDashAluno();
-  const a = Store.db.alunos.find(x => x.id === id);
-  const cs = conquistasDoAluno(id);
-  const txt = `NOCTIS · ${a ? a.nome : 'Aluno'} — conquistas: ${cs.join(', ') || 'começando agora'}`;
-  try { if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt); } catch (e) {}
-  alert('Conquistas copiadas para compartilhar:\n' + txt);
-}
-
 // ---------- SUGESTÕES DE EXERCÍCIOS ----------
 function addExercicio(txt) { const t = $('f-treino-exercicios'); if (!t) return; t.value += (t.value ? '\n' : '') + txt; }
+
+// ---------- RESET DE DEMONSTRAÇÃO ----------
+function resetarDemo() {
+  if (!confirm('Isso apaga os dados de demonstração e volta ao estado inicial. Continuar?')) return;
+  try { localStorage.removeItem('noctis_mvp_v1'); localStorage.removeItem('noctis_profile'); } catch (e) {}
+  location.reload();
+}
+
+// ---------- RELATÓRIO GERENCIAL (impressão) ----------
+function imprimirRelatorio() { if (typeof window !== 'undefined' && window.print) window.print(); }
+
+// ---------- EDITAR PERFIL ----------
+function abrirPerfil() { if (!usuarioLogado) return; $('f-perfil-nome').value = usuarioLogado.nome || ''; $('f-perfil-senha').value = ''; $('modal-perfil').classList.add('open'); }
+function fecharPerfil() { $('modal-perfil').classList.remove('open'); }
+function salvarPerfil() {
+  if (!usuarioLogado) return;
+  const nome = $('f-perfil-nome').value.trim();
+  if (!nome) return alert('Digite o nome.');
+  const senha = $('f-perfil-senha').value;
+  usuarioLogado.nome = nome;
+  if (senha) usuarioLogado.senha = senha;
+  try { const ov = JSON.parse(localStorage.getItem('noctis_profile') || '{}'); ov[usuarioLogado.email] = { nome: nome, senha: senha || undefined }; localStorage.setItem('noctis_profile', JSON.stringify(ov)); } catch (e) {}
+  fecharPerfil();
+  const un = $('user-nome'); if (un) un.textContent = usuarioLogado.nome;
+  const ua = $('user-avatar'); if (ua) ua.textContent = iniciais(usuarioLogado.nome);
+  alert('Perfil atualizado.');
+}
 
 // ---------- NOTIFICAÇÕES (sino) ----------
 function listaNotificacoes() {
@@ -849,6 +838,8 @@ function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins()
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();
+// Aplica overrides de perfil salvos (nome/senha) por e-mail
+try { const ov = JSON.parse(localStorage.getItem('noctis_profile') || '{}'); Object.keys(ov).forEach(email => { const u = USUARIOS.find(x => x.email === email); if (u) { if (ov[email] && ov[email].nome) u.nome = ov[email].nome; if (ov[email] && ov[email].senha) u.senha = ov[email].senha; } }); } catch (e) {}
 // Intro cinematográfica: 1x por sessão (clique pula direto)
 try {
   if (sessionStorage.getItem('noctis_intro') === '1') $('intro').classList.add('done');

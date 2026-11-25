@@ -74,8 +74,8 @@
 <div id="app" class="app hidden">
 <aside class="sidebar">
   <div class="brandmark sm"><span class="mark"></span>NOCTIS <small>v1.2</small></div>
-  <div class="userbox"><span class="avatar sm" id="user-avatar">N</span><div style="flex:1;min-width:0"><strong id="user-nome"></strong><small id="user-perfil"></small></div><button class="mini-logout" onclick="sair()" title="Encerrar sessão">Sair</button></div>
-  <button class="bell-btn" onclick="abrirNotificacoes()" title="Notificações"><span class="bell-ico">🔔</span><span class="bell-txt">Notificações</span><span id="notif-badge" class="notif-badge hidden">0</span></button>
+  <div class="userbox"><span class="avatar sm" id="user-avatar">N</span><div style="flex:1;min-width:0"><strong id="user-nome"></strong><small id="user-perfil"></small></div><button class="mini-logout" onclick="abrirPerfil()" title="Editar meu perfil">Perfil</button><button class="mini-logout" onclick="sair()" title="Encerrar sessão">Sair</button></div>
+  <button class="bell-btn" onclick="abrirNotificacoes()" aria-label="Abrir notificações" title="Notificações"><svg class="bell-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-txt">Notificações</span><span id="notif-badge" class="notif-badge hidden">0</span></button>
   <nav id="nav" aria-label="Navegação principal">
     <div class="nav-sec">Operação</div>
     <button class="nav-btn active" data-route="dashboard" data-perfis="Administrador,Funcionário,Nutricionista,Personal"><span class="num">00</span>Dashboard</button>
@@ -94,6 +94,8 @@
     <button class="nav-btn" data-route="forum" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">10</span>Fórum</button>
   </nav>
   <button class="kbd-hint" onclick="abrirCmdk()" title="Busca rápida"><span class="kbd">Ctrl K</span> Buscar telas e ações</button>
+  <button class="kbd-hint" onclick="resetarDemo()" title="Limpar os dados e voltar ao estado inicial"><span class="kbd">Reset</span> Resetar demonstração</button>
+  <p class="lgpd-note">Dados fictícios de demonstração · conforme LGPD</p>
 </aside>
 
 <main class="content">
@@ -102,6 +104,7 @@
     <div class="page-head">
       <div><h1>Dashboard</h1><p class="sub">Operação de hoje — <span id="hoje"></span> · <span id="dash-turno" class="mono"></span></p></div>
       <div class="head-meta"><span class="live-dot"></span>NOCTIS / TEMPO REAL</div>
+      <button class="btn small ghost" onclick="imprimirRelatorio()" title="Imprimir relatório gerencial">Relatório</button>
     </div>
     <div class="dash-grid">
       <p id="dash-fin-note" class="fin-note muted" style="display:none">Visão operacional — valores financeiros visíveis só para administração e recepção.</p>
@@ -188,7 +191,7 @@
         <button class="btn btn-check" onclick="fazerCheckin()">Liberar acesso</button>
       </div>
       <p id="checkin-msg" class="aviso"></p>
-      <button class="btn small ghost" onclick="modoBeatriz()" title="Demonstra o bloqueio de pagamento ao vivo">▶ Modo Beatriz (demonstra bloqueio)</button>
+      <button class="btn small ghost" onclick="modoBeatriz()" title="Demonstra o bloqueio de pagamento ao vivo">Simular acesso pendente</button>
       <div class="check-foot"><span class="dash-big anton"><span id="checkin-hoje-total">0</span><small class="dash-unit">hoje</small></span></div>
     </div>
     <div class="panel"><h2>Passaram hoje</h2>
@@ -398,6 +401,13 @@
   <h2>Notificações</h2>
   <div id="notif-lista"></div>
   <div class="actions"><button class="btn ghost" onclick="fecharNotificacoes()">Fechar</button></div>
+</div></div>
+
+<div id="modal-perfil" class="modal"><div class="box">
+  <h2>Meu perfil</h2>
+  <label>Nome<input id="f-perfil-nome" placeholder="Seu nome"></label>
+  <label>Nova senha (opcional)<input id="f-perfil-senha" type="password" placeholder="Deixe em branco para manter"></label>
+  <div class="actions"><button class="btn ghost" onclick="fecharPerfil()">Cancelar</button><button class="btn" onclick="salvarPerfil()">Salvar</button></div>
 </div></div>
 
 <div id="cmdk-overlay" class="cmdk-overlay hidden" onclick="fecharCmdkFundo(event)">
