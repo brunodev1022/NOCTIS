@@ -404,6 +404,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`listarAgenda()`, sandbox);
   ok($('agenda-lista').innerHTML.includes('SEGUNDA'), 'agenda deriva compromissos dos dados reais');
 
+  console.log('-- modo treino ativo (fase 8) --');
+  vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]; sessaoTreino='t1'; sessaoStart=Date.now()-120000`, sandbox);
+  vm.runInContext('finalizarSessao()', sandbox);
+  ok(vm.runInContext('Store.db.sessoes.length', sandbox)===1, 'modo treino registra a sessão');
+  ok(vm.runInContext(`Store.db.sessoes[0].duracaoMin`, sandbox)>=1, 'sessão calcula duração');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);

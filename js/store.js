@@ -30,6 +30,7 @@ function seedInicial() {
     planos: Object.keys(PLANOS).map(nome => ({ id: 'pl_' + nome.toLowerCase(), nome: nome, valor: PLANOS[nome], duracaoDias: nome === 'Mensal' ? 30 : nome === 'Trimestral' ? 90 : 365, ativo: true })),
     pagamentos: [],
     avaliacoes: [],
+    sessoes: [],
     schema: SCHEMA_VERSION,
     // Módulo nutricional (nutricionista real prescreve; sem cardápio automático)
     anamneses: {},
@@ -66,6 +67,7 @@ const Store = {
   if (!Array.isArray(this.db.planos)) this.db.planos = Object.keys(PLANOS).map(nome => ({ id: 'pl_' + nome.toLowerCase(), nome: nome, valor: PLANOS[nome], duracaoDias: nome === 'Mensal' ? 30 : nome === 'Trimestral' ? 90 : 365, ativo: true }));
   if (!Array.isArray(this.db.pagamentos)) this.db.pagamentos = [];
   if (!Array.isArray(this.db.avaliacoes)) this.db.avaliacoes = [];
+  if (!Array.isArray(this.db.sessoes)) this.db.sessoes = [];
   this.db.schema = SCHEMA_VERSION;
   return this.db;
   },

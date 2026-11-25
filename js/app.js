@@ -469,6 +469,7 @@ function verDashAluno() {
   const nExames = (Store.db.exames || []).filter(e => e.alunoId === id).length;
   const meusDesafios = (Store.db.desafios || []).filter(d => (d.participantes || []).includes(id));
   const plan = Store.db.planosAlimentares[id];
+  const sessoes = (Store.db.sessoes || []).filter(s => s.alunoId === id).slice().reverse().slice(0, 5);
   const prox = treinos[0];
   const treinoHoje = treinos.filter(t => t.dia === diaHojePT());
   const nivel = totalCheckins >= 20 ? 'ELITE' : totalCheckins >= 10 ? 'RITMO' : totalCheckins >= 4 ? 'EMBALO' : 'BASE';
@@ -490,7 +491,8 @@ function verDashAluno() {
       <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${esc(d.titulo)}</span><span class="badge paga">${esc(d.perfilAlvo)}</span></div>`).join('') || '<p class="muted">Nenhum desafio ativo. Explore em Desafios.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
     </div>
     <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${esc(anam.objetivo)} · ${esc(anam.refeicoes)} refeições/dia · ${esc(anam.restricoes || 'sem restrições')}` : 'Anamnese ainda não preenchida.'}</p></div>
-    <div class="panel"><div class="tele">HISTÓRICO · ÚLTIMOS CHECK-INS</div>${allChecks.length ? `<ul class="hist-list">${allChecks.slice().reverse().slice(0, 12).map(c => `<li><span class="mono">${(c.data || '').split('-').reverse().join('/')}</span><span class="muted">· ${c.hora || ''}</span></li>`).join('')}</ul>` : '<p class="muted">Nenhum check-in ainda.</p>'}</div>`;
+    <div class="panel"><div class="tele">HISTÓRICO · ÚLTIMOS CHECK-INS</div>${allChecks.length ? `<ul class="hist-list">${allChecks.slice().reverse().slice(0, 12).map(c => `<li><span class="mono">${(c.data || '').split('-').reverse().join('/')}</span><span class="muted">· ${c.hora || ''}</span></li>`).join('')}</ul>` : '<p class="muted">Nenhum check-in ainda.</p>'}</div>
+    <div class="panel"><div class="tele">ÚLTIMAS SESSÕES DE TREINO</div>${sessoes.length ? sessoes.map(s => `<div class="feed-row"><span class="feed-name">${esc(s.tipo)}</span><span class="mono muted">${s.duracaoMin} min · vol ${s.volume}</span></div>`).join('') : '<p class="muted">Nenhuma sessão registrada. Use "Iniciar" na tela de Treinos.</p>'}</div>`;
 }
 
 // ---------- TELA 07: TREINOS (personal planeja por perfil/objetivo) ----------
@@ -516,7 +518,7 @@ function listarTreinos() {
       <h2 class="anton work-title">${esc(t.tipo)}</h2>
       <p class="muted">${esc(t.objetivo || '')}</p>
       <ul class="work-list">${ex.slice(0, 3).map(e => `<li>${esc(e)}</li>`).join('')}${ex.length > 3 ? `<li class="muted">+${ex.length - 3} movimentos</li>` : ''}</ul>
-      <div class="work-foot"><small class="muted">${al ? esc(al.nome) : 'aluno removido'} · por ${esc(t.criadoPor || 'equipe')}</small>${podeEditar ? `<span><button class="btn small ghost" onclick="editarTreino('${t.id}')">Editar</button> <button class="btn small danger" onclick="excluirTreino('${t.id}')">Excluir</button></span>` : ''}</div></div>`;
+      <div class="work-foot"><small class="muted">${al ? esc(al.nome) : 'aluno removido'} · por ${esc(t.criadoPor || 'equipe')}</small><span><button class="btn small" onclick="abrirSessao('${t.id}')">Iniciar</button>${podeEditar ? ` <button class="btn small ghost" onclick="editarTreino('${t.id}')">Editar</button> <button class="btn small danger" onclick="excluirTreino('${t.id}')">Excluir</button>` : ''}</span></div></div>`;
   }).join('') + `</div>`;
 }
 function abrirModalTreino() {
@@ -566,6 +568,37 @@ function listarAgenda() {
   const pg = (Store.db.pagamentos || []).length;
   html += `<div class="panel"><div class="tele">REGISTROS</div><p class="muted">${av} avaliação(ões) física(s) · ${pg} pagamento(s) registrado(s).</p></div>`;
   box.innerHTML = html;
+}
+
+// ---------- MODO TREINO ATIVO (registro de sessão) ----------
+let sessaoTreino = null, sessaoStart = 0, sessaoTimerId = null;
+function abrirSessao(treinoId) {
+  const t = Store.db.treinos.find(x => x.id === treinoId); if (!t) return;
+  sessaoTreino = treinoId; sessaoStart = Date.now();
+  if ($('sessao-titulo')) $('sessao-titulo').textContent = 'Modo treino · ' + (t.tipo || '');
+  const box = $('sessao-itens'); if (box) box.innerHTML = '';
+  (t.exercicios || []).forEach(ex => addSessaoItem(ex));
+  if (sessaoTimerId) clearInterval(sessaoTimerId);
+  if ($('sessao-timer')) $('sessao-timer').textContent = '00:00';
+  sessaoTimerId = setInterval(() => { const s = Math.floor((Date.now() - sessaoStart) / 1000); const el = $('sessao-timer'); if (el) el.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 1000);
+  $('modal-sessao').classList.add('open');
+}
+function addSessaoItem(nome) {
+  const box = $('sessao-itens'); if (!box || typeof document.createElement !== 'function' || !box.appendChild) return;
+  const row = document.createElement('div'); row.className = 'sessao-row';
+  row.innerHTML = `<span class="sessao-nome">${esc(nome)}</span><label>Séries<input type="number" class="s-series" value="3" min="1"></label><label>Reps<input type="number" class="s-reps" value="12" min="1"></label><label>Carga<input type="number" class="s-carga" value="0" step="0.5"></label>`;
+  box.appendChild(row);
+}
+function fecharSessao() { if (sessaoTimerId) { clearInterval(sessaoTimerId); sessaoTimerId = null; } $('modal-sessao').classList.remove('open'); }
+function finalizarSessao() {
+  const t = Store.db.treinos.find(x => x.id === sessaoTreino);
+  const rows = document.querySelectorAll ? [...document.querySelectorAll('#sessao-itens .sessao-row')] : [];
+  const ex = rows.map(r => ({ nome: r.querySelector('.sessao-nome').textContent, series: Number(r.querySelector('.s-series').value) || 0, reps: Number(r.querySelector('.s-reps').value) || 0, carga: Number(r.querySelector('.s-carga').value) || 0 }));
+  const dur = Math.max(1, Math.round((Date.now() - sessaoStart) / 60000));
+  const vol = ex.reduce((s, e) => s + e.series * e.reps * e.carga, 0);
+  Store.db.sessoes = Store.db.sessoes || [];
+  Store.db.sessoes.push({ id: 'se' + Date.now(), alunoId: t ? t.alunoId : '', treinoId: sessaoTreino, tipo: t ? t.tipo : 'Treino', data: hojeISO(), duracaoMin: dur, volume: vol, exercicios: ex });
+  Store.salvar(); fecharSessao(); recarregarTudo(); toast('Sessão salva · ' + dur + ' min · volume ' + vol);
 }
 
 // ---------- AVALIAÇÕES FÍSICAS ----------
