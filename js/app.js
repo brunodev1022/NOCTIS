@@ -4,10 +4,13 @@
 // Tela 07 Treinos (personal) | Tela 08 Exames (aluno → nutri) | Tela 09 Desafios | Tela 10 Fórum
 
 let chartPlanos = null, chartCheckins = null;
+let rankModo = 'total';
 let usuarioLogado = null;
 const $ = (id) => document.getElementById(id);
 const hojeISO = () => new Date().toISOString().slice(0, 10);
 const BRL = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function mascaraFone(el) { const d = (el.value || '').replace(/\D/g, '').slice(0, 11); if (!d) { el.value = ''; return; } let o = '(' + d.slice(0, 2); if (d.length >= 2) o += ') '; if (d.length > 2) o += d.slice(2, 7); if (d.length >= 7) o += '-' + d.slice(7, 11); el.value = o; }
+function mascaraCPF(el) { const d = (el.value || '').replace(/\D/g, '').slice(0, 11); let o = d; if (d.length > 9) o = d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,4})/, '$1.$2.$3-$4'); else if (d.length > 6) o = d.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3'); else if (d.length > 3) o = d.replace(/(\d{3})(\d{1,3})/, '$1.$2'); el.value = o; }
 
 // ---------- VERIFICAÇÃO ANTI-ROBÔS (dispara no clique em Entrar) ----------
 // MVP 100% front-end: ao tentar logar, roda a checagem e só então valida.
@@ -106,6 +109,8 @@ const ehAluno = () => usuarioLogado && usuarioLogado.perfil === 'Aluno';
 const DIAS_PT = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const diaHojePT = () => DIAS_PT[new Date().getDay()];
 function presencasTotais() { const m = {}; Object.values(Store.db.checkins).flat().forEach(c => { m[c.alunoId] = (m[c.alunoId] || 0) + 1; }); return m; }
+function presencasSemana() { const dias = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d.toISOString().slice(0, 10); }); const m = {}; Object.entries(Store.db.checkins).forEach(([data, arr]) => { if (dias.includes(data)) (arr || []).forEach(c => { m[c.alunoId] = (m[c.alunoId] || 0) + 1; }); }); return m; }
+function setRankModo(m) { rankModo = m; atualizarDashboard(); }
 function filtrarDia(dia) { $('treino-filtro-dia').value = dia; listarTreinos(); }
 // Números com física: exibe o valor final na hora e anima por cima (respeita reduced-motion)
 const fmtInt = (v) => String(Math.round(v));
@@ -167,15 +172,16 @@ function atualizarDashboard() {
   const ph = $('pico-hora'); if (ph) ph.textContent = pico ? pico[0] + 'h' : '—';
   // inadimplentes top 4
   const di = $('dash-inadimplentes');
-  if (di) di.innerHTML = inad.slice(0, 4).map(a => `<div class="feed-row"><span class="feed-name">${a.nome}</span><span class="badge pendente">${a.plano} · ${BRL(PLANOS[a.plano] || 0)}</span>${podeGerenciarFinanceiro() ? `<button class="btn small ghost" onclick="alternarMensalidade('${a.id}')">Dar baixa</button>` : ''}</div>`).join('') || '<p class="muted">Ninguém pendente. Base limpa.</p>';
+  if (di) di.innerHTML = inad.slice(0, 4).map(a => `<div class="feed-row"><span class="feed-name">${esc(a.nome)}</span><span class="badge pendente">${a.plano} · ${BRL(PLANOS[a.plano] || 0)}</span>${podeGerenciarFinanceiro() ? `<button class="btn small ghost" onclick="alternarMensalidade('${a.id}')">Dar baixa</button>` : ''}</div>`).join('') || '<p class="muted">Ninguém pendente. Base limpa.</p>';
   // atividade ao vivo (últimos 6, todos os dias, mais recentes primeiro)
   const todos = Object.entries(checkins).flatMap(([data, arr]) => (arr || []).map(c => ({ ...c, data }))).slice(-6).reverse();
   const da = $('dash-atividade');
-  if (da) da.innerHTML = todos.map(c => { const al = alunos.find(a => a.id === c.alunoId); return `<div class="feed-row"><span class="live-dot sm"></span><span class="avatar xs">${iniciais(al ? al.nome : '?')}</span><span class="feed-name">${al ? al.nome : '—'}</span><span class="mono muted">${(c.data || '').slice(8)}/${(c.data || '').slice(5, 7)} · ${c.hora || ''}</span></div>`; }).join('') || '<p class="muted">Sem movimento ainda hoje.</p>';
+  if (da) da.innerHTML = todos.map(c => { const al = alunos.find(a => a.id === c.alunoId); return `<div class="feed-row"><span class="live-dot sm"></span><span class="avatar xs">${iniciais(al ? al.nome : '?')}</span><span class="feed-name">${al ? esc(al.nome) : '—'}</span><span class="mono muted">${(c.data || '').slice(8)}/${(c.data || '').slice(5, 7)} · ${c.hora || ''}</span></div>`; }).join('') || '<p class="muted">Sem movimento ainda hoje.</p>';
   // ranking da semana (inspirado no Strava): top 5 por presenças totais
   const rk = $('dash-ranking');
-  if (rk) { const pres = presencasTotais();
-    rk.innerHTML = [...alunos].sort((a, b) => (pres[b.id] || 0) - (pres[a.id] || 0)).slice(0, 5).map((a, i) => `<div class="rank-row"><span class="rank-pos anton">${String(i + 1).padStart(2, '0')}</span><span class="avatar sm">${iniciais(a.nome)}</span><span class="feed-name">${a.nome}<br><small class="muted">${a.plano} · ${a.status}</small></span><strong class="mono">${pres[a.id] || 0} <small class="muted">presenças</small></strong></div>`).join('') || '<p class="muted">Sem presenças ainda.</p>'; }
+  if (rk) { const pres = rankModo === 'semana' ? presencasSemana() : presencasTotais();
+    rk.innerHTML = [...alunos].sort((a, b) => (pres[b.id] || 0) - (pres[a.id] || 0)).slice(0, 5).map((a, i) => `<div class="rank-row"><span class="rank-pos anton">${String(i + 1).padStart(2, '0')}</span><span class="avatar sm">${iniciais(a.nome)}</span><span class="feed-name">${esc(a.nome)}<br><small class="muted">${a.plano} · ${a.status}</small></span><strong class="mono">${pres[a.id] || 0} <small class="muted">${rankModo === 'semana' ? 'nessa semana' : 'presenças'}</small></strong></div>`).join('') || '<p class="muted">Sem presenças ainda.</p>';
+    const bs = $('rank-btn-sem'), bt = $('rank-btn-tot'); if (bs) bs.classList.toggle('on', rankModo === 'semana'); if (bt) bt.classList.toggle('on', rankModo === 'total'); }
   // Personal e Nutri veem operação, nunca dinheiro: receita e cobrança só p/ admin/funcionário
   const semFin = usuarioLogado && ['Personal', 'Nutricionista'].includes(usuarioLogado.perfil);
   const dh = $('dash-hero'); if (dh) dh.style.display = semFin ? 'none' : '';
@@ -217,7 +223,7 @@ function listarAlunos() {
   const fp = $('filtro-plano').value, fs = $('filtro-status').value;
   const lista = Store.db.alunos.filter(a => a.nome.toLowerCase().includes(busca) && (!fp || a.plano === fp) && (!fs || a.status === fs));
   $('tb-alunos').innerHTML = lista.map(a => `
-    <tr><td><div class="member"><span class="avatar sm">${iniciais(a.nome)}</span><span><strong>${a.nome}</strong><br><small style="color:#9aa6b5">${a.fone} · ${a.idade} anos</small></span></div></td>
+    <tr><td><div class="member"><span class="avatar sm">${iniciais(a.nome)}</span><span><strong>${esc(a.nome)}</strong><br><small style="color:#9aa6b5">${esc(a.fone)} · ${a.idade} anos</small></span></div></td>
     <td><span class="badge paga">${a.plano}</span></td>
     <td><span class="badge ${a.status.toLowerCase()}">${a.status}</span></td>
     <td><span class="badge ${a.mensalidade === 'Paga' ? 'paga' : 'pendente'}">${a.mensalidade}</span></td>
@@ -225,19 +231,25 @@ function listarAlunos() {
     <button class="btn small danger" onclick="excluirAluno('${a.id}')">Excluir</button></td></tr>`).join('')
     || '<tr><td colspan="5">Nenhum aluno encontrado</td></tr>';
 }
-function abrirModalAluno() { $('modal-aluno-titulo').textContent = 'Nova matrícula'; $('f-aluno-id').value = ''; $('f-aluno-nome').value = ''; $('f-aluno-idade').value = ''; $('f-aluno-fone').value = ''; $('modal-aluno').classList.add('open'); }
+function abrirModalAluno() { $('modal-aluno-titulo').textContent = 'Nova matrícula'; $('f-aluno-id').value = ''; $('f-aluno-nome').value = ''; $('f-aluno-cpf').value = ''; $('f-aluno-idade').value = ''; $('f-aluno-fone').value = ''; $('modal-aluno').classList.add('open'); }
 function fecharModalAluno() { $('modal-aluno').classList.remove('open'); }
 function editarAluno(id) { const a = Store.db.alunos.find(x => x.id === id);
   $('modal-aluno-titulo').textContent = 'Editar matrícula'; $('f-aluno-id').value = a.id; $('f-aluno-nome').value = a.nome;
-  $('f-aluno-idade').value = a.idade; $('f-aluno-fone').value = a.fone; $('f-aluno-plano').value = a.plano;
+  $('f-aluno-idade').value = a.idade; $('f-aluno-fone').value = a.fone; $('f-aluno-cpf').value = a.cpf || ''; $('f-aluno-plano').value = a.plano;
   $('f-aluno-status').value = a.status; $('f-aluno-mens').value = a.mensalidade; $('modal-aluno').classList.add('open'); }
 function salvarAluno() {
   if (!podeMatricular()) return alert('Só o atendimento (recepção) ou o admin fazem matrícula.');
   const nome = $('f-aluno-nome').value.trim();
   if (!nome) return alert('Digite o nome do aluno');
+  const idade = Number($('f-aluno-idade').value) || 0;
+  if (idade < 12 || idade > 120) return alert('Idade inválida — informe entre 12 e 120 anos.');
+  const fone = $('f-aluno-fone').value.trim();
+  if (fone.replace(/\D/g, '').length < 10) return alert('Telefone inválido — informe DDD + número (ex: (11) 99999-9999).');
+  const cpf = $('f-aluno-cpf') ? $('f-aluno-cpf').value.trim() : '';
+  if (cpf && cpf.replace(/\D/g, '').length !== 11) return alert('CPF inválido — informe os 11 dígitos ou deixe em branco.');
   const id = $('f-aluno-id').value || ('a' + Date.now());
   const antigo = Store.db.alunos.find(x => x.id === id);
-  const dados = { id, nome, idade: Number($('f-aluno-idade').value) || 0, fone: $('f-aluno-fone').value,
+  const dados = { id, nome, idade, fone, cpf,
     plano: $('f-aluno-plano').value, status: $('f-aluno-status').value, mensalidade: $('f-aluno-mens').value,
     desde: antigo?.desde || hojeISO() };
   const i = Store.db.alunos.findIndex(x => x.id === id);
@@ -256,6 +268,16 @@ function exportarAlunosCSV() {
 }
 
 // ---------- TELA 3: CHECK-IN (valida pagamento + acesso) ----------
+function confete() {
+  try {
+    if (typeof document === 'undefined' || !document.body || typeof document.createElement !== 'function') return;
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const c = document.createElement('div'); c.className = 'confete';
+    for (let i = 0; i < 26; i++) { const p = document.createElement('i'); p.style.setProperty('--x', (Math.random() * 100) + 'vw'); p.style.setProperty('--d', (Math.random() * 0.5).toFixed(2) + 's'); p.style.setProperty('--c', 'hsl(' + Math.floor(Math.random() * 360) + ',85%,62%)'); c.appendChild(p); }
+    document.body.appendChild(c);
+    setTimeout(() => { try { c.remove(); } catch (e) {} }, 1800);
+  } catch (e) {}
+}
 function fazerCheckin() {
   const alunoId = $('checkin-aluno').value;
   const msg = $('checkin-msg');
@@ -266,8 +288,10 @@ function fazerCheckin() {
   if (a.mensalidade !== 'Paga') { msg.textContent = `${a.nome} com mensalidade PENDENTE — valide o pagamento no Financeiro.`; return; }
   const hoje = hojeISO();
   Store.db.checkins[hoje] = Store.db.checkins[hoje] || [];
+  const jaEntrou = Store.db.checkins[hoje].find(c => c.alunoId === alunoId);
+  if (jaEntrou) { msg.textContent = `${a.nome} já registrou check-in hoje às ${jaEntrou.hora}.`; return; }
   Store.db.checkins[hoje].push({ alunoId, hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
-  Store.salvar(); msg.textContent = `Acesso liberado: ${a.nome}. Bom treino.`; recarregarTudo();
+  Store.salvar(); msg.textContent = `Acesso liberado: ${a.nome}. Bom treino.`; confete(); recarregarTudo();
 }
 function listarCheckins() {
   const lista = Store.db.checkins[hojeISO()] || [];
@@ -287,7 +311,7 @@ function listarFinanceiro() {
   animarNumero($('fin-areceber'), areceber, BRL);
   animarNumero($('fin-inad'), alunos.filter(a => a.mensalidade === 'Pendente').length, fmtInt);
   $('tb-financeiro').innerHTML = alunos.map(a => `
-    <tr><td>${a.nome}</td><td>${a.plano}</td><td>${BRL(PLANOS[a.plano])}</td>
+    <tr><td>${esc(a.nome)}</td><td>${a.plano}</td><td>${BRL(PLANOS[a.plano])}</td>
     <td><span class="badge ${a.mensalidade === 'Paga' ? 'paga' : 'pendente'}">${a.mensalidade}</span></td>
     <td><button class="btn small ghost" onclick="alternarMensalidade('${a.id}')">Alternar</button></td></tr>`).join('')
     || '<tr><td colspan="5">Sem alunos ativos</td></tr>';
@@ -374,12 +398,13 @@ function verDashAluno() {
   const prox = treinos[0];
   const treinoHoje = treinos.filter(t => t.dia === diaHojePT());
   const nivel = totalCheckins >= 20 ? 'ELITE' : totalCheckins >= 10 ? 'RITMO' : totalCheckins >= 4 ? 'EMBALO' : 'BASE';
+  const conquistas = conquistasDoAluno(id);
   $('dash-aluno-box').innerHTML = `
     <div class="panel al-hero">
       <div class="al-avatar anton">${iniciais(a.nome)}</div>
       <div class="al-main">
         <div class="tele">ATLETA · NÍVEL ${nivel} · STREAK ${streak}D</div>
-        <h2 class="anton al-name">${a.nome}</h2>
+        <h2 class="anton al-name">${esc(a.nome)}</h2>
         <div class="al-pills"><span class="badge paga">${a.plano} · ${BRL(PLANOS[a.plano] || 0)}</span><span class="badge ${a.mensalidade === 'Paga' ? 'paga' : 'pendente'}">${a.mensalidade}</span><small class="muted mono">DESDE ${(a.desde || '').split('-').reverse().join('/')}</small></div>
         <div class="al-week">${dias7.map((d, i) => `<span class="al-day ${marks[i] ? 'on' : ''}" title="${d}">${'STQQSSD'[(new Date(d + 'T12:00').getDay() + 6) % 7] || '•'}</span>`).join('')}</div>
       </div>
@@ -388,10 +413,14 @@ function verDashAluno() {
     <div class="dash-grid al-grid">
       <div class="panel al-today"><div class="tele">TREINO DE HOJE · ${diaHojePT().toUpperCase()}</div>${treinoHoje.length ? `<h2 class="anton">${treinoHoje[0].tipo}</h2><p class="muted">${(treinoHoje[0].exercicios || []).slice(0, 3).join(' · ')}${(treinoHoje[0].exercicios || []).length > 3 ? ' · ...' : ''}</p><button class="btn small" onclick="irPara('treinos')">Abrir treino</button>` : '<p class="muted">Descanso programado. Aproveita pra revisar o plano alimentar.</p>'}</div>
       <div class="panel"><div class="tele">PRÓXIMO TREINO</div>${prox ? `<h2>${prox.tipo} · ${prox.dia}</h2><p class="muted">${prox.objetivo || ''}</p><ul>${(prox.exercicios || []).slice(0, 4).map(e => `<li>${e}</li>`).join('')}</ul><button class="btn small ghost" onclick="irPara('treinos')">Ver todos</button>` : '<p class="muted">Nenhum treino montado. Fala com o personal.</p>'}</div>
-      <div class="panel"><div class="tele">PLANO · ${plan && plan.itens ? 'PRESCRITO' : 'A PRESCREVER'}</div>${plan && plan.itens ? `<h2>${plan.itens.length} refeições</h2><p class="muted">por ${plan.autor || 'Equipe'}</p><button class="btn small ghost" onclick="irPara('plano')">Abrir plano</button>` : '<p class="muted">Aguardando prescrição do nutricionista.</p>'}</div>
-      <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${d.titulo}</span><span class="badge paga">${d.perfilAlvo}</span></div>`).join('') || '<p class="muted">Nenhum desafio ativo. Explore em Desafios.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
+      <div class="panel"><div class="tele">PLANO · ${plan && plan.itens ? 'PRESCRITO' : 'A PRESCREVER'}</div>${plan && plan.itens ? `<h2>${plan.itens.length} refeições</h2><p class="muted">por ${esc(plan.autor || 'Equipe')}</p><button class="btn small ghost" onclick="irPara('plano')">Abrir plano</button>` : '<p class="muted">Aguardando prescrição do nutricionista.</p>'}</div>
+      <div class="panel"><div class="tele">DESAFIOS · ${meusDesafios.length} ATIVOS</div>${meusDesafios.slice(0, 3).map(d => `<div class="feed-row"><span class="feed-name">${esc(d.titulo)}</span><span class="badge paga">${esc(d.perfilAlvo)}</span></div>`).join('') || '<p class="muted">Nenhum desafio ativo. Explore em Desafios.</p>'}<button class="btn small ghost" onclick="irPara('desafios')">Ver desafios</button></div>
     </div>
-    <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${anam.objetivo} · ${anam.refeicoes} refeições/dia · ${anam.restricoes || 'sem restrições'}` : 'Anamnese ainda não preenchida.'}</p></div>`;
+    <div class="panel"><div class="tele">FICHA · ANAMNESE</div><p>${anam ? `${esc(anam.objetivo)} · ${esc(anam.refeicoes)} refeições/dia · ${esc(anam.restricoes || 'sem restrições')}` : 'Anamnese ainda não preenchida.'}</p></div>
+    <div class="al-grid2">
+      <div class="panel"><div class="tele">CONQUISTAS</div><div class="badges">${conquistas.map(c => `<span class="badge paga">${esc(c)}</span>`).join('') || '<p class="muted">Faça check-ins, treinos e desafios para desbloquear.</p>'}</div><button class="btn small ghost" style="margin-top:10px" onclick="compartilharConquistas()">Compartilhar conquistas</button></div>
+      <div class="panel"><div class="tele">HISTÓRICO · ÚLTIMOS CHECK-INS</div>${allChecks.length ? `<ul class="hist-list">${allChecks.slice().reverse().slice(0, 12).map(c => `<li><span class="mono">${(c.data || '').split('-').reverse().join('/')}</span><span class="muted">· ${c.hora || ''}</span></li>`).join('')}</ul>` : '<p class="muted">Nenhum check-in ainda.</p>'}</div>
+    </div>`;
 }
 
 // ---------- TELA 07: TREINOS (personal planeja por perfil/objetivo) ----------
@@ -414,10 +443,10 @@ function listarTreinos() {
     const ex = t.exercicios || [];
     return `<div class="panel work-card ${isHoje ? 'today' : ''}">${isHoje ? '<span class="today-tag">HOJE</span>' : ''}
       <div class="work-top"><span class="day-chip">${t.dia}</span><small class="mono muted">${ex.length} MOVIMENTOS</small></div>
-      <h2 class="anton work-title">${t.tipo}</h2>
-      <p class="muted">${t.objetivo || ''}</p>
-      <ul class="work-list">${ex.slice(0, 3).map(e => `<li>${e}</li>`).join('')}${ex.length > 3 ? `<li class="muted">+${ex.length - 3} movimentos</li>` : ''}</ul>
-      <div class="work-foot"><small class="muted">${al ? al.nome : 'aluno removido'} · por ${t.criadoPor || 'equipe'}</small>${podeEditar ? `<span><button class="btn small ghost" onclick="editarTreino('${t.id}')">Editar</button> <button class="btn small danger" onclick="excluirTreino('${t.id}')">Excluir</button></span>` : ''}</div></div>`;
+      <h2 class="anton work-title">${esc(t.tipo)}</h2>
+      <p class="muted">${esc(t.objetivo || '')}</p>
+      <ul class="work-list">${ex.slice(0, 3).map(e => `<li>${esc(e)}</li>`).join('')}${ex.length > 3 ? `<li class="muted">+${ex.length - 3} movimentos</li>` : ''}</ul>
+      <div class="work-foot"><small class="muted">${al ? esc(al.nome) : 'aluno removido'} · por ${esc(t.criadoPor || 'equipe')}</small>${podeEditar ? `<span><button class="btn small ghost" onclick="editarTreino('${t.id}')">Editar</button> <button class="btn small danger" onclick="excluirTreino('${t.id}')">Excluir</button></span>` : ''}</div></div>`;
   }).join('') + `</div>`;
 }
 function abrirModalTreino() {
@@ -462,11 +491,11 @@ function listarExames() {
     .sort((a, b) => (b.data || '').localeCompare(a.data || ''));
   $('tb-exames').innerHTML = lista.map(e => {
     const al = Store.db.alunos.find(a => a.id === e.alunoId);
-    return `<tr><td><strong>${e.nomeArquivo}</strong><br><small style="color:#9aa6b5">${e.tipo || ''} · ${e.tamanhoKb ? e.tamanhoKb + ' KB' : ''} · ${e.obs || ''}</small></td>`
-      + `<td>${al ? al.nome : '—'}</td><td>${(e.data || '').split('-').reverse().join('/')}</td>`
+    return `<tr><td><strong>${esc(e.nomeArquivo)}</strong><br><small style="color:#9aa6b5">${esc(e.tipo || '')} · ${e.tamanhoKb ? e.tamanhoKb + ' KB' : ''} · ${esc(e.obs || '')}</small></td>`
+      + `<td>${al ? esc(al.nome) : '—'}</td><td>${(e.data || '').split('-').reverse().join('/')}</td>`
       + `<td>${podeParecer
-        ? `<textarea id="parecer-${e.id}" rows="2" placeholder="Parecer da nutrição...">${e.parecer || ''}</textarea><br><button class="btn small ghost" onclick="salvarParecer('${e.id}')">Salvar parecer</button>`
-        : (e.parecer ? e.parecer : '<span class="muted">Aguardando análise</span>')}</td>`
+        ? `<textarea id="parecer-${e.id}" rows="2" placeholder="Parecer da nutrição...">${esc(e.parecer || '')}</textarea><br><button class="btn small ghost" onclick="salvarParecer('${e.id}')">Salvar parecer</button>`
+        : (e.parecer ? esc(e.parecer) : '<span class="muted">Aguardando análise</span>')}</td>`
       + `<td>${e.conteudo ? `<button class="btn small ghost" onclick="baixarExame('${e.id}')">Baixar</button>` : ''} <button class="btn small danger" onclick="removerExame('${e.id}')">Remover</button></td></tr>`;
   }).join('') || '<tr><td colspan="5">Nenhum exame enviado</td></tr>';
 }
@@ -524,14 +553,15 @@ function listarDesafios() {
     const lid = [...parts].sort((a, b) => (pres[b] || 0) - (pres[a] || 0))[0];
     const liderNome = lid ? (Store.db.alunos.find(a => a.id === lid) || {}).nome : null;
     const pct = Math.min(100, Math.round(n / nAtivos * 100));
-    return `<div class="panel chal-card"><div class="chal-band"><span class="badge paga">${d.perfilAlvo}</span><small class="mono muted">${(d.data || '').split('-').reverse().join('/')} · POR ${d.criadorNome}</small></div>`
-      + `<h2 class="anton chal-title">${d.titulo}</h2><p class="muted">${d.descricao || ''}</p>`
+    return `<div class="panel chal-card"><div class="chal-band"><span class="badge paga">${esc(d.perfilAlvo)}</span><small class="mono muted">${(d.data || '').split('-').reverse().join('/')} · POR ${esc(d.criadorNome)}</small></div>`
+      + `<h2 class="anton chal-title">${esc(d.titulo)}</h2><p class="muted">${esc(d.descricao || '')}</p>`
       + `<div class="meta-track"><div class="meta-fill" style="width:${pct}%"></div></div>`
-      + `<small class="mono muted">${n} INSCRITOS · ${liderNome ? 'LÍDER ' + liderNome.toUpperCase() : 'SEM LÍDER AINDA'}</small>`
+      + `<small class="mono muted">${n} INSCRITOS · ${liderNome ? 'LÍDER ' + esc(liderNome.toUpperCase()) : 'SEM LÍDER AINDA'}</small>`
       + `<div class="stack">${stack || '<small class="muted">Seja o primeiro a entrar</small>'}</div>`
       + `<div class="chal-actions">${meuId
         ? (participo ? `<button class="btn small ghost" onclick="sairDesafio('${d.id}')">Sair do desafio</button>` : `<button class="btn small" onclick="participarDesafio('${d.id}')">Participar</button>`)
         : `<small class="muted">Participantes: ${parts.map(pid => (Store.db.alunos.find(a => a.id === pid) || {}).nome || pid).join(', ') || '—'}</small>`}`
+      + ` <button class="btn small ghost" onclick="curtirDesafio('${d.id}')">♥ ${(d.likes || []).length}</button>`
       + ` <button class="btn small danger" onclick="excluirDesafio('${d.id}')">Excluir</button></div></div>`;
   }).join('') || '<div class="panel empty"><h2>Nenhum desafio ainda</h2><p class="muted">A academia pode sugerir por perfil e o aluno pode criar o próprio.</p></div>';
 }
@@ -551,7 +581,7 @@ function participarDesafio(id) {
   const meuId = meuAlunoId();
   d.participantes = d.participantes || [];
   if (!d.participantes.includes(meuId)) d.participantes.push(meuId);
-  Store.salvar(); recarregarTudo();
+  Store.salvar(); confete(); recarregarTudo();
 }
 function sairDesafio(id) {
   if (!ehAluno()) return alert('Entre como Aluno para sair de desafios.');
@@ -576,7 +606,7 @@ function listarForum() {
   if (forumAberto) { if (box) box.innerHTML = ''; renderForumDetalhe(); return; }
   if ($('forum-detalhe')) { $('forum-detalhe').classList.add('hidden'); $('forum-detalhe').innerHTML = ''; }
   if (!box) return;
-  box.innerHTML = lista.map(t => `<div class="panel topic-card" onclick="abrirTopico('${t.id}')" style="cursor:pointer"><span class="avatar sm">${iniciais(t.autorNome)}</span><span class="topic-main"><h2>${t.titulo}</h2><small class="muted">por ${t.autorNome} (${t.autorPerfil}) · ${(t.data || '').split('-').reverse().join('/')}</small></span><span class="reply-pill mono">${(t.mensagens || []).length} MSGS</span></div>`).join('')
+  box.innerHTML = lista.map(t => `<div class="panel topic-card" onclick="abrirTopico('${t.id}')" style="cursor:pointer"><span class="avatar sm">${iniciais(t.autorNome)}</span><span class="topic-main"><h2>${esc(t.titulo)}</h2><small class="muted">por ${esc(t.autorNome)} (${esc(t.autorPerfil)}) · ${(t.data || '').split('-').reverse().join('/')}</small></span><span class="reply-pill mono">${(t.mensagens || []).length} MSGS</span></div>`).join('')
     || '<div class="panel empty"><h2>Nenhum tópico ainda</h2><p class="muted">Crie o primeiro e chame a galera.</p></div>';
 }
 function abrirModalTopico() { $('f-topico-titulo').value = ''; $('f-topico-msg').value = ''; $('modal-topico').classList.add('open'); }
@@ -596,8 +626,8 @@ function renderForumDetalhe() {
   const det = $('forum-detalhe');
   if (!t) { forumAberto = null; listarForum(); return; }
   det.classList.remove('hidden');
-  det.innerHTML = `<button class="btn small ghost" onclick="voltarForum()">← Voltar</button><div class="panel"><h2>${t.titulo}</h2><small class="muted">por ${t.autorNome} (${t.autorPerfil})</small></div>`
-    + t.mensagens.map(m => `<div class="panel forum-msg"><div class="member"><span class="avatar sm">${iniciais(m.autorNome)}</span><span><strong>${m.autorNome}</strong> <small class="muted">(${m.autorPerfil}) · ${(m.data || '').split('-').reverse().join('/')}</small></span></div><p>${m.texto}</p></div>`).join('')
+  det.innerHTML = `<button class="btn small ghost" onclick="voltarForum()">← Voltar</button><div class="panel"><h2>${esc(t.titulo)}</h2><small class="muted">por ${esc(t.autorNome)} (${esc(t.autorPerfil)})</small></div>`
+    + t.mensagens.map(m => `<div class="panel forum-msg"><div class="member"><span class="avatar sm">${iniciais(m.autorNome)}</span><span><strong>${esc(m.autorNome)}</strong> <small class="muted">(${esc(m.autorPerfil)}) · ${(m.data || '').split('-').reverse().join('/')}</small></span></div><p>${esc(m.texto)}</p></div>`).join('')
     + `<div class="panel"><label>Responder<textarea id="forum-resp" rows="3" placeholder="Escreva sua resposta..."></textarea></label><button class="btn" onclick="responderTopico()">Enviar resposta</button></div>`;
 }
 function responderTopico() {
@@ -624,7 +654,8 @@ function cmdkItens() {
     { titulo: 'Novo tópico', hint: 'Ação', route: 'forum', quando: () => true, run: () => { irPara('forum'); abrirModalTopico(); } },
     { titulo: 'Exportar matrículas (CSV)', hint: 'Ação', route: 'matricula', quando: podeMatricular, run: () => exportarAlunosCSV() },
   ].filter(a => { try { return a.quando(); } catch (e) { return false; } });
-  return rotas.concat(acoes);
+  const alunos = Store.db.alunos.map(a => ({ titulo: `Aluno: ${a.nome}`, hint: 'Aluno', route: 'dashaluno', run: () => { irPara('dashaluno'); const s = $('dash-aluno'); if (s) s.value = a.id; if (typeof verDashAluno === 'function') verDashAluno(); } }));
+  return rotas.concat(alunos, acoes);
 }
 function cmdkRender() {
   const q = ($('cmdk-input').value || '').toLowerCase();
@@ -645,6 +676,143 @@ if (document.addEventListener) document.addEventListener('keydown', (e) => {
   else if (cmdkAberto() && e.key === 'ArrowUp') { e.preventDefault(); cmdkMover(-1); }
   else if (cmdkAberto() && e.key === 'Enter') { cmdkGo(cmdkIndex); }
 });
+
+// ---------- MODO BEATRIZ (demonstra bloqueio ao vivo) ----------
+function modoBeatriz() {
+  const a = Store.db.alunos.find(x => x.nome.toLowerCase().includes('beatriz')) || Store.db.alunos.find(x => x.mensalidade === 'Pendente');
+  if (!a) { $('checkin-msg').textContent = 'Nenhum aluno pendente para demonstrar o bloqueio.'; return; }
+  const sel = $('checkin-aluno'); if (sel) sel.value = a.id;
+  fazerCheckin();
+}
+
+// ---------- CURTIDAS NOS DESAFIOS ----------
+function curtirDesafio(id) {
+  if (!ehAluno()) return alert('Entre como Aluno para curtir desafios.');
+  const d = Store.db.desafios.find(x => x.id === id); if (!d) return;
+  d.likes = d.likes || [];
+  const me = meuAlunoId(); const i = d.likes.indexOf(me);
+  if (i >= 0) d.likes.splice(i, 1); else d.likes.push(me);
+  Store.salvar(); recarregarTudo();
+}
+
+// ---------- TIMER DE DESCANSO ----------
+let timerId = null, timerRest = 0;
+function timerRender() { const d = $('rt-display'); if (!d) return; const m = String(Math.floor(timerRest / 60)).padStart(2, '0'); const s = String(timerRest % 60).padStart(2, '0'); d.textContent = m + ':' + s; }
+function timerSet(sec) { timerRest = sec; if (timerId) { clearInterval(timerId); timerId = null; } timerRender(); }
+function timerStart() { if (timerId) return; if (timerRest <= 0) timerRest = 60; timerId = setInterval(() => { if (timerRest > 0) { timerRest--; timerRender(); if (timerRest === 0) { clearInterval(timerId); timerId = null; try { alert('Descanso encerrado!'); } catch (e) {} } } }, 1000); }
+function timerPause() { if (timerId) { clearInterval(timerId); timerId = null; } }
+function timerReset() { if (timerId) { clearInterval(timerId); timerId = null; } timerRest = 0; timerRender(); }
+
+// ---------- CONQUISTAS (gamificação) ----------
+function conquistasDoAluno(id) {
+  const c = [];
+  const checks = Object.entries(Store.db.checkins).flatMap(([d, a]) => (a || []).map(x => ({ ...x, data: d }))).filter(x => x.alunoId === id).length;
+  const treinos = (Store.db.treinos || []).filter(t => t.alunoId === id).length;
+  const desafios = (Store.db.desafios || []).filter(d => (d.participantes || []).includes(id)).length;
+  const exames = (Store.db.exames || []).filter(e => e.alunoId === id).length;
+  if (checks >= 1) c.push('Primeiro passo');
+  if (checks >= 10) c.push('10 presenças');
+  if (checks >= 20) c.push('Elite');
+  if (treinos >= 3) c.push('3+ treinos');
+  if (desafios >= 1) c.push('Desafiante');
+  if (exames >= 1) c.push('Exames em dia');
+  return c;
+}
+function compartilharConquistas() {
+  const id = idAlvoDashAluno();
+  const a = Store.db.alunos.find(x => x.id === id);
+  const cs = conquistasDoAluno(id);
+  const txt = `NOCTIS · ${a ? a.nome : 'Aluno'} — conquistas: ${cs.join(', ') || 'começando agora'}`;
+  try { if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt); } catch (e) {}
+  alert('Conquistas copiadas para compartilhar:\n' + txt);
+}
+
+// ---------- SUGESTÕES DE EXERCÍCIOS ----------
+function addExercicio(txt) { const t = $('f-treino-exercicios'); if (!t) return; t.value += (t.value ? '\n' : '') + txt; }
+
+// ---------- NOTIFICAÇÕES (sino) ----------
+function listaNotificacoes() {
+  const l = [];
+  Store.db.alunos.filter(a => a.status === 'Ativo' && a.mensalidade === 'Pendente').forEach(a => l.push({ t: `${a.nome} está com mensalidade pendente`, r: 'financeiro' }));
+  (Store.db.exames || []).filter(e => !e.parecer).forEach(e => l.push({ t: `Exame "${e.nomeArquivo}" aguarda parecer`, r: 'exames' }));
+  const hj = (Store.db.treinos || []).filter(t => t.dia === diaHojePT()).length;
+  if (hj) l.push({ t: `${hj} treino(s) programado(s) para hoje`, r: 'treinos' });
+  return l;
+}
+function renderNotif() {
+  const l = listaNotificacoes();
+  const b = $('notif-badge');
+  if (b) { b.textContent = l.length; b.classList.toggle('hidden', l.length === 0); }
+  const box = $('notif-lista');
+  if (box) box.innerHTML = l.map(n => `<div class="feed-row"><span class="live-dot sm"></span><span class="feed-name">${esc(n.t)}</span><button class="btn small ghost" onclick="irPara('${n.r}');fecharNotificacoes()">Abrir</button></div>`).join('') || '<p class="muted">Tudo em dia. Nenhuma pendência.</p>';
+}
+function abrirNotificacoes() { renderNotif(); $('modal-notif').classList.add('open'); }
+function fecharNotificacoes() { $('modal-notif').classList.remove('open'); }
+
+// ---------- MODO APRESENTAÇÃO (tour guiado) ----------
+// Botão flutuante que conduz a demonstração passo a passo (login → ... → fórum).
+const TOUR_STEPS = [
+  { route: 'dashboard', titulo: 'Dashboard', texto: 'Visão geral em bento: receita e meta, ocupação de hoje, base por plano, fluxo de 7 dias, cobrança e ranking dos mais frequentes — tudo em tempo real.' },
+  { route: 'matricula', titulo: 'Matrícula', texto: 'Cadastro completo do aluno (só recepção/admin). Busque, filtre, crie, edite ou exclua, exporte CSV e faça backup. Agora valida idade e telefone.' },
+  { route: 'checkin', titulo: 'Check-in (RN01)', texto: 'A catraca só libera aluno ATIVO e com mensalidade PAGA. Teste a Beatriz (pendente) para ver o bloqueio e o motivo na tela.' },
+  { route: 'financeiro', titulo: 'Financeiro', texto: 'Gestão de mensalidades: receita, a receber e inadimplentes. Dê baixa com um clique e veja o dashboard atualizar na hora.' },
+  { route: 'anamnese', titulo: 'Nutrição · Anamnese', texto: 'A nutricionista coleta objetivo, refeições, restrições e observações do aluno. É a base da prescrição.' },
+  { route: 'plano', titulo: 'Plano alimentar', texto: 'Prescrição 100% manual do nutricionista, com autor e data. O aluno vê o próprio plano em modo leitura.' },
+  { route: 'treinos', titulo: 'Treinos', texto: 'O personal monta o planejamento por aluno, com dia e exercícios. O treino de HOJE ganha destaque.' },
+  { route: 'desafios', titulo: 'Desafios', texto: 'Metas por perfil (hipertrofia, emagrecimento...) e desafios criados pelos alunos, com inscritos, líder e ranking.' },
+  { route: 'forum', titulo: 'Fórum', texto: 'Comunidade: tópicos e respostas para clientes e equipe trocarem ideia.' },
+  { route: 'dashboard', titulo: 'Ctrl K', texto: 'Atalho de busca: pressione Ctrl K (ou ⌘K) para teleportar entre telas e ações — ótimo pra navegar rápido na apresentação.' },
+];
+let tourIndex = 0;
+function abrirTour() { tourIndex = 0; $('tour-overlay').classList.remove('hidden'); tourRender(); }
+function fecharTour() { $('tour-overlay').classList.add('hidden'); }
+function tourFundo(e) { if (e && e.target && e.target.id === 'tour-overlay') fecharTour(); }
+function tourRender() {
+  const s = TOUR_STEPS[tourIndex];
+  $('tour-step').textContent = `PASSO ${tourIndex + 1}/${TOUR_STEPS.length}`;
+  $('tour-title').textContent = s.titulo;
+  $('tour-text').textContent = s.texto;
+  $('tour-prev').style.visibility = tourIndex === 0 ? 'hidden' : 'visible';
+  $('tour-next').textContent = tourIndex === TOUR_STEPS.length - 1 ? 'Concluir ✓' : 'Próximo →';
+  if (s.route && typeof irPara === 'function') irPara(s.route);
+}
+function tourProximo() { if (tourIndex >= TOUR_STEPS.length - 1) return fecharTour(); tourIndex++; tourRender(); }
+function tourAnterior() { if (tourIndex <= 0) return; tourIndex--; tourRender(); }
+
+// ---------- BACKUP (exportar/importar dados em JSON) ----------
+function exportarBackup() {
+  const data = JSON.stringify(Store.db, null, 2);
+  const el = document.createElement('a');
+  el.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+  el.download = 'noctis-backup-' + hojeISO() + '.json';
+  el.click();
+}
+function abrirImportBackup() { const el = $('backup-file'); if (el && el.click) el.click(); }
+function importarBackup(input) {
+  const file = input && input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const obj = JSON.parse(reader.result);
+      if (!obj || !Array.isArray(obj.alunos)) throw new Error('formato inválido');
+      if (!confirm('Importar este backup? Os dados atuais serão substituídos.')) { if (input) input.value = ''; return; }
+      Store.db = obj;
+      if (!Store.db.anamneses) Store.db.anamneses = {};
+      if (!Store.db.planosAlimentares) Store.db.planosAlimentares = {};
+      if (!Store.db.exames) Store.db.exames = [];
+      if (!Store.db.desafios) Store.db.desafios = [];
+      if (!Store.db.forum) Store.db.forum = [];
+      if (!Array.isArray(Store.db.treinos)) Store.db.treinos = [];
+      Store.salvar(); recarregarTudo(); alert('Backup importado com sucesso!');
+    } catch (e) { alert('Arquivo de backup inválido. Selecione um .json exportado pelo NOCTIS.'); }
+    if (input) input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ---------- IMPRIMIR FICHA DO ALUNO ----------
+function imprimirFicha() { if (typeof window !== 'undefined' && window.print) window.print(); }
 
 // ---------- INIT ----------
 function preencherSelects() {
@@ -677,7 +845,7 @@ function preencherSelects() {
   preencherFormPlano(idAlvoPessoal('plano-aluno'));
   renderPlanoResult(idAlvoPessoal('plano-aluno'));
 }
-function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); }
+function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();
