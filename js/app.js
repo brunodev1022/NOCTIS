@@ -566,7 +566,7 @@ function listarAgenda() {
   }).join('') + '</div>';
   const av = (Store.db.avaliacoes || []).length;
   const pg = (Store.db.pagamentos || []).length;
-  html += `<div class="panel"><div class="tele">REGISTROS</div><p class="muted">${av} avaliação(ões) física(s) · ${pg} pagamento(s) registrado(s).</p></div>`;
+  html += `<div class="panel agenda-reg"><div class="tele">REGISTROS</div><p class="muted">${av} avaliação(ões) física(s) · ${pg} pagamento(s) registrado(s).</p></div>`;
   box.innerHTML = html;
 }
 
