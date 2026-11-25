@@ -747,21 +747,23 @@ function excluirDesafio(id) {
 // ---------- TELA 10: FÓRUM (clientes e equipe interagem) ----------
 let forumAberto = null;
 function listarForum() {
-  const lista = [...Store.db.forum].reverse();
+  const cat = $('forum-categoria') ? $('forum-categoria').value : '';
+  const lista = [...Store.db.forum].filter(t => !cat || (t.categoria || 'Dúvidas') === cat)
+    .sort((a, b) => (b.fixado ? 1 : 0) - (a.fixado ? 1 : 0) || (b.data || '').localeCompare(a.data || ''));
   const box = $('forum-lista');
   if (forumAberto) { if (box) box.innerHTML = ''; renderForumDetalhe(); return; }
   if ($('forum-detalhe')) { $('forum-detalhe').classList.add('hidden'); $('forum-detalhe').innerHTML = ''; }
   if (!box) return;
-  box.innerHTML = lista.map(t => `<div class="panel topic-card" onclick="abrirTopico('${t.id}')" style="cursor:pointer"><span class="avatar sm">${iniciais(t.autorNome)}</span><span class="topic-main"><h2>${esc(t.titulo)}</h2><small class="muted">por ${esc(t.autorNome)} (${esc(t.autorPerfil)}) · ${(t.data || '').split('-').reverse().join('/')}</small></span><span class="reply-pill mono">${(t.mensagens || []).length} MSGS</span></div>`).join('')
+  box.innerHTML = lista.map(t => `<div class="panel topic-card" onclick="abrirTopico('${t.id}')" style="cursor:pointer"><span class="avatar sm">${iniciais(t.autorNome)}</span><span class="topic-main"><h2>${esc(t.titulo)}</h2><small class="muted">${t.fixado ? '<strong style="color:var(--violet)">FIXADO</strong> · ' : ''}${esc(t.categoria || 'Dúvidas')} · por ${esc(t.autorNome)} (${esc(t.autorPerfil)}) · ${(t.data || '').split('-').reverse().join('/')}</small></span><span class="reply-pill mono">${(t.mensagens || []).length} MSGS</span></div>`).join('')
     || '<div class="panel empty"><h2>Nenhum tópico ainda</h2><p class="muted">Crie o primeiro e chame a galera.</p></div>';
 }
-function abrirModalTopico() { $('f-topico-titulo').value = ''; $('f-topico-msg').value = ''; $('modal-topico').classList.add('open'); }
+function abrirModalTopico() { $('f-topico-titulo').value = ''; $('f-topico-msg').value = ''; $('f-topico-categoria').value = 'Dúvidas'; $('f-topico-fixado').value = '0'; $('modal-topico').classList.add('open'); }
 function fecharModalTopico() { $('modal-topico').classList.remove('open'); }
 function salvarTopico() {
   const titulo = $('f-topico-titulo').value.trim();
   const texto = $('f-topico-msg').value.trim();
   if (!titulo || !texto) return alert('Digite título e mensagem');
-  Store.db.forum.push({ id: 'f' + Date.now(), titulo, autorNome: usuarioLogado.nome, autorPerfil: usuarioLogado.perfil,
+  Store.db.forum.push({ id: 'f' + Date.now(), titulo, categoria: $('f-topico-categoria').value, fixado: $('f-topico-fixado').value === '1', autorNome: usuarioLogado.nome, autorPerfil: usuarioLogado.perfil,
     data: hojeISO(), mensagens: [{ autorNome: usuarioLogado.nome, autorPerfil: usuarioLogado.perfil, texto, data: hojeISO() }] });
   Store.salvar(); fecharModalTopico(); forumAberto = null; recarregarTudo();
 }
@@ -991,6 +993,7 @@ function preencherSelects() {
   if ($('aval-aluno')) $('aval-aluno').onchange = listarAvaliacoes;
   if ($('plano-aluno')) $('plano-aluno').onchange = () => { preencherFormPlano(idAlvoPessoal('plano-aluno')); renderPlanoResult(idAlvoPessoal('plano-aluno')); };
   if ($('desafio-filtro')) $('desafio-filtro').onchange = listarDesafios;
+  if ($('forum-categoria')) $('forum-categoria').onchange = listarForum;
   // Aluno acompanha o próprio plano em leitura; só a nutrição prescreve (nutri real, sem auto-cardápio)
   const pf = $('plano-form'); if (pf) pf.style.display = podeGerenciarNutri() ? '' : 'none';
   carregar();

@@ -410,6 +410,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(vm.runInContext('Store.db.sessoes.length', sandbox)===1, 'modo treino registra a sessão');
   ok(vm.runInContext(`Store.db.sessoes[0].duracaoMin`, sandbox)>=1, 'sessão calcula duração');
 
+  console.log('-- comunidade (categorias/fixado) --');
+  vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]`, sandbox);
+  $('f-topico-titulo').value='Aviso'; $('f-topico-msg').value='x'; $('f-topico-categoria').value='Avisos'; $('f-topico-fixado').value='1';
+  vm.runInContext('salvarTopico()', sandbox);
+  ok(vm.runInContext(`Store.db.forum[Store.db.forum.length-1].fixado`, sandbox)===true, 'tópico pode ser fixado');
+  ok(vm.runInContext(`Store.db.forum[Store.db.forum.length-1].categoria`, sandbox)==='Avisos', 'tópico tem categoria');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);

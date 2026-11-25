@@ -390,6 +390,9 @@
       <div><h1>Fórum</h1><p class="sub">Dúvidas, dicas e desafios da comunidade</p></div>
       <button class="btn" onclick="abrirModalTopico()">Novo tópico</button>
     </div>
+    <div class="toolbar">
+      <select id="forum-categoria"><option value="">Todas as categorias</option><option>Dúvidas</option><option>Dicas</option><option>Desafios</option><option>Avisos</option><option>Off-topic</option></select>
+    </div>
     <div id="forum-lista"></div>
     <div id="forum-detalhe" class="hidden"></div>
   </section>
@@ -500,6 +503,10 @@
 <div id="modal-topico" class="modal"><div class="box">
   <h2>Novo tópico</h2>
   <label>Título<input id="f-topico-titulo" placeholder="Ex: Dica de pré-treino barato?"></label>
+  <div class="row">
+    <label>Categoria<select id="f-topico-categoria"><option>Dúvidas</option><option>Dicas</option><option>Desafios</option><option>Avisos</option><option>Off-topic</option></select></label>
+    <label>Fixar tópico<select id="f-topico-fixado"><option value="0">Não</option><option value="1">Sim (fixado)</option></select></label>
+  </div>
   <label>Mensagem<textarea id="f-topico-msg" rows="4" placeholder="Escreva a primeira mensagem do tópico..."></textarea></label>
   <div class="actions"><button class="btn ghost" onclick="fecharModalTopico()">Cancelar</button><button class="btn" onclick="salvarTopico()">Publicar</button></div>
 </div></div>

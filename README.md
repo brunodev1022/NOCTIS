@@ -40,7 +40,7 @@ A parte de nutrição (anamnese e plano alimentar) saiu do ilustrativo: tem auto
 - **Reset de demonstração:** 1 clique limpa os dados e volta ao estado inicial (ideal pra repetir a apresentação).
 - **Aviso LGPD:** nota discreta de que os dados são fictícios, no rodapé do menu.
 - **Acessibilidade:** ícones em SVG com `aria-label`, foco visível e respeito a `prefers-reduced-motion`.
-- **Testes:** subiu de 71 para **111 asserts**, todos passando (`node tests/mvp.test.cjs`).
+- **Testes:** subiu de 71 para **113 asserts**, todos passando (`node tests/mvp.test.cjs`).
 
 ## NOCTIS 2.0 — overhaul (fases 1–2 entregues)
 
@@ -59,7 +59,8 @@ Esta versão inicia o overhaul para um produto comercial. Já entregue e verific
 - **Schema de dados v2:** versionamento + migração automática preservando registros.
 - **Agenda:** compromissos derivados dos treinos/avaliações/pagamentos (sem dados fictícios).
 - **Modo treino ativo:** registre séries/reps/carga por exercício, cronômetro e resumo (duração + volume) salvo no histórico do aluno.
-- **Testes:** 111 asserts passando.
+- **Comunidade:** categorias (Dúvidas/Dicas/Desafios/Avisos/Off-topic), tópicos fixados e filtro por categoria.
+- **Testes:** 113 asserts passando.
 
 **Roadmap (próximas fases):** treinos avançados + modo treino ativo (registro de séries), migração para IndexedDB + camada de repositórios, autenticação/autorização server-side (backend real) e notificações externas (e-mail/push/WhatsApp). Cada fase será entregue mantendo o projeto funcional e os testes verdes.
 
@@ -101,7 +102,7 @@ O trabalho passou por seis fases: descoberta dos requisitos e wireframes (feito 
 - Treinos (Maristela): personal monta por aluno/perfil/objetivo
 - Engajamento (Maristela): desafios por perfil + desafios do aluno · fórum com tópicos e respostas
 - Lançamento: testes internos · testes com alunos reais · deploy
-- Testes automatizados: `node tests/mvp.test.cjs` (111 asserts, zero dependências)
+- Testes automatizados: `node tests/mvp.test.cjs` (113 asserts, zero dependências)
 
 ## 5. Riscos e decisões (do Loop)
 
@@ -146,7 +147,7 @@ Bruno abre com problema, solução e login; Rafael mostra matrícula + check-in;
 | Nome | Responsável por |
 |---|---|
 | Bruno Campos | Login (5 perfis + acesso rápido), intro, verificação anti-robôs, Dashboards bento com sigilo financeiro e deploy no GitHub Pages |
-| Rafael Santos | Matrícula (só atendimento/admin), Check-in com validação de pagamento (RN01) e suite de testes (111 asserts) |
+| Rafael Santos | Matrícula (só atendimento/admin), Check-in com validação de pagamento (RN01) e suite de testes (113 asserts) |
 | Tiago Ribeiro | Financeiro, nutrição (Anamnese + Plano manual + Exames com parecer) e apresentação |
 | Lucas Mynssem | Identidade visual e front-end (bento, cards, ranking, Treino de Hoje, responsivo), `style.css`, Dashboard do Aluno e Treinos |
 | Enzo Guimaraes | Documentação (`docs/documentacao.html`, README), roteiros dos 5, Desafios, Fórum e apoio nos testes |
@@ -159,7 +160,7 @@ Bruno abre com problema, solução e login; Rafael mostra matrícula + check-in;
 | Rafael Santos | ~1 min | Nova matrícula, check-in liberado e bloqueado (Beatriz, pendente), RN01 + testes |
 | Tiago Ribeiro | ~1 min | Financeiro, Anamnese, plano manual da nutri + Exames com parecer |
 | Lucas Mynssem | ~1 min | Visual (roxo + preto), Treinos em cards, Treino de Hoje, Dashboard do aluno |
-| Enzo Guimaraes | ~1 min | Desafios, Fórum, documentação e como rodar os 111 testes |
+| Enzo Guimaraes | ~1 min | Desafios, Fórum, documentação e como rodar os 113 testes |
 
 Na hora de apresentar: Bruno → Rafael → Tiago → Lucas → Enzo fecha. Roteiro completo de cada um (fala + código) em `roteiros/`.
 
