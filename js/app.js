@@ -801,6 +801,7 @@ function cmdkItens() {
     { titulo: 'Novo desafio', hint: 'Ação', route: 'desafios', quando: () => true, run: () => { irPara('desafios'); abrirModalDesafio(); } },
     { titulo: 'Novo tópico', hint: 'Ação', route: 'forum', quando: () => true, run: () => { irPara('forum'); abrirModalTopico(); } },
     { titulo: 'Exportar matrículas (CSV)', hint: 'Ação', route: 'matricula', quando: podeMatricular, run: () => exportarAlunosCSV() },
+    { titulo: 'Apresentação (tour)', hint: 'Ação', route: 'dashboard', quando: () => true, run: () => abrirTour() },
   ].filter(a => { try { return a.quando(); } catch (e) { return false; } });
   const alunos = Store.db.alunos.map(a => ({ titulo: `Aluno: ${a.nome}`, hint: 'Aluno', route: 'dashaluno', run: () => { irPara('dashaluno'); const s = $('dash-aluno'); if (s) s.value = a.id; if (typeof verDashAluno === 'function') verDashAluno(); } }));
   return rotas.concat(alunos, acoes);
