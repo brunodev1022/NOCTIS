@@ -84,6 +84,7 @@
     <button class="nav-btn" data-route="matricula" data-perfis="Administrador,Funcionário"><span class="num">01</span>Matrícula</button>
     <button class="nav-btn" data-route="checkin" data-perfis="Administrador,Funcionário"><span class="num">02</span>Check-in</button>
     <button class="nav-btn" data-route="financeiro" data-perfis="Administrador,Funcionário"><span class="num">03</span>Financeiro</button>
+    <button class="nav-btn" data-route="planos" data-perfis="Administrador,Funcionário"><span class="num">03b</span>Planos</button>
     <div class="nav-sec">Nutrição</div>
     <button class="nav-btn" data-route="anamnese" data-perfis="Administrador,Funcionário,Nutricionista"><span class="num">04</span>Anamnese</button>
     <button class="nav-btn" data-route="plano" data-perfis="Administrador,Funcionário,Nutricionista,Aluno"><span class="num">05</span>Plano alimentar</button>
@@ -232,6 +233,24 @@
     <div class="panel nopad"><table>
       <thead><tr><th>Aluno</th><th>Plano</th><th>Valor</th><th>Situação</th><th>Ação</th></tr></thead>
       <tbody id="tb-financeiro"></tbody>
+    </table></div>
+    <div class="panel nopad">
+      <div class="dash-flex-between" style="padding:16px 16px 0"><h2 style="margin:0">Lançamentos</h2><small class="mono muted">pagamentos registrados</small></div>
+      <table>
+        <thead><tr><th>Aluno</th><th>Valor</th><th>Vencimento</th><th>Forma</th><th>Status</th></tr></thead>
+        <tbody id="tb-pagamentos"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="view-planos" class="view">
+    <div class="page-head">
+      <div><h1>Planos</h1><p class="sub">Planos e assinaturas da academia</p></div>
+      <button class="btn" onclick="abrirModalPlano()">Novo plano</button>
+    </div>
+    <div class="panel nopad"><table>
+      <thead><tr><th>Plano</th><th>Valor</th><th>Duração</th><th>Situação</th><th>Ações</th></tr></thead>
+      <tbody id="tb-planos"></tbody>
     </table></div>
   </section>
 
@@ -388,6 +407,17 @@
   </div>
   <label>Mensalidade<select id="f-aluno-mens"><option>Paga</option><option>Pendente</option></select></label>
   <div class="actions"><button class="btn ghost" onclick="fecharModalAluno()">Cancelar</button><button class="btn" onclick="salvarAluno()">Salvar</button></div>
+</div></div>
+
+<div id="modal-plano" class="modal"><div class="box">
+  <h2 id="modal-plano-titulo">Novo plano</h2>
+  <input type="hidden" id="f-plano-id">
+  <label>Nome<input id="f-plano-nome" placeholder="Ex: Mensal"></label>
+  <div class="row">
+    <label>Valor (R$)<input id="f-plano-valor" type="number" step="0.01" placeholder="89.90"></label>
+    <label>Duração (dias)<input id="f-plano-dias" type="number" placeholder="30"></label>
+  </div>
+  <div class="actions"><button class="btn ghost" onclick="fecharModalPlano()">Cancelar</button><button class="btn" onclick="salvarPlano()">Salvar</button></div>
 </div></div>
 
 <div id="modal-treino" class="modal"><div class="box">

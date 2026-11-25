@@ -380,6 +380,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`usuarioLogado=USUARIOS.find(u=>u.perfil==='Personal'); atualizarDashboard()`, sandbox);
   ok($('dash-title').textContent==='Central do personal', 'dashboard do personal tem título próprio');
 
+  console.log('-- planos + pagamentos (fase 4) --');
+  vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]`, sandbox);
+  ok(vm.runInContext('Store.db.planos.length', sandbox)===3, 'seed tem 3 planos');
+  vm.runInContext(`registrarPagamento('a3')`, sandbox);
+  ok(vm.runInContext(`Store.db.pagamentos.length`, sandbox)===1, 'registrar pagamento cria lançamento');
+  ok(vm.runInContext(`Store.db.alunos.find(a=>a.id==='a3').mensalidade`, sandbox)==='Paga', 'pagamento deixa a mensalidade paga');
+  vm.runInContext(`listarPlanos()`, sandbox);
+  ok($('tb-planos').innerHTML.includes('Mensal'), 'lista de planos renderiza');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);

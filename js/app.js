@@ -347,13 +347,53 @@ function listarFinanceiro() {
   $('tb-financeiro').innerHTML = alunos.map(a => `
     <tr><td>${esc(a.nome)}</td><td>${a.plano}</td><td>${BRL(PLANOS[a.plano])}</td>
     <td><span class="badge ${a.mensalidade === 'Paga' ? 'paga' : 'pendente'}">${a.mensalidade}</span></td>
-    <td><button class="btn small ghost" onclick="alternarMensalidade('${a.id}')">Alternar</button></td></tr>`).join('')
+    <td><button class="btn small ghost" onclick="registrarPagamento('${a.id}')">Registrar</button> <button class="btn small ghost" onclick="alternarMensalidade('${a.id}')">Alternar</button></td></tr>`).join('')
     || '<tr><td colspan="5">Sem alunos ativos</td></tr>';
 }
 function alternarMensalidade(id) { const a = Store.db.alunos.find(x => x.id === id);
   if (!a) return;
   if (!podeGerenciarFinanceiro()) return alert('Só Admin ou Funcionário dão baixa em mensalidade.');
   a.mensalidade = a.mensalidade === 'Paga' ? 'Pendente' : 'Paga'; Store.salvar(); recarregarTudo(); }
+function registrarPagamento(id) {
+  const a = Store.db.alunos.find(x => x.id === id); if (!a) return;
+  if (!podeGerenciarFinanceiro()) return alert('Só Admin ou Funcionário registram pagamentos.');
+  const valor = PLANOS[a.plano] || 0;
+  const d = new Date(); d.setDate(d.getDate() + 30); const venc = d.toISOString().slice(0, 10);
+  Store.db.pagamentos = Store.db.pagamentos || [];
+  Store.db.pagamentos.push({ id: 'pg' + Date.now(), alunoId: id, valor: valor, data: hojeISO(), vencimento: venc, forma: 'Manual', status: 'Pago' });
+  a.mensalidade = 'Paga'; Store.salvar(); recarregarTudo(); toast('Pagamento registrado');
+}
+function listarPagamentos() {
+  const box = $('tb-pagamentos'); if (!box) return;
+  const ps = [...(Store.db.pagamentos || [])].reverse();
+  box.innerHTML = ps.map(p => { const al = Store.db.alunos.find(a => a.id === p.alunoId); return `<tr><td>${al ? esc(al.nome) : '—'}</td><td>${BRL(p.valor)}</td><td>${(p.vencimento || '').split('-').reverse().join('/')}</td><td>${esc(p.forma || 'Manual')}</td><td><span class="badge paga">${p.status}</span></td></tr>`; }).join('') || '<tr><td colspan="5">Nenhum lançamento.</td></tr>';
+}
+
+// ---------- PLANOS / ASSINATURAS ----------
+function listarPlanos() {
+  const box = $('tb-planos'); if (!box) return;
+  box.innerHTML = (Store.db.planos || []).map(p => `<tr><td><strong>${esc(p.nome)}</strong></td><td>${BRL(p.valor)}</td><td>${p.duracaoDias} dias</td><td><span class="badge ${p.ativo ? 'paga' : 'pendente'}">${p.ativo ? 'Ativo' : 'Inativo'}</span></td><td><button class="btn small ghost" onclick="editarPlano('${p.id}')">Editar</button> <button class="btn small danger" onclick="excluirPlano('${p.id}')">Excluir</button></td></tr>`).join('') || '<tr><td colspan="5">Nenhum plano cadastrado.</td></tr>';
+}
+function abrirModalPlano() { $('modal-plano-titulo').textContent = 'Novo plano'; $('f-plano-id').value = ''; $('f-plano-nome').value = ''; $('f-plano-valor').value = ''; $('f-plano-dias').value = '30'; $('modal-plano').classList.add('open'); }
+function fecharModalPlano() { $('modal-plano').classList.remove('open'); }
+function editarPlano(id) { const p = Store.db.planos.find(x => x.id === id); if (!p) return; $('modal-plano-titulo').textContent = 'Editar plano'; $('f-plano-id').value = p.id; $('f-plano-nome').value = p.nome; $('f-plano-valor').value = p.valor; $('f-plano-dias').value = p.duracaoDias; $('modal-plano').classList.add('open'); }
+function salvarPlano() {
+  if (!podeGerenciarFinanceiro()) return alert('Só Admin ou Funcionário editam planos.');
+  const nome = $('f-plano-nome').value.trim(); const valor = Number($('f-plano-valor').value) || 0; const dias = Number($('f-plano-dias').value) || 30;
+  if (!nome || valor <= 0) return alert('Informe nome e valor válidos.');
+  const id = $('f-plano-id').value || ('pl_' + Date.now());
+  Store.db.planos = Store.db.planos || [];
+  const reg = { id: id, nome: nome, valor: valor, duracaoDias: dias, ativo: true };
+  const i = Store.db.planos.findIndex(x => x.id === id);
+  i >= 0 ? Store.db.planos[i] = reg : Store.db.planos.push(reg);
+  Store.salvar(); fecharModalPlano(); recarregarTudo(); toast('Plano salvo');
+}
+function excluirPlano(id) {
+  if (!podeGerenciarFinanceiro()) return alert('Só Admin ou Funcionário excluem planos.');
+  if (!confirm('Excluir este plano?')) return;
+  Store.db.planos = (Store.db.planos || []).filter(x => x.id !== id);
+  Store.salvar(); recarregarTudo();
+}
 
 // ---------- TELAS 5-6: NUTRIÇÃO (nutricionista prescreve) ----------
 function salvarAnamnese() {
@@ -880,7 +920,7 @@ function preencherSelects() {
   preencherFormPlano(idAlvoPessoal('plano-aluno'));
   renderPlanoResult(idAlvoPessoal('plano-aluno'));
 }
-function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
+function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); listarPagamentos(); listarPlanos(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();

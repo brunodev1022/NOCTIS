@@ -26,6 +26,8 @@ function seedInicial() {
       { id: 't2', alunoId: 'a2', tipo: 'Funcional', dia: 'Quarta', exercicios: ['Burpee 4x15', 'Kettlebell swing 3x20', 'Prancha 3x1min'] }
     ],
     checkins: {},
+    planos: Object.keys(PLANOS).map(nome => ({ id: 'pl_' + nome.toLowerCase(), nome: nome, valor: PLANOS[nome], duracaoDias: nome === 'Mensal' ? 30 : nome === 'Trimestral' ? 90 : 365, ativo: true })),
+    pagamentos: [],
     // Módulo nutricional (nutricionista real prescreve; sem cardápio automático)
     anamneses: {},
     planosAlimentares: {},
@@ -57,8 +59,10 @@ const Store = {
     if (!this.db.exames) this.db.exames = [];
     if (!this.db.desafios) this.db.desafios = [];
     if (!this.db.forum) this.db.forum = [];
-    if (!Array.isArray(this.db.treinos)) this.db.treinos = [];
-    return this.db;
+  if (!Array.isArray(this.db.treinos)) this.db.treinos = [];
+  if (!Array.isArray(this.db.planos)) this.db.planos = Object.keys(PLANOS).map(nome => ({ id: 'pl_' + nome.toLowerCase(), nome: nome, valor: PLANOS[nome], duracaoDias: nome === 'Mensal' ? 30 : nome === 'Trimestral' ? 90 : 365, ativo: true }));
+  if (!Array.isArray(this.db.pagamentos)) this.db.pagamentos = [];
+  return this.db;
   },
   salvar() { localStorage.setItem(DB_KEY, JSON.stringify(this.db)); }
 };
