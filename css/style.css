@@ -512,7 +512,7 @@ textarea:disabled{opacity:.6}
 @media(max-width:900px){.ficha-grid{grid-template-columns:1fr 1fr}}
 
 /* agenda */
-.agenda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.agenda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
 .agenda-grid .panel{margin:0}
 @media(max-width:900px){.agenda-grid{grid-template-columns:1fr}}
 

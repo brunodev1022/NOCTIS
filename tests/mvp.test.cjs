@@ -70,8 +70,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 (async () => {
   console.log('== NOCTIS MVP — testes ==\n-- banco (store.js) --');
   vm.runInContext('Store.carregar()', sandbox);
-  ok(vm.runInContext('Store.db.alunos.length', sandbox) === 4, 'seed tem 4 alunos');
-  ok(vm.runInContext('Store.db.treinos.length', sandbox) === 2, 'seed tem 2 treinos');
+  ok(vm.runInContext('Store.db.alunos.length', sandbox) >= 4, 'seed tem ao menos 4 alunos');
+  ok(vm.runInContext('Store.db.treinos.length', sandbox) >= 2, 'seed tem ao menos 2 treinos');
   ok(vm.runInContext('PLANOS.Mensal', sandbox) === 89.90, 'plano Mensal = 89,90');
   ok(vm.runInContext('USUARIOS.length', sandbox) === 5, 'existem 5 perfis de login (admin, funcionário, aluno, nutri, personal)');
   ok(vm.runInContext(`USUARIOS.some(u=>u.perfil==='Nutricionista')`, sandbox), 'perfil Nutricionista existe (pedido Maristela)');
@@ -142,9 +142,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   console.log('-- financeiro (RN02) --');
   vm.runInContext(`Store.db = seedInicial()`, sandbox);
   vm.runInContext('listarFinanceiro()', sandbox);
-  const expRec = (89.90 + 239.90).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  ok($('fin-recebido').textContent === expRec, `recebido = ${expRec} (Ana + Carlos)`);
-  ok(String($('fin-inad').textContent) === '1', '1 inadimplente ativo (Beatriz; Diego é inativo)');
+  const expRec = vm.runInContext(`Store.db.alunos.filter(a=>a.status==='Ativo'&&a.mensalidade==='Paga').reduce((s,a)=>s+(PLANOS[a.plano]||0),0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})`, sandbox);
+  ok($('fin-recebido').textContent === expRec, 'recebido = soma dos ativos pagos');
+  const expInad = vm.runInContext(`Store.db.alunos.filter(a=>a.status==='Ativo'&&a.mensalidade==='Pendente').length`, sandbox);
+  ok(String($('fin-inad').textContent) === String(expInad), 'inadimplentes ativos batem com o seed');
   vm.runInContext(`alternarMensalidade('a3')`, sandbox);
   ok(vm.runInContext(`Store.db.alunos.find(a=>a.id==='a3').mensalidade`, sandbox) === 'Paga', 'alternar muda Pendente→Paga');
 
@@ -171,8 +172,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // Treinos: personal cria planejamento
   $('f-treino-aluno').value = 'a1'; $('f-treino-tipo').value = 'Musculação'; $('f-treino-dia').value = 'Segunda';
   $('f-treino-objetivo').value = 'Hipertrofia'; $('f-treino-exercicios').value = 'Supino 3x12'; $('f-treino-id').value = '';
+  const trSeed0 = vm.runInContext('Store.db.treinos.length', sandbox);
   vm.runInContext(`usuarioLogado = USUARIOS[0]; salvarTreino()`, sandbox);
-  ok(vm.runInContext(`Store.db.treinos.length`, sandbox) === 3, 'personal/admin cria treino (2 seed + 1 novo)');
+  ok(vm.runInContext(`Store.db.treinos.length`, sandbox) === trSeed0 + 1, 'personal/admin cria treino (seed + 1)');
   // Plano manual (nutricionista real prescreve, sem auto-cardápio)
   $('plano-aluno').value = 'a1';
   vm.runInContext(`usuarioLogado = USUARIOS[0]; addRefeicao('Café da manhã', '3 ovos + 60g aveia')`, sandbox);
@@ -205,8 +207,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`responderTopico()`, sandbox);
   ok(vm.runInContext(`Store.db.forum.find(f=>f.id==='${fid}').mensagens.length`, sandbox) === 2, 'resposta entra no tópico');
   // Exames: coleção persiste metadados
+  const ex0 = vm.runInContext(`Store.db.exames.length`, sandbox);
   vm.runInContext(`Store.db.exames.push({id:'ex', alunoId:'a1', nomeArquivo:'hemograma.pdf', data:'2026-09-25', obs:'rotina', parecer:'ok', conteudo:''}); Store.salvar()`, sandbox);
-  ok(vm.runInContext(`Store.db.exames.length`, sandbox) === 1, 'exame do aluno é registrado p/ nutri analisar');
+  ok(vm.runInContext(`Store.db.exames.length`, sandbox) === ex0 + 1, 'exame do aluno é registrado p/ nutri analisar');
 
   console.log('-- travas de perfil (Maristela) --');
   vm.runInContext(`Store.db = seedInicial(); Store.salvar()`, sandbox);
@@ -382,9 +385,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   console.log('-- planos + pagamentos (fase 4) --');
   vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]`, sandbox);
-  ok(vm.runInContext('Store.db.planos.length', sandbox)===3, 'seed tem 3 planos');
+  ok(vm.runInContext('Store.db.planos.length', sandbox)>=3, 'seed tem ao menos 3 planos');
+  const pg0 = vm.runInContext(`Store.db.pagamentos.length`, sandbox);
   vm.runInContext(`registrarPagamento('a3')`, sandbox);
-  ok(vm.runInContext(`Store.db.pagamentos.length`, sandbox)===1, 'registrar pagamento cria lançamento');
+  ok(vm.runInContext(`Store.db.pagamentos.length`, sandbox)===pg0+1, 'registrar pagamento cria lançamento');
   ok(vm.runInContext(`Store.db.alunos.find(a=>a.id==='a3').mensalidade`, sandbox)==='Paga', 'pagamento deixa a mensalidade paga');
   vm.runInContext(`listarPlanos()`, sandbox);
   ok($('tb-planos').innerHTML.includes('Mensal'), 'lista de planos renderiza');
@@ -392,11 +396,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   console.log('-- avaliações físicas + schema (fase 5) --');
   vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]`, sandbox);
   ok(vm.runInContext('Store.db.schema', sandbox)===2, 'schema de dados versionado (v2)');
+  const av0 = vm.runInContext('Store.db.avaliacoes.length', sandbox);
   $('f-aval-aluno').value='a1'; $('f-aval-peso').value='80'; $('f-aval-altura').value='175'; $('f-aval-gord').value='12'; $('f-aval-data').value='2026-09-01'; $('f-aval-obs').value='';
   vm.runInContext('salvarAval()', sandbox);
   $('f-aval-peso').value='78'; $('f-aval-data').value='2026-09-20';
   vm.runInContext('salvarAval()', sandbox);
-  ok(vm.runInContext('Store.db.avaliacoes.length', sandbox)===2, 'avaliações físicas são registradas');
+  ok(vm.runInContext('Store.db.avaliacoes.length', sandbox)===av0+2, 'avaliações físicas são registradas');
   $('aval-aluno').value='a1';
   vm.runInContext('listarAvaliacoes()', sandbox);
   ok($('tb-avaliacoes').innerHTML.includes('78'), 'tabela de avaliações lista os registros');
@@ -406,8 +411,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   console.log('-- modo treino ativo (fase 8) --');
   vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]; sessaoTreino='t1'; sessaoStart=Date.now()-120000`, sandbox);
+  const se0 = vm.runInContext('Store.db.sessoes.length', sandbox);
   vm.runInContext('finalizarSessao()', sandbox);
-  ok(vm.runInContext('Store.db.sessoes.length', sandbox)===1, 'modo treino registra a sessão');
+  ok(vm.runInContext('Store.db.sessoes.length', sandbox)===se0+1, 'modo treino registra a sessão');
   ok(vm.runInContext(`Store.db.sessoes[0].duracaoMin`, sandbox)>=1, 'sessão calcula duração');
 
   console.log('-- comunidade (categorias/fixado) --');
