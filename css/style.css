@@ -303,8 +303,8 @@ textarea:disabled{opacity:.6}
 .fin-note{grid-column:span 12;margin:0;font-size:13px;border:1px dashed var(--line);border-radius:var(--r-md);padding:10px 14px}
 .rank-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:#0d0d16;margin-bottom:8px}
 .rank-pos{font-size:22px;color:var(--violet);min-width:38px}
-.topic-card{display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:border-color .2s,transform .2s}
-.topic-card:hover{border-color:var(--violet-strong);transform:translateX(3px)}
+.topic-card{display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:border-color .2s}
+.topic-card:hover{border-color:var(--violet-strong)}
 .topic-main{flex:1;min-width:0}
 .topic-main h2{margin:0 0 4px}
 .reply-pill{font-size:11px;color:var(--violet);border:1px solid rgba(139,92,246,.4);border-radius:20px;padding:5px 12px;white-space:nowrap}
