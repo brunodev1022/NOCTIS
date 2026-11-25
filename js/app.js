@@ -553,6 +553,34 @@ function excluirTreino(id) {
   Store.salvar(); recarregarTudo();
 }
 
+// ---------- AVALIAÇÕES FÍSICAS ----------
+function listarAvaliacoes() {
+  const box = $('tb-avaliacoes'); if (!box) return;
+  const alvo = $('aval-aluno') ? $('aval-aluno').value : '';
+  const lista = (Store.db.avaliacoes || []).filter(a => !alvo || a.alunoId === alvo).sort((x, y) => (y.data || '').localeCompare(x.data || ''));
+  box.innerHTML = lista.map(a => `<tr><td>${(a.data || '').split('-').reverse().join('/')}</td><td>${a.peso || '—'}</td><td>${a.altura || '—'}</td><td>${a.gordura || '—'}</td><td>${esc(a.obs || '')}</td><td><button class="btn small danger" onclick="excluirAval('${a.id}')">Excluir</button></td></tr>`).join('') || '<tr><td colspan="6">Nenhuma avaliação registrada.</td></tr>';
+  renderAvalEvol(alvo);
+}
+function renderAvalEvol(alvo) {
+  const el = $('aval-evol'); if (!el) return;
+  const arr = (Store.db.avaliacoes || []).filter(a => (!alvo || a.alunoId === alvo) && a.peso).sort((x, y) => (x.data || '').localeCompare(y.data || ''));
+  if (arr.length < 2) { el.textContent = 'Sem dados suficientes para evolução.'; return; }
+  const first = arr[0].peso, last = arr[arr.length - 1].peso, d = last - first;
+  el.innerHTML = `<strong>${first}</strong> → <strong>${last}</strong> kg <span class="badge ${d <= 0 ? 'paga' : 'pendente'}">${d > 0 ? '+' : ''}${d.toFixed(1)} kg</span>`;
+}
+function abrirModalAval() { $('f-aval-id').value = ''; $('f-aval-peso').value = ''; $('f-aval-altura').value = ''; $('f-aval-gord').value = ''; $('f-aval-obs').value = ''; $('f-aval-data').value = hojeISO(); $('modal-avaliacao').classList.add('open'); }
+function fecharModalAval() { $('modal-avaliacao').classList.remove('open'); }
+function salvarAval() {
+  if (!podeGerenciarTreinos() && !podeGerenciarNutri()) return alert('Sem permissão para registrar avaliação.');
+  const alunoId = $('f-aval-aluno').value; if (!alunoId) return alert('Escolha um aluno');
+  const reg = { id: $('f-aval-id').value || ('av' + Date.now()), alunoId: alunoId, peso: Number($('f-aval-peso').value) || 0, altura: Number($('f-aval-altura').value) || 0, gordura: Number($('f-aval-gord').value) || 0, data: $('f-aval-data').value || hojeISO(), obs: $('f-aval-obs').value.trim() };
+  Store.db.avaliacoes = Store.db.avaliacoes || [];
+  const i = Store.db.avaliacoes.findIndex(x => x.id === reg.id);
+  i >= 0 ? Store.db.avaliacoes[i] = reg : Store.db.avaliacoes.push(reg);
+  Store.salvar(); fecharModalAval(); recarregarTudo(); toast('Avaliação salva');
+}
+function excluirAval(id) { if (!confirm('Excluir esta avaliação?')) return; Store.db.avaliacoes = (Store.db.avaliacoes || []).filter(x => x.id !== id); Store.salvar(); recarregarTudo(); }
+
 // ---------- TELA 08: EXAMES (aluno envia, nutri analisa) ----------
 function listarExames() {
   const filtro = idAlvoPessoal('exame-aluno');
@@ -892,7 +920,7 @@ function imprimirFicha() { if (typeof window !== 'undefined' && window.print) wi
 // ---------- INIT ----------
 function preencherSelects() {
   const opts = Store.db.alunos.map(a => `<option value="${a.id}">${a.nome} — ${a.plano} (${a.mensalidade})</option>`).join('') || '<option value="">Cadastre um aluno</option>';
-  ['checkin-aluno', 'anam-aluno', 'plano-aluno', 'dash-aluno', 'treino-aluno', 'exame-aluno', 'f-treino-aluno'].forEach(id => { const el = $(id); if (el) el.innerHTML = opts; });
+  ['checkin-aluno', 'anam-aluno', 'plano-aluno', 'dash-aluno', 'treino-aluno', 'exame-aluno', 'f-treino-aluno', 'aval-aluno', 'f-aval-aluno'].forEach(id => { const el = $(id); if (el) el.innerHTML = opts; });
   // Perfil Aluno: esconde os seletores e trava no próprio registro (privacidade)
   const souAluno = usuarioLogado && usuarioLogado.perfil === 'Aluno';
   ['dash-aluno', 'treino-aluno', 'exame-aluno', 'plano-aluno'].forEach(id => {
@@ -912,6 +940,7 @@ function preencherSelects() {
   if ($('treino-aluno')) $('treino-aluno').onchange = listarTreinos;
   if ($('treino-filtro-dia')) $('treino-filtro-dia').onchange = listarTreinos;
   if ($('exame-aluno')) $('exame-aluno').onchange = listarExames;
+  if ($('aval-aluno')) $('aval-aluno').onchange = listarAvaliacoes;
   if ($('plano-aluno')) $('plano-aluno').onchange = () => { preencherFormPlano(idAlvoPessoal('plano-aluno')); renderPlanoResult(idAlvoPessoal('plano-aluno')); };
   if ($('desafio-filtro')) $('desafio-filtro').onchange = listarDesafios;
   // Aluno acompanha o próprio plano em leitura; só a nutrição prescreve (nutri real, sem auto-cardápio)
@@ -920,7 +949,7 @@ function preencherSelects() {
   preencherFormPlano(idAlvoPessoal('plano-aluno'));
   renderPlanoResult(idAlvoPessoal('plano-aluno'));
 }
-function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); listarPagamentos(); listarPlanos(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
+function recarregarTudo() { preencherSelects(); listarAlunos(); listarCheckins(); listarFinanceiro(); listarPagamentos(); listarPlanos(); listarAvaliacoes(); verDashAluno(); atualizarDashboard(); listarTreinos(); listarExames(); listarDesafios(); listarForum(); renderNotif(); }
 ['busca-aluno', 'filtro-plano', 'filtro-status'].forEach(id => $(id).addEventListener('input', listarAlunos));
 
 Store.carregar();

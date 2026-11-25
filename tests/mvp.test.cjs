@@ -389,6 +389,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   vm.runInContext(`listarPlanos()`, sandbox);
   ok($('tb-planos').innerHTML.includes('Mensal'), 'lista de planos renderiza');
 
+  console.log('-- avaliações físicas + schema (fase 5) --');
+  vm.runInContext(`Store.db=seedInicial(); usuarioLogado=USUARIOS[0]`, sandbox);
+  ok(vm.runInContext('Store.db.schema', sandbox)===2, 'schema de dados versionado (v2)');
+  $('f-aval-aluno').value='a1'; $('f-aval-peso').value='80'; $('f-aval-altura').value='175'; $('f-aval-gord').value='12'; $('f-aval-data').value='2026-09-01'; $('f-aval-obs').value='';
+  vm.runInContext('salvarAval()', sandbox);
+  $('f-aval-peso').value='78'; $('f-aval-data').value='2026-09-20';
+  vm.runInContext('salvarAval()', sandbox);
+  ok(vm.runInContext('Store.db.avaliacoes.length', sandbox)===2, 'avaliações físicas são registradas');
+  $('aval-aluno').value='a1';
+  vm.runInContext('listarAvaliacoes()', sandbox);
+  ok($('tb-avaliacoes').innerHTML.includes('78'), 'tabela de avaliações lista os registros');
+
   console.log('\n' + results.join('\n'));
   console.log(`\nTOTAL: ${passed} passou, ${failed} falhou`);
   process.exit(failed ? 1 : 0);

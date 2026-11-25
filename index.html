@@ -92,6 +92,7 @@
     <div class="nav-sec">Treino</div>
     <button class="nav-btn" data-route="dashaluno" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">06</span>Dashboard do aluno</button>
     <button class="nav-btn" data-route="treinos" data-perfis="Administrador,Personal,Funcionário,Aluno"><span class="num">07</span>Treinos</button>
+    <button class="nav-btn" data-route="avaliacoes" data-perfis="Administrador,Personal,Funcionário,Nutricionista"><span class="num">07b</span>Avaliações</button>
     <div class="nav-sec">Comunidade</div>
     <button class="nav-btn" data-route="desafios" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">09</span>Desafios</button>
     <button class="nav-btn" data-route="forum" data-perfis="Administrador,Funcionário,Aluno,Nutricionista,Personal"><span class="num">10</span>Fórum</button>
@@ -328,6 +329,19 @@
     <div id="treinos-lista"></div>
   </section>
 
+  <section id="view-avaliacoes" class="view">
+    <div class="page-head">
+      <div><h1>Avaliações físicas</h1><p class="sub">Acompanhamento profissional (dados fictícios)</p></div>
+      <button class="btn" onclick="abrirModalAval()">Nova avaliação</button>
+    </div>
+    <div class="toolbar"><select id="aval-aluno"></select></div>
+    <div class="panel"><div class="tele">EVOLUÇÃO DE PESO (kg)</div><div id="aval-evol" class="muted" style="margin-top:8px">Sem dados suficientes.</div></div>
+    <div class="panel nopad"><table>
+      <thead><tr><th>Data</th><th>Peso</th><th>Altura</th><th>% Gord.</th><th>Observação</th><th>Ação</th></tr></thead>
+      <tbody id="tb-avaliacoes"></tbody>
+    </table></div>
+  </section>
+
   <section id="view-exames" class="view">
     <div class="page-head">
       <div><h1>Exames</h1><p class="sub">Envio do aluno, análise da nutrição</p></div>
@@ -418,6 +432,22 @@
     <label>Duração (dias)<input id="f-plano-dias" type="number" placeholder="30"></label>
   </div>
   <div class="actions"><button class="btn ghost" onclick="fecharModalPlano()">Cancelar</button><button class="btn" onclick="salvarPlano()">Salvar</button></div>
+</div></div>
+
+<div id="modal-avaliacao" class="modal"><div class="box">
+  <h2>Nova avaliação física</h2>
+  <input type="hidden" id="f-aval-id">
+  <label>Aluno<select id="f-aval-aluno"></select></label>
+  <div class="row">
+    <label>Peso (kg)<input id="f-aval-peso" type="number" step="0.1"></label>
+    <label>Altura (cm)<input id="f-aval-altura" type="number"></label>
+  </div>
+  <div class="row">
+    <label>% Gordura<input id="f-aval-gord" type="number" step="0.1"></label>
+    <label>Data<input id="f-aval-data" type="date"></label>
+  </div>
+  <label>Observação<textarea id="f-aval-obs" rows="2" placeholder="Dados informados/estimados pelo profissional"></textarea></label>
+  <div class="actions"><button class="btn ghost" onclick="fecharModalAval()">Cancelar</button><button class="btn" onclick="salvarAval()">Salvar</button></div>
 </div></div>
 
 <div id="modal-treino" class="modal"><div class="box">

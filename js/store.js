@@ -1,5 +1,6 @@
 // store.js — camada de dados (11 telas: operação + nutrição + treinos + comunidade)
 const DB_KEY = 'noctis_mvp_v1';
+const SCHEMA_VERSION = 2;
 
 const PLANOS = { Mensal: 89.90, Trimestral: 239.90, Anual: 799.90 };
 
@@ -28,6 +29,8 @@ function seedInicial() {
     checkins: {},
     planos: Object.keys(PLANOS).map(nome => ({ id: 'pl_' + nome.toLowerCase(), nome: nome, valor: PLANOS[nome], duracaoDias: nome === 'Mensal' ? 30 : nome === 'Trimestral' ? 90 : 365, ativo: true })),
     pagamentos: [],
+    avaliacoes: [],
+    schema: SCHEMA_VERSION,
     // Módulo nutricional (nutricionista real prescreve; sem cardápio automático)
     anamneses: {},
     planosAlimentares: {},
@@ -62,6 +65,8 @@ const Store = {
   if (!Array.isArray(this.db.treinos)) this.db.treinos = [];
   if (!Array.isArray(this.db.planos)) this.db.planos = Object.keys(PLANOS).map(nome => ({ id: 'pl_' + nome.toLowerCase(), nome: nome, valor: PLANOS[nome], duracaoDias: nome === 'Mensal' ? 30 : nome === 'Trimestral' ? 90 : 365, ativo: true }));
   if (!Array.isArray(this.db.pagamentos)) this.db.pagamentos = [];
+  if (!Array.isArray(this.db.avaliacoes)) this.db.avaliacoes = [];
+  this.db.schema = SCHEMA_VERSION;
   return this.db;
   },
   salvar() { localStorage.setItem(DB_KEY, JSON.stringify(this.db)); }
